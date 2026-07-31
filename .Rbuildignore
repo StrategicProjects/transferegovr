@@ -13,6 +13,7 @@
 ^pkgdown$
 ^docs$
 ^data-raw$
+^vignettes/articles$
 ^cran-comments\.md$
 ^CODE_OF_CONDUCT\.md$
 ^CONTRIBUTING\.md$

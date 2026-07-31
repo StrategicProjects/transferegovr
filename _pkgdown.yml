@@ -41,6 +41,9 @@ navbar:
         href: articles/pagination.html
       - text: Putting the tables back together
         href: articles/joining-tables.html
+      - text: "Análises"
+      - text: "Pernambuco em dois cadastros"
+        href: articles/investimentos-pernambuco.html
     news:
       text: News
       href: news/index.html
@@ -84,6 +87,12 @@ articles:
   - transferegovr
   - pagination
   - joining-tables
+- title: Analyses
+  desc: >
+    Data journalism built on these APIs. Written in Portuguese, for a Brazilian
+    public-management audience.
+  contents:
+  - articles/investimentos-pernambuco
 
 footer:
   structure:

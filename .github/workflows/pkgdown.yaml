@@ -33,6 +33,9 @@ jobs:
       - name: Deploy to GitHub Pages branch
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          clean: false
+          # `clean: false` only ever adds and overwrites, so a file deleted
+          # from the repository stayed published forever. Two figures dropped
+          # when the article was rewritten were still being served.
+          clean: true
           branch: gh-pages
           folder: docs

@@ -88,11 +88,16 @@ main table.table {
   border-spacing: 0;
   border: 1px solid var(--tg-line);
   border-radius: 0.5rem;
-  overflow: hidden;
-  /* Largura total. Tentar dimensionar pelo conteudo, como o Notion faz,
-     distribui mal quando uma coluna e de texto corrido e a outra e curta: a
-     coluna curta incha e a longa quebra em tres linhas. */
-  width: 100%;
+  /* pkgdown declara `main table { display: block; overflow: auto }` para que
+     tabelas largas rolem. Caixa de bloco preenche o pai -- e por isso que a
+     tabela esticava e a ultima coluna absorvia toda a folga; a propriedade
+     `width` nunca foi a causa. `fit-content` preserva a rolagem e encolhe a
+     caixa ate a largura das colunas. */
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
   margin: 1.5rem 0 2rem;
   font-size: 0.94rem;
   line-height: 1.5;
@@ -141,13 +146,6 @@ main table.table > :not(caption) > * > * {
 main .table-responsive,
 main table {
   max-width: 100%;
-}
-
-@media (max-width: 720px) {
-  main table {
-    display: block;
-    overflow-x: auto;
-  }
 }
 
 .ref-index th,

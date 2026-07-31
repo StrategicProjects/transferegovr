@@ -1,0 +1,91 @@
+url: https://strategicprojects.github.io/transferegovr/
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+  bslib:
+    primary: "#1351B4"
+    secondary: "#2670E8"
+    success: "#168821"
+    base_font: system-ui
+    heading_font: system-ui
+    code_font: monospace
+
+lang: en
+
+home:
+  title: transferegovr | Brazilian federal transfers data in R
+  description: >
+    R interface to the TransfereGov open data APIs: special transfers,
+    fund-to-fund transfers, and decentralised credit.
+
+navbar:
+  structure:
+    left: [intro, reference, articles, news]
+    right: [search, github]
+  components:
+    intro:
+      text: Get started
+      href: articles/transferegovr.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    articles:
+      text: Guides
+      menu:
+      - text: "Start here"
+      - text: Introduction to transferegovr
+        href: articles/transferegovr.html
+      - text: "Working with the data"
+      - text: Collecting large tables safely
+        href: articles/pagination.html
+      - text: Putting the tables back together
+        href: articles/joining-tables.html
+    news:
+      text: News
+      href: news/index.html
+    github:
+      icon: fab fa-github
+      aria-label: GitHub
+      href: https://github.com/StrategicProjects/transferegovr
+
+reference:
+- title: Queries
+  desc: Retrieving rows from the three TransfereGov APIs.
+  contents:
+  - tg_get
+  - tg_count
+  - module_shortcuts
+  - tg_metadata
+- title: Filters
+  desc: >
+    The comparison operators the APIs accept. Each topic also lists its
+    Portuguese alias, which shares the same help page.
+  contents:
+  - filters
+  - tg_operators
+- title: Discovery
+  desc: What the APIs publish, without making a request.
+  contents:
+  - tg_modules
+  - tg_tables
+  - tg_fields
+  - tg_schema_date
+- title: Configuration
+  desc: Caching and connection settings.
+  contents:
+  - tg_cache_dir
+  - tg_cache_clear
+  - tg_base_url
+
+articles:
+- title: Guides
+  contents:
+  - transferegovr
+  - pagination
+  - joining-tables
+
+footer:
+  structure:
+    left: developed_by
+    right: built_with

@@ -1,0 +1,10 @@
+citHeader("To cite transferegovr in publications, use:")
+
+bibentry(
+  bibtype  = "Manual",
+  title    = "transferegovr: Access the 'TransfereGov' Open Data APIs",
+  author   = person("Andre", "Leite"),
+  year     = "2026",
+  note     = "R package version 0.1.0",
+  url      = "https://github.com/StrategicProjects/transferegovr"
+)

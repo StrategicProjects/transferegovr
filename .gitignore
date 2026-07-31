@@ -1,0 +1,16 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+docs/
+*.tar.gz
+*.Rcheck/
+inst/doc
+
+# Working notes for coding agents, kept out of the published repository.
+CLAUDE.md
+CLAUDE.local.md
+plan.md
+memory/
+.claude/

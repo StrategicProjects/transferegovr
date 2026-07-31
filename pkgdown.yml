@@ -2,10 +2,11 @@ pandoc: 3.8.3
 pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
+  articles/investimentos-pernambuco: investimentos-pernambuco.html
   joining-tables: joining-tables.html
   pagination: pagination.html
   transferegovr: transferegovr.html
-last_built: 2026-07-31T20:56Z
+last_built: 2026-07-31T21:28Z
 urls:
   reference: https://strategicprojects.github.io/transferegovr/reference
   article: https://strategicprojects.github.io/transferegovr/articles

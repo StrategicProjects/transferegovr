@@ -43,3 +43,5 @@ Authors:
 
 - Diogo Bezerra <diogo.bezerra@ufpe.br>
   ([ORCID](https://orcid.org/0000-0002-1216-8674))
+
+- Júlia Nascimento Barreto <juliabarreto@gd.seplag.pe.gov.br>

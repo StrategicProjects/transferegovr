@@ -14,18 +14,21 @@
 
 - **Diogo Bezerra**. Author. [](https://orcid.org/0000-0002-1216-8674)
 
+- **Júlia Nascimento Barreto**. Author.
+
 ## Citation
 
 Source:
 [`inst/CITATION`](https://github.com/StrategicProjects/transferegovr/blob/main/inst/CITATION)
 
-Leite A, Wasiliew M, Vasconcelos H, Amorim C, Bezerra D (2026).
-*transferegovr: Access the TransfereGov Open Data APIs*. R package
-version 0.1.0, <https://github.com/StrategicProjects/transferegovr>.
+Leite A, Wasiliew M, Vasconcelos H, Amorim C, Bezerra D, Nascimento
+Barreto J (2026). *transferegovr: Access the TransfereGov Open Data
+APIs*. R package version 0.1.0,
+<https://github.com/StrategicProjects/transferegovr>.
 
     @Manual{,
       title = {transferegovr: Access the TransfereGov Open Data APIs},
-      author = {Andre Leite and Marcos Wasiliew and Hugo Vasconcelos and Carlos Amorim and Diogo Bezerra},
+      author = {Andre Leite and Marcos Wasiliew and Hugo Vasconcelos and Carlos Amorim and Diogo Bezerra and Júlia {Nascimento Barreto}},
       year = {2026},
       note = {R package version 0.1.0},
       url = {https://github.com/StrategicProjects/transferegovr},

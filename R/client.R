@@ -93,7 +93,40 @@ tg_base_url <- function() {
     req <- httr2::req_url_query(req, !!!query, .multi = "explode")
   }
 
+  .check_url_length(req)
+
   req
+}
+
+# A filter built with `in_()` over a few thousand identifiers produces a URL the
+# service cannot accept, and the failure it produces is not readable: curl
+# reports "Error in the HTTP2 framing layer", which says nothing about the
+# query. Failing here names the cause instead.
+.tg_max_url <- 7000L
+
+.check_url_length <- function(req, call = rlang::caller_env()) {
+  length <- nchar(req$url, type = "bytes")
+
+  if (length <= .tg_max_url) {
+    return(invisible(NULL))
+  }
+
+  # Assigned to a local first: cli reads `{.foo}` as a style, so interpolating
+  # a name that starts with a dot errors.
+  maximum <- .tg_max_url
+
+  cli::cli_abort(
+    c(
+      "The request URL is {length} bytes, over the {maximum} the service
+       accepts.",
+      "i" = "A filter built with {.fn in_} over a long vector is the usual
+             cause.",
+      "i" = "Split the values into batches of a few hundred and bind the
+             results."
+    ),
+    class = "transferegovr_url_error",
+    call = call
+  )
 }
 
 # 5xx from the gateway and 429 from the service are worth retrying. A 400 is

@@ -15,8 +15,8 @@ tg_campos(modulo, tabela)
 
 \item{table}{A table name from \code{\link[=tg_tables]{tg_tables()}}.}
 
-\item{modulo}{Portuguese alias for \code{module}, available only in
-\code{\link[=tg_tabelas]{tg_tabelas()}}.}
+\item{modulo}{Portuguese alias for \code{module}, available in \code{\link[=tg_tabelas]{tg_tabelas()}} and
+\code{\link[=tg_campos]{tg_campos()}}.}
 
 \item{tabela}{Portuguese alias for \code{table}, available only in
 \code{\link[=tg_campos]{tg_campos()}}.}

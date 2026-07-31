@@ -41,22 +41,26 @@ would look like missing data.
 ## Ask how big it is first
 
 ```{r}
-sizes <- do.call(rbind, lapply(seq_len(nrow(tg_tables())), function(i) {
-  row <- tg_tables()[i, ]
-  data.frame(
-    module = row$module,
-    table = row$table,
-    rows = tg_count(row$module, row$table)
-  )
-}))
+tg_count("fundoafundo", "gestao_financeira_lancamentos")
+#> [1] 1115444
+```
 
-sizes[order(-sizes$rows), ][1:5, ]
-#>        module                          table    rows
-#> 1 fundoafundo  gestao_financeira_lancamentos 1115444
-#> 2 fundoafundo gestao_financeira_subtransacoes 377666
-#> 3 transferen…    historico_pagamento_especial  281163
-#> 4 fundoafundo           plano_acao_historico  183379
-#> 5 transferen…                   meta_especial  156016
+To size everything at once, `tg_tables()` takes a `counts` argument. It is the
+only part of that function that touches the network — one request per table,
+cached, so the second call in a session is free:
+
+```{r}
+tg_tables(counts = TRUE) |>
+  dplyr::arrange(desc(rows))
+#> # A tibble: 48 × 6
+#>   module                  table                           columns    rows …
+#>   <chr>                   <chr>                             <int>   <dbl>
+#> 1 fundoafundo             gestao_financeira_lancamentos        32 1115444
+#> 2 fundoafundo             gestao_financeira_subtransacoes      16  377666
+#> 3 transferenciasespeciais historico_pagamento_especial          5  281163
+#> 4 fundoafundo             plano_acao_historico                  5  183379
+#> 5 transferenciasespeciais meta_especial                        16  156016
+#> # ℹ 43 more rows
 ```
 
 A million rows is over a thousand requests. The package throttles itself to

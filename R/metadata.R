@@ -139,22 +139,37 @@ tg_modulos <- tg_modules
 #'
 #' @param module A module name from [tg_modules()]. Aliases such as
 #'   `"fundo_a_fundo"` are accepted. `NULL` lists the tables of every module.
-#' @param modulo Portuguese alias for `module`, available only in
+#' @param counts If `TRUE`, adds a `rows` column with the number of rows each
+#'   table currently holds. This is the only part of this function that needs a
+#'   network connection: it makes one request per table, so `tg_tables(counts =
+#'   TRUE)` with no module makes forty-eight. Responses are cached.
+#' @param modulo Portuguese alias for `module`, available in [tg_tabelas()] and
+#'   [tg_campos()].
+#' @param contagens Portuguese alias for `counts`, available only in
 #'   [tg_tabelas()].
 #'
 #' @return A tibble with one row per table: its module, name, number of columns,
 #'   the primary key when the API declares one, and the description published in
-#'   the API schema.
+#'   the API schema. With `counts = TRUE`, also the current number of rows.
 #' @export
 #' @family discovery
 #' @examples
 #' tg_tables("ted")
 #' tg_tables()
-tg_tables <- function(module = NULL) {
+#'
+#' if (interactive()) {
+#'   # How big is everything, largest first?
+#'   tg_tables(counts = TRUE)[order(-tg_tables(counts = TRUE)$rows), ]
+#' }
+tg_tables <- function(module = NULL, counts = FALSE) {
   modules <- if (is.null(module)) {
     names(.tg_schema)
   } else {
     .tg_match_module(module)
+  }
+
+  if (!is.logical(counts) || length(counts) != 1L || is.na(counts)) {
+    cli::cli_abort("{.arg counts} must be {.code TRUE} or {.code FALSE}.")
   }
 
   rows <- lapply(modules, function(m) {
@@ -185,13 +200,40 @@ tg_tables <- function(module = NULL) {
     )
   })
 
-  purrr::list_rbind(rows)
+  result <- purrr::list_rbind(rows)
+
+  if (!counts) {
+    return(result)
+  }
+
+  result$rows <- .tg_row_counts(result$module, result$table)
+  result
 }
 
 #' @rdname tg_tables
 #' @export
-tg_tabelas <- function(modulo = NULL) {
-  tg_tables(modulo)
+tg_tabelas <- function(modulo = NULL, contagens = FALSE) {
+  tg_tables(modulo, contagens)
+}
+
+# One request per table. A progress bar because forty-eight throttled requests
+# take the better part of a minute the first time, and none after that while
+# the cache is warm.
+.tg_row_counts <- function(modules, tables) {
+  bar <- cli::cli_progress_bar(
+    name = "counting rows",
+    total = length(tables),
+    .envir = rlang::caller_env()
+  )
+
+  counts <- vapply(seq_along(tables), function(i) {
+    cli::cli_progress_update(id = bar)
+    tg_count(modules[[i]], tables[[i]])
+  }, numeric(1))
+
+  cli::cli_progress_done(id = bar)
+
+  counts
 }
 
 #' List the columns of a table

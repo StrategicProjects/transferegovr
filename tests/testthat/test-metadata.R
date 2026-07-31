@@ -117,3 +117,60 @@ test_that("the schema records when it was built", {
   expect_s3_class(tg_schema_date(), "Date")
   expect_false(is.na(tg_schema_date()))
 })
+
+test_that("counts = FALSE makes no request and matches the plain call", {
+  # The schema half of `tg_tables()` must stay usable offline; only `counts`
+  # touches the network.
+  expect_equal(tg_tables(), tg_tables(counts = FALSE))
+  expect_false("rows" %in% names(tg_tables()))
+})
+
+test_that("counts = TRUE adds one row count per table", {
+  # Without this the previous test's cached counts are served and no request
+  # is made at all -- which is correct behaviour, and useless for this test.
+  withr::local_options(transferegovr.cache = FALSE)
+  recorded <- local_recorded_requests(
+    rep(list(mock_json_response("[]", content_range = "*/42")), 13)
+  )
+
+  result <- tg_tables("ted", counts = TRUE)
+
+  expect_length(recorded$requests, 13L)
+  expect_true("rows" %in% names(result))
+  expect_equal(result$rows, rep(42, 13))
+})
+
+test_that("counts is validated before any request", {
+  expect_error(tg_tables("ted", counts = "yes"))
+  expect_error(tg_tables("ted", counts = NA))
+  expect_error(tg_tables("ted", counts = c(TRUE, TRUE)))
+})
+
+test_that("the Portuguese alias takes the counts argument too", {
+  withr::local_options(transferegovr.cache = FALSE)
+  recorded <- local_recorded_requests(
+    rep(list(mock_json_response("[]", content_range = "*/7")), 13)
+  )
+
+  expect_equal(tg_tabelas("ted", contagens = TRUE)$rows, rep(7, 13))
+  expect_length(recorded$requests, 13L)
+})
+
+test_that("a repeated count is served from the cache", {
+  # 48 counts is 48 requests the first time and none the next, which is what
+  # makes `tg_tables(counts = TRUE)` usable more than once in a session.
+  dir <- withr::local_tempdir()
+  withr::local_options(
+    transferegovr.cache = TRUE,
+    transferegovr.cache_dir = dir
+  )
+  recorded <- local_recorded_requests(
+    rep(list(mock_json_response("[]", content_range = "*/9")), 13)
+  )
+
+  first <- tg_tables("ted", counts = TRUE)
+  second <- tg_tables("ted", counts = TRUE)
+
+  expect_length(recorded$requests, 13L)
+  expect_equal(first$rows, second$rows)
+})

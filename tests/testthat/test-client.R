@@ -239,3 +239,24 @@ test_that("the user agent identifies the package", {
 
   expect_match(recorded$requests[[1]]$options$useragent, "transferegovr")
 })
+
+test_that("an over-long URL is reported as such, not as a network failure", {
+  # curl answers a URL this long with "Error in the HTTP2 framing layer", which
+  # says nothing about the query that caused it.
+  expect_error(
+    tg_get("ted", "plano_acao", id_plano_acao = in_(1:2000), .cache = FALSE),
+    "in_",
+    class = "transferegovr_url_error"
+  )
+})
+
+test_that("a normal request is nowhere near the URL limit", {
+  recorded <- local_recorded_requests(mock_page(1, total = 1))
+
+  tg_get("ted", "plano_acao",
+    id_plano_acao = in_(1:50), .limit = 1,
+    .cache = FALSE
+  )
+
+  expect_lt(nchar(recorded$requests[[1]]$url), .tg_max_url)
+})

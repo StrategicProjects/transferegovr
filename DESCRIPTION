@@ -1,9 +1,17 @@
 Package: transferegovr
 Title: Access the 'TransfereGov' Open Data APIs
 Version: 0.1.0
-Authors@R:
+Authors@R: c(
     person("Andre", "Leite", email = "leite@castlab.org", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-4718-9766"))
+           comment = c(ORCID = "0000-0002-4718-9766")),
+    person("Marcos", "Wasiliew", email = "marcos.wasiliew@sepe.pe.gov.br", role = "aut"),
+    person("Hugo", "Vasconcelos", email = "hugo.vasconcelos@ufpe.br", role = "aut",
+           comment = c(ORCID = "0000-0001-6249-0920")),
+    person("Carlos", "Amorim", email = "carlos.agaf@ufpe.br", role = "aut",
+           comment = c(ORCID = "0000-0001-6315-8305")),
+    person("Diogo", "Bezerra", email = "diogo.bezerra@ufpe.br", role = "aut",
+           comment = c(ORCID = "0000-0002-1216-8674"))
+  )
 Description: Provides a modern interface to the open data application
     programming interfaces of the Brazilian federal government's
     'TransfereGov' platform (<https://api.transferegov.gestao.gov.br>).

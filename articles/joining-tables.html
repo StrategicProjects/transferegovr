@@ -90,7 +90,7 @@ This vignette maps the keys.</p>
 <p>Two identifiers do most of the work across all three modules:</p>
 <ul>
 <li>
-<strong><code>id_programa</code></strong> — the programme, which is
+<strong><code>id_programa</code></strong> — the program, which is
 the funding instrument as a whole.</li>
 <li>
 <strong><code>id_plano_acao</code></strong> — the action plan, which
@@ -162,7 +162,7 @@ history.</p>
 <div class="section level2">
 <h2 id="a-worked-example">A worked example<a class="anchor" aria-label="anchor" href="#a-worked-example"></a>
 </h2>
-<p>Which federal bodies decentralise the most money, and to what?</p>
+<p>Which federal bodies decentralize the most money, and to what?</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">programas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span></span>
 <span>  <span class="st">"ted"</span>, <span class="st">"programa"</span>,</span>
@@ -204,9 +204,9 @@ Count before and after:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="va">planos</span><span class="op">$</span><span class="va">id_programa</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">programas</span><span class="op">$</span><span class="va">id_programa</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
-<p>Every action plan in TED belongs to a programme that is also
-published. That is worth knowing rather than assuming, because it is not
-true of every key in these APIs. Sampling two hundred values from each
+<p>Every action plan in TED belongs to a program that is also published.
+That is worth knowing rather than assuming, because it is not true of
+every key in these APIs. Sampling two hundred values from each
 relationship in the diagrams above, most resolve completely, but three
 do not:</p>
 <table class="table">

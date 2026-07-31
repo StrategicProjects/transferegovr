@@ -15,8 +15,8 @@ maps the keys.
 
 Two identifiers do most of the work across all three modules:
 
-- **`id_programa`** — the programme, which is the funding instrument as
-  a whole.
+- **`id_programa`** — the program, which is the funding instrument as a
+  whole.
 - **`id_plano_acao`** — the action plan, which is one recipient’s share
   of it.
 
@@ -82,7 +82,7 @@ Note that `meta_especial` and `finalidade_especial` hang off the
 
 ## A worked example
 
-Which federal bodies decentralise the most money, and to what?
+Which federal bodies decentralize the most money, and to what?
 
 ``` r
 
@@ -131,7 +131,7 @@ sum(!planos$id_programa %in% programas$id_programa)
 #> [1] 0
 ```
 
-Every action plan in TED belongs to a programme that is also published.
+Every action plan in TED belongs to a program that is also published.
 That is worth knowing rather than assuming, because it is not true of
 every key in these APIs. Sampling two hundred values from each
 relationship in the diagrams above, most resolve completely, but three

@@ -22,7 +22,7 @@ tg_modules()
 #>   <chr>                   <chr>                       <int> <chr>
 #> 1 transferenciasespeciais Special transfers              14 https://api.tran…
 #> 2 fundoafundo             Fund-to-fund transfers         21 https://api.tran…
-#> 3 ted                     Decentralised credit (TED)     13 https://api.tran…
+#> 3 ted                     Decentralized credit (TED)     13 https://api.tran…
 ```
 
 - **Special transfers** are the modality created by Constitutional
@@ -33,7 +33,7 @@ tg_modules()
   into a state, district or municipal fund, under the terms of specific
   legislation.
 - **TED**, *termo de execução descentralizada*, is how budget credit is
-  decentralised between federal bodies.
+  decentralized between federal bodies.
 
 Module names may be written with underscores, so `"fundo_a_fundo"` and
 `"transferencias_especiais"` both work.
@@ -244,7 +244,7 @@ tg_metadata(plans)
 ```
 
 `total_rows` is what the API said matched; `rows_returned` is what you
-have. Keeping both is what makes a partial download recognisable as one.
+have. Keeping both is what makes a partial download recognizable as one.
 
 ## Where to next
 

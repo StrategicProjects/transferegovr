@@ -1,26 +1,12 @@
 # Changelog
 
-## transferegovr (development version)
-
-- [`tg_tables()`](https://strategicprojects.github.io/transferegovr/reference/tg_tables.md)
-  gains a `counts` argument, so sizing every table is one call instead
-  of a loop over
-  [`tg_count()`](https://strategicprojects.github.io/transferegovr/reference/tg_count.md).
-  It is the only part of that function that needs a network connection,
-  and the responses are cached.
-- A request whose URL grows past what the service accepts now fails with
-  a message naming the cause — a filter built with
-  [`in_()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  over a long vector. Previously curl reported “Error in the HTTP2
-  framing layer”, which said nothing about the query.
-
 ## transferegovr 0.1.0
 
 First release.
 
 - Covers the three TransfereGov open data APIs — special transfers
   (`transferenciasespeciais`), fund-to-fund transfers (`fundoafundo`)
-  and decentralised credit (`ted`) — and the forty-eight tables they
+  and decentralized credit (`ted`) — and the forty-eight tables they
   publish.
 - [`tg_get()`](https://strategicprojects.github.io/transferegovr/reference/tg_get.md)
   and
@@ -68,6 +54,15 @@ First release.
   switches to a persistent location and
   [`tg_cache_clear()`](https://strategicprojects.github.io/transferegovr/reference/tg_cache_clear.md)
   empties it.
+- `tg_tables(counts = TRUE)` reports how many rows each table currently
+  holds, so sizing every table is one call rather than a loop over
+  [`tg_count()`](https://strategicprojects.github.io/transferegovr/reference/tg_count.md).
+  It is the only part of that function that needs a network connection.
+- A request whose URL grows past what the service accepts fails with a
+  message naming the cause — a filter built with
+  [`in_()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
+  over a long vector. curl otherwise reports “Error in the HTTP2 framing
+  layer”, which says nothing about the query.
 - English is canonical throughout, with Portuguese aliases for the
   exported verbs. Table names, column names and categorical values stay
   in Portuguese because they are the APIs’ own contract.

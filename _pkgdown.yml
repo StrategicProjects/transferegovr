@@ -17,7 +17,7 @@ home:
   title: transferegovr | Brazilian federal transfers data in R
   description: >
     R interface to the TransfereGov open data APIs: special transfers,
-    fund-to-fund transfers, and decentralised credit.
+    fund-to-fund transfers, and decentralized credit.
 
 navbar:
   structure:

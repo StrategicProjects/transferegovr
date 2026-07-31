@@ -229,7 +229,7 @@ print.tg_filter <- function(x, ...) {
   invisible(x)
 }
 
-# Serialisation ---------------------------------------------------------------
+# Serialization ---------------------------------------------------------------
 
 # The set of operator constructors, used both to build the evaluation mask and
 # to document the vocabulary in `tg_operators()`. A list, not an environment:

@@ -34,7 +34,7 @@ The platform publishes three APIs, covering **48 tables** in all:
 |---|---|---|
 | `transferenciasespeciais` | Special transfers, created by Constitutional Amendment 105/2019 for individual parliamentary amendments | 14 |
 | `fundoafundo` | Fund-to-fund transfers, from federal funds directly to state, district and municipal funds | 21 |
-| `ted` | Decentralised credit between federal bodies (*termo de execução descentralizada*) | 13 |
+| `ted` | Decentralized credit between federal bodies (*termo de execução descentralizada*) | 13 |
 
 All three are [PostgREST](https://postgrest.org) services, so this package
 exposes their filtering, column selection and ordering directly, rather than

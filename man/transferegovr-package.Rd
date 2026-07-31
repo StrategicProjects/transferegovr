@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
 
-Provides a modern interface to the open data application programming interfaces of the Brazilian federal government's 'TransfereGov' platform (\url{https://api.transferegov.gestao.gov.br}). Covers the special transfers, fund-to-fund transfers, and decentralised credit ('TED') modules, which together publish forty-eight tables on action plans, programmes, budget commitments, financial execution, management reports, and payment orders. The APIs are built on 'PostgREST', so the package exposes its filtering, column selection, and ordering operators directly, and returns tidy tibbles with types taken from the published schema. Automatic pagination, request throttling, retries with exponential backoff, and an optional response cache are included.
+Provides a modern interface to the open data application programming interfaces of the Brazilian federal government's 'TransfereGov' platform (\url{https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos}). Covers the special transfers, fund-to-fund transfers, and decentralized credit ('TED') modules, which together publish forty-eight tables on action plans, programs, budget commitments, financial execution, management reports, and payment orders. The APIs are built on 'PostgREST', so the package exposes its filtering, column selection, and ordering operators directly, and returns tidy tibbles with types taken from the published schema. Automatic pagination, request throttling, retries with exponential backoff, and an optional response cache are included.
 }
 \seealso{
 Useful links:

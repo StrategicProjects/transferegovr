@@ -31,8 +31,9 @@ tg_campos(modulo, tabela)
 
 - modulo:
 
-  Portuguese alias for `module`, available only in
-  [`tg_tabelas()`](https://strategicprojects.github.io/transferegovr/reference/tg_tables.md).
+  Portuguese alias for `module`, available in
+  [`tg_tabelas()`](https://strategicprojects.github.io/transferegovr/reference/tg_tables.md)
+  and `tg_campos()`.
 
 - tabela:
 

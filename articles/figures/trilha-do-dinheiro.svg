@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 906" width="940" height="906"
+     role="img" aria-labelledby="trilha-title trilha-desc"
+     font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <title id="trilha-title">A trilha do dinheiro nas transferências especiais</title>
+  <desc id="trilha-desc">Fluxo em cinco etapas, cada uma numa tabela da API de
+  transferências especiais: da emenda parlamentar ao plano de ação, deste ao
+  empenho, do empenho ao documento hábil e daí à ordem bancária que credita a
+  conta do beneficiário. Entre o empenho e o documento hábil, um desvio mostra
+  os 204 planos impedidos de Pernambuco, com 207 empenhos e 151,8 milhões de
+  reais que não seguem adiante.</desc>
+
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#8FB3DC"/>
+    </marker>
+    <marker id="seta-bloqueio" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#E1493B"/>
+    </marker>
+  </defs>
+
+  <rect width="940" height="906" rx="16" fill="#0A2540"/>
+
+  <g fill="none" stroke="#2E6FD9" stroke-width="1" opacity="0.10">
+    <path d="M0 48H940M0 96H940M0 144H940M0 192H940M0 240H940M0 288H940M0 336H940M0 384H940M0 432H940M0 480H940M0 528H940M0 576H940M0 624H940M0 672H940M0 720H940M0 768H940M0 816H940M0 864H940M48 0V906M96 0V906M144 0V906M192 0V906M240 0V906M288 0V906M336 0V906M384 0V906M432 0V906M480 0V906M528 0V906M576 0V906M624 0V906M672 0V906M720 0V906M768 0V906M816 0V906M864 0V906M912 0V906"/>
+  </g>
+
+  <text x="470" y="44" text-anchor="middle" fill="#FFFFFF" font-size="17" font-weight="700">
+    A trilha do dinheiro nas transferências especiais
+  </text>
+  <text x="470" y="66" text-anchor="middle" fill="#A9C4E4" font-size="11.5">
+    Pernambuco, 2020–2026 · cada etapa é uma tabela do módulo transferenciasespeciais
+  </text>
+
+  <!-- 1. emenda -->
+  <rect x="270" y="88" width="400" height="56" rx="10" fill="#0E2A47" stroke="#2E6FD9" stroke-width="1.2"/>
+  <text x="470" y="112" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="700">Emenda parlamentar individual</text>
+  <text x="470" y="132" text-anchor="middle" fill="#A9C4E4" font-size="11.5">42 parlamentares indicaram recursos para PE</text>
+
+  <path d="M470 144V174" stroke="#8FB3DC" stroke-width="2" marker-end="url(#seta)"/>
+
+  <!-- 2. plano de acao -->
+  <rect x="190" y="178" width="560" height="92" rx="10" fill="#12314F" stroke="#3FD98A" stroke-width="1.5"/>
+  <text x="470" y="202" text-anchor="middle" fill="#FFFFFF" font-size="14.5" font-weight="700">Plano de ação</text>
+  <text x="470" y="222" text-anchor="middle" fill="#3FD98A" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">plano_acao_especial</text>
+  <text x="470" y="243" text-anchor="middle" fill="#FFFFFF" font-size="12.5" font-weight="600">1.962 planos · R$ 1,71 bilhão</text>
+  <text x="470" y="261" text-anchor="middle" fill="#A9C4E4" font-size="11">184 beneficiários — municípios e o Estado · 88% investimento, 12% custeio</text>
+
+  <text x="486" y="290" fill="#8FB3DC" font-size="10.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">id_plano_acao</text>
+  <path d="M470 270V304" stroke="#8FB3DC" stroke-width="2" marker-end="url(#seta)"/>
+
+  <!-- 3. empenho -->
+  <rect x="190" y="308" width="560" height="80" rx="10" fill="#12314F" stroke="#2E6FD9" stroke-width="1.2"/>
+  <text x="470" y="332" text-anchor="middle" fill="#FFFFFF" font-size="14.5" font-weight="700">Empenho</text>
+  <text x="470" y="352" text-anchor="middle" fill="#3FD98A" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">empenho_especial</text>
+  <text x="470" y="373" text-anchor="middle" fill="#FFFFFF" font-size="12.5" font-weight="600">2.111 empenhos · R$ 1,71 bilhão — todos os planos chegam aqui</text>
+
+  <!-- desvio: os impedidos -->
+  <path d="M750 348H812V424" stroke="#E1493B" stroke-width="2" fill="none"
+        stroke-linejoin="round" marker-end="url(#seta-bloqueio)"/>
+  <rect x="700" y="428" width="224" height="96" rx="10" fill="#2A1620" stroke="#E1493B" stroke-width="1.5"/>
+  <text x="812" y="452" text-anchor="middle" fill="#FF8B7E" font-size="13.5" font-weight="700">Impedidos</text>
+  <text x="812" y="472" text-anchor="middle" fill="#FFFFFF" font-size="12" font-weight="600">204 planos · 207 empenhos</text>
+  <text x="812" y="490" text-anchor="middle" fill="#FF8B7E" font-size="13" font-weight="700">R$ 151,8 milhões</text>
+  <text x="812" y="510" text-anchor="middle" fill="#E8B4AE" font-size="10.5">nenhum documento hábil emitido</text>
+  <text x="812" y="546" text-anchor="middle" fill="#A9C4E4" font-size="10">motivo mais comum: falta de</text>
+  <text x="812" y="560" text-anchor="middle" fill="#A9C4E4" font-size="10">análise conclusiva no prazo (91)</text>
+
+  <text x="486" y="410" fill="#8FB3DC" font-size="10.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">id_empenho</text>
+  <path d="M470 388V424" stroke="#8FB3DC" stroke-width="2" marker-end="url(#seta)"/>
+
+  <!-- 4. documento habil -->
+  <rect x="190" y="428" width="470" height="80" rx="10" fill="#12314F" stroke="#2E6FD9" stroke-width="1.2"/>
+  <text x="425" y="452" text-anchor="middle" fill="#FFFFFF" font-size="14.5" font-weight="700">Documento hábil</text>
+  <text x="425" y="472" text-anchor="middle" fill="#3FD98A" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">documento_habil_especial</text>
+  <text x="425" y="493" text-anchor="middle" fill="#FFFFFF" font-size="12.5" font-weight="600">2.030 documentos · R$ 1,56 bilhão</text>
+
+  <text x="441" y="530" fill="#8FB3DC" font-size="10.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">id_dh</text>
+  <path d="M425 508V544" stroke="#8FB3DC" stroke-width="2" marker-end="url(#seta)"/>
+
+  <!-- 5. ordem de pagamento / bancaria -->
+  <rect x="190" y="548" width="470" height="96" rx="10" fill="#12314F" stroke="#2E6FD9" stroke-width="1.2"/>
+  <text x="425" y="572" text-anchor="middle" fill="#FFFFFF" font-size="14.5" font-weight="700">Ordem de pagamento e ordem bancária</text>
+  <text x="425" y="592" text-anchor="middle" fill="#3FD98A" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ordem_pagamento_ordem_bancaria_especial</text>
+  <text x="425" y="613" text-anchor="middle" fill="#FFFFFF" font-size="12.5" font-weight="600">1.932 ordens — todas com ordem bancária emitida</text>
+  <text x="425" y="632" text-anchor="middle" fill="#A9C4E4" font-size="11">o histórico de cada uma fica em historico_pagamento_especial</text>
+
+  <path d="M425 644V680" stroke="#8FB3DC" stroke-width="2" marker-end="url(#seta)"/>
+
+  <!-- 6. conta -->
+  <rect x="190" y="684" width="470" height="64" rx="10" fill="#12314F" stroke="#3FD98A" stroke-width="1.5"/>
+  <text x="425" y="710" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="700">Conta do beneficiário</text>
+  <text x="425" y="730" text-anchor="middle" fill="#A9C4E4" font-size="11">agência e conta constam do próprio plano de ação</text>
+
+  <!-- fechamento aritmetico -->
+  <rect x="100" y="782" width="740" height="80" rx="10" fill="#0E2A47" stroke="#3FD98A" stroke-width="1.2"/>
+  <text x="470" y="808" text-anchor="middle" fill="#FFFFFF" font-size="13" font-weight="700">
+    A conta fecha: R$ 1.709,6 mi empenhados − R$ 1.557,9 mi em documentos hábeis = R$ 151,8 mi
+  </text>
+  <text x="470" y="830" text-anchor="middle" fill="#A9C4E4" font-size="11.5">
+    exatamente o valor dos planos impedidos. O dinheiro não some no caminho: ele para, e o sistema diz onde.
+  </text>
+  <text x="470" y="850" text-anchor="middle" fill="#8FB3DC" font-size="10">
+    Fonte: API TransfereGov, módulo transferenciasespeciais, extração de 31/07/2026.
+  </text>
+</svg>

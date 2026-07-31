@@ -105,22 +105,24 @@ service, and the shortfall would look like missing data.</p>
 <h2 id="ask-how-big-it-is-first">Ask how big it is first<a class="anchor" aria-label="anchor" href="#ask-how-big-it-is-first"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="../reference/tg_tables.html">tg_tables</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">row</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_tables.html">tg_tables</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>    module <span class="op">=</span> <span class="va">row</span><span class="op">$</span><span class="va">module</span>,</span>
-<span>    table <span class="op">=</span> <span class="va">row</span><span class="op">$</span><span class="va">table</span>,</span>
-<span>    rows <span class="op">=</span> <span class="fu"><a href="../reference/tg_count.html">tg_count</a></span><span class="op">(</span><span class="va">row</span><span class="op">$</span><span class="va">module</span>, <span class="va">row</span><span class="op">$</span><span class="va">table</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">sizes</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="va">sizes</span><span class="op">$</span><span class="va">rows</span><span class="op">)</span>, <span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="op">]</span></span>
-<span><span class="co">#&gt;        module                          table    rows</span></span>
-<span><span class="co">#&gt; 1 fundoafundo  gestao_financeira_lancamentos 1115444</span></span>
-<span><span class="co">#&gt; 2 fundoafundo gestao_financeira_subtransacoes 377666</span></span>
-<span><span class="co">#&gt; 3 transferen…    historico_pagamento_especial  281163</span></span>
-<span><span class="co">#&gt; 4 fundoafundo           plano_acao_historico  183379</span></span>
-<span><span class="co">#&gt; 5 transferen…                   meta_especial  156016</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_count.html">tg_count</a></span><span class="op">(</span><span class="st">"fundoafundo"</span>, <span class="st">"gestao_financeira_lancamentos"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1115444</span></span></code></pre></div>
+<p>To size everything at once, <code><a href="../reference/tg_tables.html">tg_tables()</a></code> takes a
+<code>counts</code> argument. It is the only part of that function that
+touches the network — one request per table, cached, so the second call
+in a session is free:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_tables.html">tg_tables</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">rows</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 48 × 6</span></span>
+<span><span class="co">#&gt;   module                  table                           columns    rows …</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                   &lt;chr&gt;                             &lt;int&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 fundoafundo             gestao_financeira_lancamentos        32 1115444</span></span>
+<span><span class="co">#&gt; 2 fundoafundo             gestao_financeira_subtransacoes      16  377666</span></span>
+<span><span class="co">#&gt; 3 transferenciasespeciais historico_pagamento_especial          5  281163</span></span>
+<span><span class="co">#&gt; 4 fundoafundo             plano_acao_historico                  5  183379</span></span>
+<span><span class="co">#&gt; 5 transferenciasespeciais meta_especial                        16  156016</span></span>
+<span><span class="co">#&gt; # ℹ 43 more rows</span></span></code></pre></div>
 <p>A million rows is over a thousand requests. The package throttles
 itself to sixty requests a minute by default, so that download takes
 something like twenty minutes. That is usually the wrong shape for the
@@ -134,7 +136,7 @@ server:</p>
 <p><strong>Select only the columns you need.</strong>
 <code>gestao_financeira_lancamentos</code> has 32 columns; if you want
 four of them, the other 28 need never cross the network.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span></span>
 <span>  <span class="st">"fundoafundo"</span>, <span class="st">"gestao_financeira_lancamentos"</span>,</span>
 <span>  .select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -147,7 +149,7 @@ four of them, the other 28 need never cross the network.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p><strong>Filter before you fetch.</strong> A year’s worth of a table
 is usually what was wanted anyway:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_count.html">tg_count</a></span><span class="op">(</span></span>
 <span>  <span class="st">"fundoafundo"</span>, <span class="st">"gestao_financeira_lancamentos"</span>,</span>
 <span>  data_lancamento_gestao_financeira <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="../reference/filters.html">gte</a></span><span class="op">(</span><span class="st">"2025-01-01"</span><span class="op">)</span>, <span class="fu"><a href="../reference/filters.html">lt</a></span><span class="op">(</span><span class="st">"2026-01-01"</span><span class="op">)</span><span class="op">)</span></span>
@@ -165,16 +167,16 @@ rows and the wrong contents.</p>
 <p>So every request this package makes carries an explicit order. By
 default it is the table’s primary key where the API declares one, and
 its identifier columns otherwise:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_metadata.html">tg_metadata</a></span><span class="op">(</span><span class="va">plans</span><span class="op">)</span><span class="op">$</span><span class="va">order</span></span>
 <span><span class="co">#&gt; [1] "id_plano_acao.asc" "id_programa.asc"   "sq_instrumento.asc"</span></span></code></pre></div>
 <p>You can supply your own, and pagination will use it:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"ted"</span>, <span class="st">"plano_acao"</span>, .order <span class="op">=</span> <span class="st">"vl_total_plano_acao.desc"</span>, .limit <span class="op">=</span> <span class="fl">2500</span><span class="op">)</span></span></code></pre></div>
 <p>Bear in mind that ordering by a column with many ties leaves the
 order within each tie undefined, which brings the problem back. Prefer
 an identifier, or add one as a tiebreaker:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span></span>
 <span>  <span class="st">"ted"</span>, <span class="st">"plano_acao"</span>,</span>
 <span>  .order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"vl_total_plano_acao.desc"</span>, <span class="st">"id_plano_acao.asc"</span><span class="op">)</span>,</span>
@@ -186,7 +188,7 @@ an identifier, or add one as a tiebreaker:</p>
 </h2>
 <p><code>.offset</code> skips rows that have already been collected, so
 a long download can be taken in sittings:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">first</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"ted"</span>, <span class="st">"plano_acao_etapa"</span>, .limit <span class="op">=</span> <span class="fl">20000</span><span class="op">)</span></span>
 <span><span class="va">rest</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"ted"</span>, <span class="st">"plano_acao_etapa"</span>, .limit <span class="op">=</span> <span class="cn">Inf</span>, .offset <span class="op">=</span> <span class="fl">20000</span><span class="op">)</span></span></code></pre></div>
 <p>Both parts must use the same order, or they are pages of two
@@ -214,12 +216,12 @@ the data rather than only in the console.</p>
 not re-fetch what it already has. Each page is cached separately, so an
 interrupted collection resumes from the network only where it has
 to.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_cache_dir.html">tg_cache_dir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "/tmp/RtmpXXXX/transferegovr-cache"</span></span></code></pre></div>
 <p>The default is the session’s temporary directory, so nothing outlives
 the session unless you ask for it:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_cache_dir.html">tg_cache_dir</a></span><span class="op">(</span><span class="fu">tools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/tools/userdir.html" class="external-link">R_user_dir</a></span><span class="op">(</span><span class="st">"transferegovr"</span>, <span class="st">"cache"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Set <code>TRANSFEREGOVR_CACHE_DIR</code> in <code>.Renviron</code> to
 make that permanent, and adjust the lifetime with
@@ -237,7 +239,7 @@ retried: it means the service rejected the query itself and will reject
 it identically next time.</p>
 <p>Both are adjustable, but the defaults exist to keep the package a
 considerate client of a public service:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span></span>
 <span>  transferegovr.requests_per_minute <span class="op">=</span> <span class="fl">30</span>,</span>
 <span>  transferegovr.max_tries <span class="op">=</span> <span class="fl">6</span>,</span>

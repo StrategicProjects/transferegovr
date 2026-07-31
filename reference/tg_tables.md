@@ -5,9 +5,9 @@ List the tables a module publishes
 ## Usage
 
 ``` r
-tg_tables(module = NULL)
+tg_tables(module = NULL, counts = FALSE)
 
-tg_tabelas(modulo = NULL)
+tg_tabelas(modulo = NULL, contagens = FALSE)
 ```
 
 ## Arguments
@@ -19,15 +19,29 @@ tg_tabelas(modulo = NULL)
   Aliases such as `"fundo_a_fundo"` are accepted. `NULL` lists the
   tables of every module.
 
+- counts:
+
+  If `TRUE`, adds a `rows` column with the number of rows each table
+  currently holds. This is the only part of this function that needs a
+  network connection: it makes one request per table, so
+  `tg_tables(counts = TRUE)` with no module makes forty-eight. Responses
+  are cached.
+
 - modulo:
 
-  Portuguese alias for `module`, available only in `tg_tabelas()`.
+  Portuguese alias for `module`, available in `tg_tabelas()` and
+  [`tg_campos()`](https://strategicprojects.github.io/transferegovr/reference/tg_fields.md).
+
+- contagens:
+
+  Portuguese alias for `counts`, available only in `tg_tabelas()`.
 
 ## Value
 
 A tibble with one row per table: its module, name, number of columns,
 the primary key when the API declares one, and the description published
-in the API schema.
+in the API schema. With `counts = TRUE`, also the current number of
+rows.
 
 ## See also
 
@@ -71,4 +85,9 @@ tg_tables()
 #>  9 transferenciasespeciais plano_acao_especial        27 id_plano_a… NA         
 #> 10 transferenciasespeciais plano_trabalho_anali…      10 NA          NA         
 #> # ℹ 38 more rows
+
+if (interactive()) {
+  # How big is everything, largest first?
+  tg_tables(counts = TRUE)[order(-tg_tables(counts = TRUE)$rows), ]
+}
 ```

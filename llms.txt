@@ -265,6 +265,6 @@ Caching and connection settings.
 Data journalism built on these APIs. Written in Portuguese, for a
 Brazilian public-management audience.
 
-- [Pernambuco em dois cadastros: 64 bilhões em obras, mil prazos
-  vencidos e um ponto no meio do
-  Atlântico](https://strategicprojects.github.io/transferegovr/articles/investimentos-pernambuco.md):
+- [O caminho de 1,7 bilhão até Pernambuco — e os 151,8 milhões que
+  pararam no
+  meio](https://strategicprojects.github.io/transferegovr/articles/investimentos-pernambuco.md):

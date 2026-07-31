@@ -43,6 +43,12 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="transferegovr-development-version">transferegovr (development version)<a class="anchor" aria-label="anchor" href="#transferegovr-development-version"></a></h2>
+<ul><li>
+<code><a href="../reference/tg_tables.html">tg_tables()</a></code> gains a <code>counts</code> argument, so sizing every table is one call instead of a loop over <code><a href="../reference/tg_count.html">tg_count()</a></code>. It is the only part of that function that needs a network connection, and the responses are cached.</li>
+<li>A request whose URL grows past what the service accepts now fails with a message naming the cause — a filter built with <code><a href="../reference/filters.html">in_()</a></code> over a long vector. Previously curl reported “Error in the HTTP2 framing layer”, which said nothing about the query.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="transferegovr-010">transferegovr 0.1.0<a class="anchor" aria-label="anchor" href="#transferegovr-010"></a></h2>
 <p>First release.</p>
 <ul><li>Covers the three TransfereGov open data APIs — special transfers (<code>transferenciasespeciais</code>), fund-to-fund transfers (<code>fundoafundo</code>) and decentralised credit (<code>ted</code>) — and the forty-eight tables they publish.</li>
@@ -60,7 +66,8 @@
 <li>Responses are cached for an hour, by default in the session’s temporary directory. <code><a href="../reference/tg_cache_dir.html">tg_cache_dir()</a></code> switches to a persistent location and <code><a href="../reference/tg_cache_clear.html">tg_cache_clear()</a></code> empties it.</li>
 <li>English is canonical throughout, with Portuguese aliases for the exported verbs. Table names, column names and categorical values stay in Portuguese because they are the APIs’ own contract.</li>
 </ul></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

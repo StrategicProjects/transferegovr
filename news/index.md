@@ -1,5 +1,19 @@
 # Changelog
 
+## transferegovr (development version)
+
+- [`tg_tables()`](https://strategicprojects.github.io/transferegovr/reference/tg_tables.md)
+  gains a `counts` argument, so sizing every table is one call instead
+  of a loop over
+  [`tg_count()`](https://strategicprojects.github.io/transferegovr/reference/tg_count.md).
+  It is the only part of that function that needs a network connection,
+  and the responses are cached.
+- A request whose URL grows past what the service accepts now fails with
+  a message naming the cause — a filter built with
+  [`in_()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
+  over a long vector. Previously curl reported “Error in the HTTP2
+  framing layer”, which said nothing about the query.
+
 ## transferegovr 0.1.0
 
 First release.

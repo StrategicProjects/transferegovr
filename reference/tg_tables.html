@@ -49,9 +49,9 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tg_tables</span><span class="op">(</span>module <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tg_tables</span><span class="op">(</span>module <span class="op">=</span> <span class="cn">NULL</span>, counts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">tg_tabelas</span><span class="op">(</span>modulo <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">tg_tabelas</span><span class="op">(</span>modulo <span class="op">=</span> <span class="cn">NULL</span>, contagens <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -63,8 +63,19 @@
 <code>"fundo_a_fundo"</code> are accepted. <code>NULL</code> lists the tables of every module.</p></dd>
 
 
+<dt id="arg-counts">counts<a class="anchor" aria-label="anchor" href="#arg-counts"></a></dt>
+<dd><p>If <code>TRUE</code>, adds a <code>rows</code> column with the number of rows each
+table currently holds. This is the only part of this function that needs a
+network connection: it makes one request per table, so <code>tg_tables(counts = TRUE)</code> with no module makes forty-eight. Responses are cached.</p></dd>
+
+
 <dt id="arg-modulo">modulo<a class="anchor" aria-label="anchor" href="#arg-modulo"></a></dt>
-<dd><p>Portuguese alias for <code>module</code>, available only in
+<dd><p>Portuguese alias for <code>module</code>, available in <code>tg_tabelas()</code> and
+<code><a href="tg_fields.html">tg_campos()</a></code>.</p></dd>
+
+
+<dt id="arg-contagens">contagens<a class="anchor" aria-label="anchor" href="#arg-contagens"></a></dt>
+<dd><p>Portuguese alias for <code>counts</code>, available only in
 <code>tg_tabelas()</code>.</p></dd>
 
 </dl></div>
@@ -72,7 +83,7 @@
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble with one row per table: its module, name, number of columns,
 the primary key when the API declares one, and the description published in
-the API schema.</p>
+the API schema. With <code>counts = TRUE</code>, also the current number of rows.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -116,6 +127,11 @@ the API schema.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> transferenciasespeciais plano_acao_especial        27 id_plano_a… <span style="color: #BB0000;">NA</span>         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> transferenciasespeciais plano_trabalho_anali…      10 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 38 more rows</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="co"># How big is everything, largest first?</span></span></span>
+<span class="r-in"><span>  <span class="fu">tg_tables</span><span class="op">(</span>counts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="fu">tg_tables</span><span class="op">(</span>counts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">$</span><span class="va">rows</span><span class="op">)</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

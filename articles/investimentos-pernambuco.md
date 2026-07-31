@@ -1,320 +1,260 @@
-# Pernambuco em dois cadastros: 64 bilhões em obras, mil prazos vencidos e um ponto no meio do Atlântico
-
-*O que dois sistemas federais dizem sobre o mesmo território — e o que
-eles não conseguem dizer.*
-
-> **Sobre esta análise.** Todos os números vêm de extrações feitas em
-> **31 de julho de 2026** das APIs de dados abertos do TransfereGov e do
-> ObrasGov. O código que os produz está reproduzido ao longo do texto.
-> Os dados são atualizados diariamente pelo governo federal; refazer a
-> extração em outra data produzirá números diferentes, e é esperado que
-> produza.
-
-Dois sistemas do governo federal registram dinheiro que desce para
-Pernambuco. O **TransfereGov** cuida das transferências — o repasse em
-si, quem manda, quem recebe, quanto. O **ObrasGov** cuida do que é
-construído com ele — a obra, o prazo, e, desde 2021, o ponto no mapa
-onde ela deveria estar.
-
-Cruzar os dois não é trivial, porque não existe chave comum: são
-cadastros distintos, com identificadores próprios. O que os liga é o
-território — o código IBGE do município. É por aí que este texto anda.
-
-O retrato que sai não é o de um sistema quebrado. É o de dois sistemas
-que funcionam razoavelmente bem naquilo que cobram de si mesmos, e que
-quase não cobram justamente a informação que permitiria fiscalizá-los.
-
-------------------------------------------------------------------------
-
-## O tamanho da coisa
-
-``` r
-
-library(obrasgovr)
-library(dplyr)
-
-projetos <- get_projects(uf_principal = "PE", page_size = 200, all_pages = TRUE)
-
-valor_previsto <- function(x) {
-  if (length(x) == 0) return(NA_real_)
-  sum(vapply(x, function(y) as.numeric(y$vl_investimento_previsto), numeric(1)),
-      na.rm = TRUE)
-}
-
-projetos <- projetos |>
-  mutate(valor = vapply(investimentos_previstos, valor_previsto, numeric(1)))
-
-projetos |>
-  group_by(situacao) |>
-  summarise(projetos = n(),
-            bilhoes = round(sum(valor, na.rm = TRUE) / 1e9, 2)) |>
-  arrange(desc(projetos))
-#> # A tibble: 6 × 3
-#>   situacao    projetos bilhoes
-#>   <chr>          <int>   <dbl>
-#> 1 Concluída       2262    6.8
-#> 2 Cadastrada      1961   45.09
-#> 3 Em execução      974   11.31
-#> 4 Cancelada        204    0.36
-#> 5 Inacabada         44    0.24
-#> 6 Paralisada        32    0.17
-```
-
-São **5.477 projetos** com Pernambuco como unidade federativa principal
-e **R\$ 63,96 bilhões** em investimento previsto.
-
-O primeiro número que incomoda está na segunda linha. **R\$ 45,09
-bilhões — 70% de todo o valor — estão em projetos com situação
-“Cadastrada”**, ou seja, que ainda não começaram. Os 2.262 projetos já
-concluídos somam R\$ 6,8 bilhões, pouco mais de um décimo do total. O
-que existe em Pernambuco, no papel, é sobretudo promessa.
-
-Quatro órgãos concentram 77% do valor:
-
-| Órgão responsável                                      | Projetos | R\$ bi |
-|--------------------------------------------------------|---------:|-------:|
-| Ministério da Integração e do Desenvolvimento Regional |      143 |   22,9 |
-| Companhia Brasileira de Trens Urbanos                  |       26 |   11,1 |
-| Ministério da Economia                                 |    2.117 |    8,8 |
-| DNIT                                                   |       66 |    6,6 |
-
-A assimetria é o dado. O MIDR movimenta R\$ 22,9 bilhões em 143 projetos
-— R\$ 160 milhões cada. O Ministério da Economia movimenta R\$ 8,8
-bilhões espalhados por 2.117 projetos — R\$ 4,2 milhões cada. São dois
-regimes de política pública diferentes convivendo no mesmo cadastro, e
-qualquer média que os junte não descreve nenhum dos dois.
-
-## O ritmo
-
-![Gráfico de barras: projetos do ObrasGov cadastrados em Pernambuco por
-ano — 123 em 2021, 364 em 2022, 503 em 2023, 796 em 2024, 3.059 em 2025
-e 632 até julho de 2026. O investimento previsto não acompanha o volume:
-R\$ 19,3 bilhões em 2021 contra R\$ 9,6 bilhões em
-2025.](figures/ritmo.png)
-
-Gráfico de barras: projetos do ObrasGov cadastrados em Pernambuco por
-ano — 123 em 2021, 364 em 2022, 503 em 2023, 796 em 2024, 3.059 em 2025
-e 632 até julho de 2026. O investimento previsto não acompanha o volume:
-R\$ 19,3 bilhões em 2021 contra R\$ 9,6 bilhões em 2025.
-
-O cadastro acelerou de forma acentuada: de 123 projetos em 2021 para
-3.059 em 2025. Mas o valor não acompanha o volume. Em 2021, 123 projetos
-carregavam R\$ 19,3 bilhões; em 2025, 3.059 projetos carregaram R\$ 9,6
-bilhões. O sistema passou a registrar muito mais coisa, muito menor.
-
-Duas ressalvas antes de ler isso como tendência. O ObrasGov começou a
-operar em 2021, então o primeiro ano não é um ano de política pública, é
-o ano em que o estoque anterior entrou no sistema — o que explica o
-valor alto concentrado em poucos registros. E 2026 está incompleto: a
-extração vai até 30 de julho.
-
-## O calendário que não fecha
-
-Aqui a análise para de ser sobre Pernambuco e passa a ser sobre o
-sistema.
-
-``` r
-
-hoje <- Sys.Date()
-
-vencidos <- projetos |>
-  filter(situacao %in% c("Em execução", "Cadastrada"),
-         !is.na(dt_final_prevista),
-         dt_final_prevista < hoje)
-
-nrow(vencidos)
-#> [1] 1086
-sum(vencidos$valor, na.rm = TRUE) / 1e9
-#> [1] 39.42
-```
-
-**1.086 projetos passaram da data prevista de conclusão e continuam
-listados como “em execução” ou “cadastrada”. Somam R\$ 39,42 bilhões** —
-quase dois terços de tudo que Pernambuco tem registrado.
-
-E não é atraso recente:
-
-| Tempo desde o prazo vencido | Projetos |
-|-----------------------------|---------:|
-| menos de 1 ano              |      337 |
-| 1 a 2 anos                  |      151 |
-| 2 a 5 anos                  |      365 |
-| 5 a 10 anos                 |      169 |
-| mais de 10 anos             |       64 |
-
-**Sessenta e quatro projetos estão mais de dez anos além do prazo** e
-seguem sem qualquer marcação de conclusão, cancelamento ou paralisação.
-Não é possível distinguir, pelos dados, uma obra genuinamente travada de
-um registro que ninguém voltou para atualizar. Essa indistinção é, ela
-própria, o achado.
-
-O motivo é o campo que quase ninguém preenche:
-
-``` r
-
-sum(!is.na(projetos$dt_final_efetiva))
-#> [1] 43
-```
-
-**Dos 5.477 projetos, 43 têm data efetiva de conclusão** — 0,8%. Mesmo
-entre os 2.262 marcados como “Concluída”, a data real de entrega é
-exceção. O ObrasGov registra bem o que se pretende fazer e quase não
-registra o que foi feito. Sem isso, nenhum indicador de prazo é
-calculável: não dá para dizer se uma obra atrasa, quanto atrasa, nem se
-o atraso piorou.
-
-Nos 43 casos em que dá para comparar, 8 foram entregues depois do
-previsto (18,6%). É uma amostra pequena demais para generalizar, e vale
-dizê-lo em vez de transformar em manchete.
-
-Há ainda o resíduo técnico. **Nove projetos têm data prevista de término
-anterior à de início** — vários com fim em `1899-12-30` ou `1900-01-01`,
-que são o marco zero de planilhas eletrônicas. É a assinatura de um
-campo vazio que virou data ao atravessar uma exportação.
-
-## Onde as obras dizem estar
-
-Desde 2021 o ObrasGov aceita coordenadas. Isso permite algo que a
-maioria dos cadastros públicos brasileiros não permite: **testar a
-informação contra o território**. Se um projeto se declara em Petrolina
-e seu ponto cai no Amazonas, não é preciso auditar em campo para saber
-que algo está errado.
-
-O teste é ponto-em-polígono contra a malha municipal do IBGE:
-
-``` r
-
-library(sf)
-library(geobr)
-library(tidyr)
-
-pins <- projetos |>
-  select(id_projeto_investimento, desc_nome, pins) |>
-  filter(lengths(pins) > 0) |>
-  unnest_longer(pins) |>
-  mutate(
-    lat = as.numeric(vapply(pins, function(x) x$latitude, character(1))),
-    lon = as.numeric(vapply(pins, function(x) x$longitude, character(1)))
-  ) |>
-  filter(!is.na(lat), !is.na(lon))
-
-municipios <- read_municipality(year = 2022) |> st_make_valid()
-
-onde_caem <- pins |>
-  st_as_sf(coords = c("lon", "lat"), crs = 4326, remove = FALSE) |>
-  st_join(municipios[, c("code_muni", "name_muni", "abbrev_state")],
-          join = st_within)
-```
-
-Antes dos resultados, a cobertura. **5.417 dos 5.477 projetos (98,9%)
-têm ao menos um ponto** — adesão alta, digna de nota. São 8.651
-registros de ponto, dos quais **505 vêm sem latitude ou longitude**: o
-ponto foi criado e ficou vazio. Restam 8.146 coordenadas utilizáveis.
-
-![Mapa do Brasil com os pontos das obras declaradas em Pernambuco que
-caem fora do estado. Em vermelho, 141 pontos em outros estados, a
-maioria na divisa com a Paraíba, mais casos isolados no Amazonas e na
-Bahia. Em laranja, 52 pontos no mar, incluindo um a 346 km da
-costa.](figures/mapa.png)
-
-Mapa do Brasil com os pontos das obras declaradas em Pernambuco que caem
-fora do estado. Em vermelho, 141 pontos em outros estados, a maioria na
-divisa com a Paraíba, mais casos isolados no Amazonas e na Bahia. Em
-laranja, 52 pontos no mar, incluindo um a 346 km da costa.
-
-**141 pontos caem em outro estado**, distribuídos assim:
-
-| Estado onde o ponto cai | Pontos |
-|-------------------------|-------:|
-| Paraíba                 |    130 |
-| Ceará                   |      6 |
-| Amazonas                |      2 |
-| Alagoas                 |      1 |
-| Bahia                   |      1 |
-| Rio Grande do Norte     |      1 |
-
-Afetam **16 projetos**. A concentração na Paraíba tem explicação
-geográfica banal — a divisa PE–PB corta uma região densa de pequenos
-municípios, e erros de poucos quilômetros atravessam a fronteira. Os
-outros não têm essa desculpa. O projeto `15853.26-85`, “Pavimentação de
-estradas vicinais”, declara-se em Pernambuco e tem ponto em **Manicoré,
-no Amazonas — 2.643 km de distância**. O `123265.26-04`, do MIDR, cai em
-Morro do Chapéu, na Bahia, a 582 km.
-
-**Outros 52 pontos não caem em município nenhum**: estão no mar.
-Quarenta deles a menos de 2 km da linha de costa, o que é consistente
-com obra litorânea e imprecisão do polígono. Mas seis estão a mais de 18
-km da terra, e um — do projeto `40077.26-04`, em execução — está a **346
-km da costa, em pleno Atlântico**.
-
-Vale registrar o que *não* é erro. Sete pontos que um teste ingênuo de
-caixa envolvente acusaria caem em **Fernando de Noronha**, a 361 km do
-continente. O arquipélago é distrito estadual de Pernambuco, e os pontos
-estão certos. Foi preciso o polígono municipal real para não transformar
-Noronha em anomalia — um lembrete de que o filtro grosseiro erra para os
-dois lados.
-
-## A manchete que não se sustenta
-
-O teste mais severo é comparar o ponto com o município que o próprio
-projeto declara. Ali, **179 dos 8.089 pontos comparáveis (2,2%) caem
-fora de todos os municípios declarados**, afetando 54 projetos.
-
-Seria uma boa manchete. Mas a distância desmonta:
-
-![Gráfico de barras da distância entre o ponto e o município declarado,
-para 54 projetos: 39 a menos de 1 km, 3 entre 1 e 5 km, 4 entre 5 e 25
-km, 5 entre 25 e 100 km, 1 entre 100 e 500 km e 2 acima de 500 km. A
-grande maioria é imprecisão de fronteira.](figures/distancias.png)
-
-Gráfico de barras da distância entre o ponto e o município declarado,
-para 54 projetos: 39 a menos de 1 km, 3 entre 1 e 5 km, 4 entre 5 e 25
-km, 5 entre 25 e 100 km, 1 entre 100 e 500 km e 2 acima de 500 km. A
-grande maioria é imprecisão de fronteira.
-
-**Trinta e nove dos 54 projetos estão a menos de um quilômetro** da
-divisa que declaram. Isso não é obra no lugar errado: é a resolução do
-polígono municipal encontrando a resolução da coordenada. Recife e
-Jaboatão dos Guararapes trocam de lado o tempo todo nessa faixa, e
-nenhum gestor precisa fazer nada a respeito.
-
-O deslocamento real são **15 projetos** — 0,3% dos que têm ponto.
-Destes, dois passam de 500 km e um de 200 km. Em valor, os projetos com
-ponto deslocado somam **R\$ 284,8 milhões, ou 0,4%** dos R\$ 63,96
-bilhões do estado.
-
-Essa é a conclusão honesta, e ela é menos vistosa do que a que os 2,2%
-sugeriam. A qualidade das coordenadas do ObrasGov em Pernambuco é
-**boa**. O problema não é volume, é natureza: um punhado de registros
-aponta para o estado errado, e não há no sistema nada que os impeça de
-existir. Uma validação de fronteira no momento do cadastro — a mesma que
-fizemos aqui em três linhas — barraria todos os quinze.
-
-Verificamos também se a origem da geometria explica o erro. Não explica
-de forma conclusiva: “Vetorização” erra em 3 de 152 projetos (2,0%) e
-“Par de Lat/Long” em 51 de 5.308 (1,0%). A diferença existe, mas 3 casos
-não sustentam recomendação.
-
-## O contraste que interessa
-
-Do outro lado, o TransfereGov não tem coordenada nenhuma. Tem UF e
-código IBGE do município — e os dois nunca se contradizem:
+# O caminho de 1,7 bilhão até Pernambuco — e os 151,8 milhões que pararam no meio
+
+*Um em cada quatro planos de transferência especial de 2025 foi barrado.
+Dois terços deles, porque o próprio governo não concluiu a análise no
+prazo.*
+
+> **Sobre esta análise.** Os números vêm de extrações feitas em **31 de
+> julho de 2026** da API de dados abertos do TransfereGov, com o pacote
+> [transferegovr](https://strategicprojects.github.io/transferegovr/). O
+> código está reproduzido ao longo do texto. Os dados são atualizados
+> diariamente; refazer a extração em outra data produzirá números
+> diferentes.
+
+Transferência especial é o que a imprensa apelidou de “emenda Pix”:
+dinheiro que a Emenda Constitucional 105/2019 permitiu repassar direto
+da União para estados e municípios, sem convênio e sem prestação de
+contas ao ministério repassador. O ente recebe e decide.
+
+O que quase nunca se diz sobre esse desenho é que ele deixou um rastro
+administrativo minucioso. Cada etapa — o plano, o empenho, o documento
+hábil, a ordem bancária — vira uma linha numa tabela pública. Dá para
+acompanhar cada real do anúncio ao crédito em conta. Este texto faz isso
+para Pernambuco.
+
+## A trilha
 
 ``` r
 
 library(transferegovr)
+library(dplyr)
 
-planos <- tg_get("fundoafundo", "plano_acao", .limit = Inf)
+planos <- tg_get(
+  "transferenciasespeciais", "plano_acao_especial",
+  uf_beneficiario_plano_acao = "PE",
+  .limit = Inf
+)
 
-uf_por_codigo <- c("26" = "PE", "25" = "PB", "27" = "AL", "29" = "BA")  # etc.
+planos <- planos |>
+  mutate(
+    valor = coalesce(valor_custeio_plano_acao, 0) +
+      coalesce(valor_investimento_plano_acao, 0)
+  )
+
+nrow(planos)
+#> [1] 1962
+sum(planos$valor) / 1e6
+#> [1] 1709.6
+```
+
+**1.962 planos de ação, R\$ 1,71 bilhão**, entre 2020 e julho de 2026.
+Vão para **184 beneficiários** — 183 municípios e o Estado de Pernambuco
+— indicados por **42 parlamentares**. Do total, 88% é investimento e 12%
+custeio.
+
+![A trilha do dinheiro nas transferências especiais em Pernambuco, em
+cinco etapas: emenda parlamentar de 42 parlamentares; plano de ação,
+1.962 planos e R\$ 1,71 bilhão na tabela plano_acao_especial; empenho,
+2.111 empenhos e R\$ 1,71 bilhão em empenho_especial; documento hábil,
+2.030 documentos e R\$ 1,56 bilhão em documento_habil_especial; ordem de
+pagamento e ordem bancária, 1.932 ordens todas emitidas; e a conta do
+beneficiário. Entre empenho e documento hábil, um desvio marca 204
+planos impedidos, 207 empenhos e R\$ 151,8 milhões que não seguem
+adiante.](figures/trilha-do-dinheiro.svg)
+
+A trilha do dinheiro nas transferências especiais em Pernambuco, em
+cinco etapas: emenda parlamentar de 42 parlamentares; plano de ação,
+1.962 planos e R\$ 1,71 bilhão na tabela plano_acao_especial; empenho,
+2.111 empenhos e R\$ 1,71 bilhão em empenho_especial; documento hábil,
+2.030 documentos e R\$ 1,56 bilhão em documento_habil_especial; ordem de
+pagamento e ordem bancária, 1.932 ordens todas emitidas; e a conta do
+beneficiário. Entre empenho e documento hábil, um desvio marca 204
+planos impedidos, 207 empenhos e R\$ 151,8 milhões que não seguem
+adiante.
+
+O encaixe é exato, e vale reparar nele: **R\$ 1.709,6 milhões empenhados
+menos R\$ 1.557,9 milhões em documentos hábeis dão R\$ 151,8 milhões —
+precisamente o valor dos planos impedidos.** O dinheiro não evapora
+entre etapas. Ele para num ponto identificável, e o sistema registra
+qual.
+
+Isso é mais raro do que parece em dado público brasileiro, e merece ser
+dito antes das críticas.
+
+## O ritmo
+
+![Gráfico de barras empilhadas das transferências especiais para
+Pernambuco por ano do plano de ação: 16 planos e R\$ 14,7 milhões em
+2020, 134 e R\$ 94,8 mi em 2021, 239 e R\$ 147,2 mi em 2022, 306 e R\$
+333,8 mi em 2023, 350 e R\$ 352,5 mi em 2024, 559 e R\$ 423,0 mi em
+2025, e 358 e R\$ 343,5 mi até julho de 2026. A parcela impedida, em
+vermelho, é quase invisível até 2024 e salta em
+2025.](figures/especiais-ritmo.png)
+
+Gráfico de barras empilhadas das transferências especiais para
+Pernambuco por ano do plano de ação: 16 planos e R\$ 14,7 milhões em
+2020, 134 e R\$ 94,8 mi em 2021, 239 e R\$ 147,2 mi em 2022, 306 e R\$
+333,8 mi em 2023, 350 e R\$ 352,5 mi em 2024, 559 e R\$ 423,0 mi em
+2025, e 358 e R\$ 343,5 mi até julho de 2026. A parcela impedida, em
+vermelho, é quase invisível até 2024 e salta em 2025.
+
+De R\$ 14,7 milhões em 2020 para R\$ 423 milhões em 2025 — vinte e nove
+vezes em cinco anos. E 2026, com o ano pela metade, já passou de R\$ 343
+milhões. A modalidade deixou de ser marginal.
+
+A faixa vermelha é o assunto do próximo trecho.
+
+## Onde trava
+
+``` r
 
 planos |>
+  count(situacao_plano_acao, wt = valor / 1e6, name = "milhoes")
+#> # A tibble: 3 × 2
+#>   situacao_plano_acao              milhoes
+#>   <chr>                              <dbl>
+#> 1 CIENTE                            1557.9
+#> 2 IMPEDIDO                           128.7
+#> 3 IMPEDIDO_REJEICAO_PLANO_TRABALHO    23.1
+```
+
+**204 planos estão impedidos, somando R\$ 151,8 milhões.** Todos foram
+empenhados — o dinheiro chegou a ser reservado no orçamento — e nenhum
+gerou documento hábil. Ficam num limbo: comprometidos e parados.
+
+E não estão espalhados no tempo:
+
+| Ano      |  Planos | Impedidos |         % | R\$ mi travados |
+|----------|--------:|----------:|----------:|----------------:|
+| 2020     |      16 |         0 |      0,0% |             0,0 |
+| 2021     |     134 |         4 |      3,0% |             2,6 |
+| 2022     |     239 |         9 |      3,8% |             5,8 |
+| 2023     |     306 |         8 |      2,6% |            12,4 |
+| 2024     |     350 |         0 |      0,0% |             0,0 |
+| **2025** | **559** |   **141** | **25,2%** |        **96,4** |
+| 2026     |     358 |        42 |     11,7% |            34,6 |
+
+**Em 2025, um em cada quatro planos foi impedido.** Nos quatro anos
+anteriores o índice nunca passou de 3,8%, e 2024 fechou com zero.
+
+O motivo declarado é o que dá o tom:
+
+``` r
+
+planos |>
+  filter(!is.na(motivo_impedimento_plano_acao)) |>
+  count(motivo_impedimento_plano_acao, sort = TRUE)
+#> 1 "Impedido por falta de análise conclusiva no prazo estabelecido."      91
+#> 2 "Conforme Lei Complementar n° 210/2024, Artigo 10, Inciso X; …"        29
+#> 3 "Impedido por Rejeição do Plano de Trabalho"                           21
+#> 4 "Impedimento por falta de complementação/ajuste do plano de trabalho…" 11
+#> 5 "Impedido por Restrição Técnica - inobservância da aplicação mínima…"   6
+```
+
+**Noventa e três dos 141 impedimentos de 2025 — dois terços — são “falta
+de análise conclusiva no prazo estabelecido”.** Não é o município que
+errou o formulário, não é restrição técnica, não é rejeição de mérito. É
+o prazo de análise vencendo sem que a análise saísse.
+
+Vale a cautela: os planos de 2025 e 2026 são os mais recentes, e é
+natural que concentrem pendências que o tempo resolveria. Mas “falta de
+análise conclusiva no prazo” não é pendência aberta — é prazo esgotado,
+com efeito jurídico de impedimento. E a diferença entre 2024, com zero,
+e 2025, com 141, é grande demais para ser só maturação. A Lei
+Complementar 210/2024, citada em 29 dos casos, mudou as regras nesse
+intervalo e é a hipótese mais óbvia a investigar.
+
+Do ponto de vista de quem gere um município de Pernambuco, o efeito é
+concreto: R\$ 96,4 milhões que constavam como recurso disponível em 2025
+não viraram documento hábil, e a razão registrada não é nada que a
+prefeitura pudesse ter feito diferente.
+
+## Quem recebe, quem indica
+
+``` r
+
+planos |>
+  group_by(nome_beneficiario_plano_acao) |>
+  summarise(planos = n(), milhoes = round(sum(valor) / 1e6, 1)) |>
+  arrange(desc(milhoes))
+#> # A tibble: 184 × 3
+#>   nome_beneficiario_plano_acao planos milhoes
+#>   <chr>                         <int>   <dbl>
+#> 1 MUNICIPIO DE SAO CAITANO         28    57.5
+#> 2 MUNICIPIO DO BOM JARDIM          46    52.5
+#> 3 MUNICIPIO DE BREJINHO            36    44.7
+#> 4 ESTADO DE PERNAMBUCO             26    38.0
+#> 5 MUNICIPIO DE PAUDALHO            19    29.2
+#> # ℹ 179 more rows
+```
+
+São Caitano é o maior destino da modalidade no estado, à frente do
+próprio Estado de Pernambuco. Não há nada de irregular nisso — a
+transferência especial é, por desenho, instrumento de emenda individual,
+e emendas individuais seguem a base de quem as propõe, não o mapa das
+carências. O dado apenas torna esse desenho visível.
+
+A tabela guarda o autor de cada emenda, o que permite a leitura
+complementar:
+
+``` r
+
+planos |>
+  group_by(nome_parlamentar_emenda_plano_acao) |>
+  summarise(planos = n(), milhoes = round(sum(valor) / 1e6, 1)) |>
+  arrange(desc(milhoes))
+#> 1 André Ferreira       119  95.1
+#> 2 Carlos Veras         118  80.7
+#> 3 Felipe Carreras       53  80.7
+#> 4 Humberto Costa       163  79.1
+#> 5 Renildo Calheiros     65  76.0
+```
+
+Quarenta e dois parlamentares, nenhum plano sem autor informado. A
+dispersão é notável: o primeiro colocado responde por 5,6% do total. Não
+é um instrumento capturado por poucos.
+
+## A outra porta: fundo a fundo
+
+Transferência especial não é a única via. O módulo `fundoafundo` cobre
+repasses de fundo federal para fundo estadual ou municipal — saúde,
+assistência social, educação:
+
+``` r
+
+ff <- tg_get("fundoafundo", "plano_acao", .limit = Inf)
+
+ff |>
+  filter(uf_ente_recebedor_plano_acao == "PE") |>
+  summarise(planos = n(),
+            milhoes = sum(valor_total_plano_acao, na.rm = TRUE) / 1e6)
+#> # A tibble: 1 × 2
+#>   planos milhoes
+#>    <int>   <dbl>
+#> 1    868   1792.
+```
+
+**868 planos, R\$ 1,79 bilhão** — praticamente o mesmo volume das
+transferências especiais, por um caminho institucional inteiramente
+diferente, com fundo constituído, conselho e prestação de contas
+setorial. Um município recebe pelas duas portas ao mesmo tempo, e nenhum
+dos dois sistemas mostra a outra metade.
+
+Aqui a qualidade do cadastro é exemplar. Testamos a coerência entre a UF
+declarada e o código IBGE do município, cujos dois primeiros dígitos são
+o código do estado:
+
+``` r
+
+uf_do_codigo <- c("26" = "PE", "25" = "PB", "27" = "AL", "29" = "BA")  # etc.
+
+ff |>
   filter(!is.na(uf_ente_recebedor_plano_acao),
          !is.na(codigo_ibge_municipio_ente_recebedor_plano_acao)) |>
   mutate(
     codigo = sprintf("%07.0f", codigo_ibge_municipio_ente_recebedor_plano_acao),
-    prefixo = substr(codigo, 1, 2),
-    coerente = uf_ente_recebedor_plano_acao == uf_por_codigo[prefixo]
+    uf_ibge = uf_do_codigo[substr(codigo, 1, 2)],
+    coerente = uf_ente_recebedor_plano_acao == uf_ibge
   ) |>
   count(coerente)
 #> # A tibble: 1 × 2
@@ -323,93 +263,107 @@ planos |>
 #> 1 TRUE     25971
 ```
 
-**Zero inconsistências em 25.971 planos de ação.** Nenhum prefixo de
-código IBGE inválido. Nenhum município com dois nomes diferentes. A
-localização declarada no TransfereGov é internamente coerente do começo
-ao fim.
+**Zero contradições em 25.971 planos**, em todo o país. Nenhum prefixo
+inválido, nenhum código IBGE com dois nomes de município diferentes.
 
-A leitura fácil seria “TransfereGov é melhor”. A leitura correta é
-outra: **o TransfereGov não pode errar assim porque não pede o dado que
-erra**. Ele registra qual município recebe — informação administrativa,
-validada contra uma tabela fechada, praticamente impossível de
-contradizer. O ObrasGov pede onde a obra está, informação do mundo
-físico, que exige alguém em campo com um GPS. Uma é verificável no
-cadastro; a outra só é verificável no território.
+## O que o TransfereGov não diz
 
-O ObrasGov, ao aceitar coordenadas, assumiu o risco de estar
-visivelmente errado. É por isso que é possível escrever este parágrafo
-sobre ele e não sobre o outro. **Cadastro que não pode ser contestado
-não é cadastro melhor — é cadastro que pede menos.**
+Há uma pergunta que nenhuma das tabelas acima responde: **onde a obra
+está**.
 
-Do lado do dinheiro, os planos fundo a fundo com recebedor em
-Pernambuco:
+O TransfereGov registra qual ente recebe — informação administrativa,
+validada contra uma tabela fechada, quase impossível de contradizer. Não
+registra coordenada. Para isso é preciso o outro cadastro federal, o
+[ObrasGov](https://strategicprojects.github.io/obrasgovr/), que desde
+2021 aceita latitude e longitude. Os dois não têm chave comum: o que os
+liga é o território.
 
-| Ano de início da vigência | Planos | R\$ milhões |
-|---------------------------|-------:|------------:|
-| 2020                      |    219 |       199,6 |
-| 2021                      |     15 |        45,7 |
-| 2022                      |     27 |       453,4 |
-| 2023                      |    392 |       391,6 |
-| 2024                      |      8 |        70,2 |
-| 2025                      |    197 |       588,2 |
-| 2026                      |      9 |        43,5 |
-| 2029                      |      1 |         0,7 |
+E ali a história é outra. Dos 5.477 projetos com Pernambuco como UF
+principal, 98,9% têm ponto — adesão alta. Mas ao testar cada ponto
+contra a malha municipal do IBGE:
 
-A oscilação entre 392 planos em 2023 e 8 em 2024 é o efeito dos ciclos
-de adesão a programas, não uma queda de repasse. E a última linha é o
-mesmo tipo de resíduo das datas de 1899: **um plano com início de
-vigência em 2029**.
+![Mapa do Brasil com os pontos de obras declaradas em Pernambuco que
+caem fora do estado: 141 pontos em vermelho em outros estados, a maioria
+na divisa com a Paraíba, mais casos isolados no Amazonas e na Bahia, e
+52 pontos em laranja no mar, um deles a 346 km da
+costa.](figures/mapa.png)
+
+Mapa do Brasil com os pontos de obras declaradas em Pernambuco que caem
+fora do estado: 141 pontos em vermelho em outros estados, a maioria na
+divisa com a Paraíba, mais casos isolados no Amazonas e na Bahia, e 52
+pontos em laranja no mar, um deles a 346 km da costa.
+
+**141 pontos caem em outro estado** — 130 na Paraíba, o que a divisa
+densa explica, mas também dois no Amazonas: um projeto de estradas
+vicinais declarado em Pernambuco tem ponto em Manicoré, a 2.643 km.
+**Outros 52 caem no mar**, a maioria a menos de 2 km da costa, mas um a
+346 km, em obra marcada como em execução.
+
+A manchete tentadora seria “2,2% dos pontos estão errados” — a proporção
+que cai fora de todo município declarado. Ela não sobrevive à distância:
+**39 dos 54 projetos afetados estão a menos de um quilômetro da
+divisa**, o que é resolução de polígono, não obra no lugar errado. O
+deslocamento real são 15 projetos, 0,3%.
+
+Vale registrar o que também não é erro: sete pontos que um teste ingênuo
+acusaria caem em **Fernando de Noronha**, a 361 km do continente. O
+arquipélago é Pernambuco, e os pontos estão certos.
+
+O contraste é instrutivo, mas a lição não é “um é melhor que o outro”.
+**O TransfereGov não pode errar a localização porque não pede o dado que
+erra.** O ObrasGov, ao aceitar coordenada, assumiu o risco de estar
+visivelmente errado — e é por isso que dá para escrever este parágrafo
+sobre ele. Cadastro que não pode ser contestado não é cadastro melhor; é
+cadastro que pede menos.
 
 ## O que um gestor faz com isso
 
-Três coisas são acionáveis hoje, e todas são baratas:
+Três coisas, todas baratas:
 
-1.  **Validar a coordenada contra o município na hora do cadastro.** Os
-    15 projetos genuinamente deslocados seriam barrados por um
-    `st_within` — o mesmo que roda em segundos neste artigo. É a
-    diferença entre um cadastro que aceita e um que confere.
-2.  **Tratar data efetiva como obrigatória na conclusão.** Enquanto 0,8%
-    dos projetos tiverem data real de entrega, nenhum indicador de prazo
-    do estado é calculável, e os 1.086 projetos vencidos continuarão
-    indistinguíveis entre “travado” e “desatualizado”.
-3.  **Fazer uma varredura dos vencidos há mais de cinco anos.** São 233
-    projetos. Não é volume que exija sistema: é volume que cabe numa
-    planilha e numa reunião.
-
-E uma coisa não é acionável, mas deve ser dita: **a análise acima só foi
-possível porque o ObrasGov publica coordenada**. A crítica que este
-texto faz a ele é mérito dele. Um sistema que publicasse menos
-apareceria melhor aqui.
+1.  **Acompanhar o prazo de análise, não só o de execução.** Os R\$ 96,4
+    milhões travados em 2025 não dependeram de nenhum município. Um
+    alerta sobre planos com análise próxima do vencimento é uma consulta
+    a `plano_acao_especial` filtrando por `situacao_plano_acao`.
+2.  **Ler as duas portas juntas.** Nenhum sistema mostra quanto um
+    município recebe no total. O código IBGE permite somar transferência
+    especial e fundo a fundo, e essa soma é o número que um secretário
+    de planejamento precisa.
+3.  **Validar coordenada contra município no cadastro.** Do lado do
+    ObrasGov, os 15 projetos genuinamente deslocados seriam barrados por
+    um `st_within` — a mesma checagem que roda em segundos aqui.
 
 ------------------------------------------------------------------------
 
 ## Limites desta análise
 
-- **Recorte.** Só projetos com `uf_principal = "PE"`. Obras em outros
-  estados que atendam Pernambuco, ou multiestaduais registradas sob
-  outra UF, ficam de fora.
-- **A malha é de 2022.** Municípios criados ou com divisa alterada
-  depois disso podem gerar divergência que não é erro do cadastro.
-- **“Fora do município declarado” não é prova de erro de coordenada.**
-  Pode ser erro do município declarado. Os dados não permitem dizer qual
-  dos dois campos está errado — apenas que eles se contradizem.
-- **O ponto marca o projeto, não necessariamente a obra.** Um projeto
-  linear — estrada, adutora — é representado por pontos, e a distância a
-  uma sede municipal não mede erro nesses casos.
-- **Valor é investimento previsto**, informado no cadastro. Não é
-  empenho, não é pago, e não é liquidado.
+- **Recorte.** Transferências especiais com
+  `uf_beneficiario_plano_acao = "PE"` e planos fundo a fundo com ente
+  recebedor em PE. Recursos que chegam ao estado por outras vias — TED,
+  convênios do SICONV, execução direta federal — ficam de fora.
+- **“Impedido” é situação corrente, não sentença.** Um plano impedido em
+  julho de 2026 pode ser desimpedido depois. O que os dados sustentam é
+  a fotografia da data de extração.
+- **A causa do salto de 2025 não está provada.** A concentração é
+  factual; a Lei Complementar 210/2024 é hipótese, sugerida por aparecer
+  entre os motivos.
+- **Valor do plano não é valor pago.** É custeio mais investimento
+  declarados. O pagamento efetivo está na ordem bancária, e nem toda
+  ordem bancária foi conciliada aqui.
+- **A parte do ObrasGov é resumo** de uma análise mais longa; a malha
+  municipal usada é a de 2022.
 
 ## Reprodução
 
-Os dados vêm de duas APIs públicas, sem autenticação. Os dois pacotes se
-instalam com [pak](https://pak.r-lib.org):
-
 ``` r
 
-pak::pak(c("StrategicProjects/obrasgovr", "StrategicProjects/transferegovr"))
+pak::pak(c("StrategicProjects/transferegovr", "StrategicProjects/obrasgovr"))
 ```
 
-A malha municipal vem do [geobr](https://ipeagit.github.io/geobr/). A
-extração completa deste artigo baixa cerca de 5,5 mil projetos e 9,7 mil
-geometrias — alguns minutos, respeitando o limite de requisições que os
-dois pacotes já aplicam sozinhos.
+Ambas as APIs são públicas e sem autenticação. A extração completa baixa
+cerca de 2 mil planos, 2 mil empenhos e 26 mil planos fundo a fundo —
+poucos minutos, com o limite de requisições que o pacote já respeita
+sozinho.
+
+Uma ressalva prática: a trilha do empenho ao documento hábil usa
+`id_empenho = in_(...)` com milhares de valores, e uma lista muito longa
+estoura o tamanho da URL. Faça em lotes de algumas centenas.

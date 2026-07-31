@@ -1,0 +1,98 @@
+:root {
+  --tg-navy: #0a2540;
+  --tg-blue: #1351b4;
+  --tg-bright: #2670e8;
+  --tg-green: #3fd98a;
+  --tg-surface: #f3f8f5;
+}
+
+body {
+  color: #243447;
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+.navbar {
+  background: linear-gradient(105deg, var(--tg-navy), var(--tg-blue) 72%, var(--tg-bright)) !important;
+  border-bottom: 3px solid var(--tg-green);
+  box-shadow: 0 0.25rem 1rem rgba(10, 37, 64, 0.16);
+}
+
+.navbar-brand,
+.navbar .nav-link,
+.navbar .navbar-toggler {
+  color: #fff !important;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  color: #d6ffe9 !important;
+}
+
+.template-home .page-header {
+  border-bottom: 0;
+  margin-bottom: 1.75rem;
+}
+
+/* pkgdown puts the logo in the page header itself, so the copy the README
+   carries for GitHub would otherwise appear twice on the home page. */
+.template-home .readme-logo {
+  display: none;
+}
+
+.template-home .page-header .logo {
+  filter: drop-shadow(0 0.5rem 0.65rem rgba(10, 37, 64, 0.18));
+}
+
+/* The architecture diagram is a wide SVG on a dark card; let it use the full
+   column and keep its corners from clashing with the page background. */
+.architecture-diagram {
+  border-radius: 0.75rem;
+  box-shadow: 0 0.35rem 1.1rem rgba(10, 37, 64, 0.14);
+  margin: 1.5rem 0 2rem;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--tg-navy);
+  font-weight: 700;
+}
+
+h2 {
+  border-bottom: 2px solid #dceae2;
+  padding-bottom: 0.35rem;
+}
+
+a {
+  text-underline-offset: 0.15em;
+}
+
+pre {
+  border: 1px solid #dbe6e0;
+  border-radius: 0.55rem;
+  box-shadow: 0 0.2rem 0.7rem rgba(10, 37, 64, 0.05);
+}
+
+table {
+  margin-bottom: 1.5rem;
+}
+
+.ref-index th,
+.ref-index td {
+  padding-block: 0.65rem;
+}
+
+.aside .links,
+.aside .roles {
+  background: var(--tg-surface);
+  border-radius: 0.65rem;
+  padding: 0.85rem 1rem;
+}
+
+footer {
+  border-top: 3px solid #dceae2;
+  margin-top: 3rem;
+}

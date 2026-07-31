@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 692.82" role="img" aria-label="transferegovr">
+  <path d="M300.00 0.00L600.00 173.21L600.00 519.62L300.00 692.82L0.00 519.62L0.00 173.21Z" fill="#0A2540"/>
+  <g transform="translate(300.00 346.41) scale(1.340) translate(-300.00 -305.00)">
+    <g fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M300 250 V318"/>
+      <path d="M152 360 V318 H448 V360"/>
+      <path d="M300 318 V360"/>
+    </g>
+    <g fill="#FFFFFF">
+      <rect x="254" y="158" width="92" height="92" rx="18"/>
+      <path d="M136 360L168 360L152 382Z"/>
+      <path d="M284 360L316 360L300 382Z"/>
+      <path d="M432 360L464 360L448 382Z"/>
+    </g>
+    <g fill="#3FD98A">
+      <circle cx="152" cy="418" r="34"/>
+      <circle cx="300" cy="418" r="34"/>
+      <circle cx="448" cy="418" r="34"/>
+    </g>
+  </g>
+  <path d="M300.00 8.08L593.00 177.25L593.00 515.57L300.00 684.74L7.00 515.57L7.00 177.25Z" fill="none" stroke="#05172A" stroke-width="14"/>
+</svg>
+

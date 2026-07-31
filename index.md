@@ -1,5 +1,7 @@
 # transferegovr
 
+![transferegovr hex logo](reference/figures/logo.svg)
+
 An R interface to the open data APIs of **TransfereGov**, the Brazilian
 federal government’s platform for transfers to states, municipalities
 and civil society.
@@ -126,6 +128,26 @@ tg_cache_dir(tools::R_user_dir("transferegovr", "cache"))
 or set `TRANSFEREGOVR_CACHE_DIR` in your `.Renviron`.
 [`tg_cache_clear()`](https://strategicprojects.github.io/transferegovr/reference/tg_cache_clear.md)
 empties it.
+
+## How it works
+
+![Architecture of transferegovr: the public verbs pass through filter
+and schema validation, the pagination loop, and the HTTP client and its
+cache, reach the three PostgREST services, and return through the parser
+as a typed tibble.](reference/figures/architecture.svg)
+
+Two things in that picture are worth stating plainly, because they are
+where a naive client of these APIs loses data:
+
+- **The 1000-row cap is silent.** Ask for more and the service returns
+  1000 rows with a `206`, and nothing in the body says the result was
+  cut short. Only `Content-Range` does. `.limit` counts rows and is met
+  by fetching pages.
+- **Offset pagination needs an order.** A Postgres query without
+  `ORDER BY` has no defined row order, so page two can repeat page one
+  and skip rows elsewhere. Every request this package sends carries an
+  explicit order, and the rows collected are checked against the total
+  the API reported.
 
 ## Column names are in Portuguese
 

@@ -22,7 +22,9 @@ tg_modules()
 \seealso{
 Other discovery:
 \code{\link[=tg_fields]{tg_fields()}},
+\code{\link[=tg_params]{tg_params()}},
 \code{\link[=tg_schema_date]{tg_schema_date()}},
-\code{\link[=tg_tables]{tg_tables()}}
+\code{\link[=tg_tables]{tg_tables()}},
+\code{\link[=tg_updated_at]{tg_updated_at()}}
 }
 \concept{discovery}

@@ -3,16 +3,21 @@ API’s
 backoff
 Barreto
 CMD
+CNPJ
 Codecov
 de
 descentralizada
+especiais
 execução
+FastAPI
+fundoafundo
 Lifecycle
 Nascimento
 ObrasGov
 obrasgovr
 OpenAPI
 ORCID
+parcerias
 pkgdown
 Postgres
 PostgREST
@@ -23,3 +28,4 @@ termo
 tibble
 tibbles
 TransfereGov
+unnest

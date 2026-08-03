@@ -17,7 +17,7 @@ home:
   title: transferegovr | Brazilian federal transfers data in R
   description: >
     R interface to the TransfereGov open data APIs: special transfers,
-    fund-to-fund transfers, and decentralized credit.
+    fund-to-fund transfers, and partnership management.
 
 navbar:
   structure:
@@ -54,25 +54,22 @@ navbar:
 
 reference:
 - title: Queries
-  desc: Retrieving rows from the three TransfereGov APIs.
+  desc: Retrieving rows from the three TransfereGov API modules.
   contents:
   - tg_get
   - tg_count
   - module_shortcuts
   - tg_metadata
-- title: Filters
-  desc: >
-    The comparison operators the APIs accept. Each topic also lists its
-    Portuguese alias, which shares the same help page.
-  contents:
-  - filters
-  - tg_operators
 - title: Discovery
-  desc: What the APIs publish, without making a request.
+  desc: >
+    What the APIs publish, without making a request. Each topic also lists its
+    Portuguese alias, which shares the same help page.
   contents:
   - tg_modules
   - tg_tables
   - tg_fields
+  - tg_params
+  - tg_updated_at
   - tg_schema_date
 - title: Configuration
   desc: Caching and connection settings.

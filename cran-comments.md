@@ -2,7 +2,17 @@
 
 0 errors | 0 warnings | 0 notes
 
-* This is a new release.
+## About this version
+
+Version 0.1.0 was submitted on 2026-07-31 and covered the TransfereGov
+'PostgREST' services at `api.transferegov.gestao.gov.br`.
+
+The platform also publishes a second set of services, at
+`api-publica.transferegov.gestao.gov.br`, with a different contract:
+page-number pagination, typed query parameters instead of operators, and a
+module ('parcerias') that the first host does not serve at all. Version 0.2.0
+targets those services instead. It is a rewrite rather than an addition, so it
+supersedes the pending 0.1.0 submission.
 
 ## Test environments
 
@@ -32,7 +42,7 @@ tested rather than assumed.
   response cache defaults to `tempdir()`, and `tg_cache_dir()` must be called
   explicitly to make it persistent.
 
-* Table names, column names and categorical values appear in Portuguese in the
-  documentation, and a few Portuguese words are in `inst/WORDLIST`. They are the
-  APIs' own identifiers and cannot be translated without breaking the queries
-  they name.
+* Table names, column names, query parameter names and categorical values
+  appear in Portuguese in the documentation, and a few Portuguese words are in
+  `inst/WORDLIST`. They are the APIs' own identifiers and cannot be translated
+  without breaking the queries they name.

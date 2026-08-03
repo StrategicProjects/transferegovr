@@ -135,14 +135,6 @@ test_that("a column the schema does not know is typed by inspection", {
   expect_type(out$novo, "double")
 })
 
-test_that("a column set by .select shapes the result", {
-  rows <- rows_from('[{"a":1,"b":2}]')
-  out <- .tg_rows_to_tibble(rows, fields(a = "integer", b = "integer"),
-    columns = "a"
-  )
-
-  expect_named(out, "a")
-})
 
 test_that("an empty result still carries the table's columns and types", {
   # A zero-row tibble with no columns would break any code that binds pages or
@@ -155,14 +147,6 @@ test_that("an empty result still carries the table's columns and types", {
   expect_type(out$b, "integer")
 })
 
-test_that("an empty result narrowed by .select keeps only those columns", {
-  out <- .tg_rows_to_tibble(list(), fields(a = "Date", b = "integer"),
-    columns = "b"
-  )
-
-  expect_named(out, "b")
-  expect_type(out$b, "integer")
-})
 
 test_that("rows presenting columns in different orders are still aligned", {
   rows <- rows_from('[{"a":1,"b":2},{"b":20,"a":10}]')
@@ -180,25 +164,20 @@ test_that("a nested value is kept whole in a list-column", {
   expect_equal(out$a[[1]], list(x = 1))
 })
 
-test_that("Content-Range is read in every form the service sends", {
-  expect_equal(.tg_parse_content_range("0-99/6176")$total, 6176)
-  expect_equal(.tg_parse_content_range("0-99/6176")$first, 0L)
-  expect_equal(.tg_parse_content_range("0-99/6176")$last, 99L)
-  expect_true(is.na(.tg_parse_content_range("0-2/*")$total))
-  expect_equal(.tg_parse_content_range("*/0")$total, 0)
-  expect_true(is.na(.tg_parse_content_range("*/0")$first))
-  expect_equal(.tg_parse_content_range("items 0-9/10")$total, 10)
+test_that("a column the schema declares as an array is always a list column", {
+  # Even when every row on this page holds an empty array, so the class does
+  # not depend on which page was fetched.
+  rows <- rows_from('[{"a":[]},{"a":[]}]')
+  out <- .tg_rows_to_tibble(rows, fields(a = "list"))
+
+  expect_type(out$a, "list")
+  expect_equal(out$a, list(list(), list()))
 })
 
-test_that("a missing or malformed Content-Range reports no total", {
-  expect_true(is.na(.tg_parse_content_range(NULL)$total))
-  expect_true(is.na(.tg_parse_content_range("")$total))
-  expect_true(is.na(.tg_parse_content_range("nonsense")$total))
-  expect_true(is.na(.tg_parse_content_range("0-99")$total))
-})
+test_that("a null in a declared array column becomes an empty list", {
+  rows <- rows_from('[{"a":[{"x":1}]},{"a":null}]')
+  out <- .tg_rows_to_tibble(rows, fields(a = "list"))
 
-test_that("a total beyond integer range survives as a double", {
-  # As an integer this would become NA and silently disable the completeness
-  # check that bounds multi-page collection.
-  expect_equal(.tg_parse_content_range("0-9/3000000000")$total, 3e9)
+  expect_equal(out$a[[1]], list(list(x = 1)))
+  expect_equal(out$a[[2]], list())
 })

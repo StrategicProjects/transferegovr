@@ -3,29 +3,15 @@
 Asks the API for the number of rows matching a set of filters without
 retrieving them. Worth doing before a large
 [`tg_get()`](https://strategicprojects.github.io/transferegovr/reference/tg_get.md):
-the biggest table in these APIs holds over a million rows, which is more
-than a thousand requests.
+the biggest table in these APIs holds over a million rows, which at 200
+rows a request is more than five thousand requests.
 
 ## Usage
 
 ``` r
-tg_count(
-  module,
-  table,
-  ...,
-  .params = list(),
-  .cache = NULL,
-  .base_url = tg_base_url()
-)
+tg_count(module, table, ..., .cache = NULL, .base_url = NULL)
 
-tg_contar(
-  module,
-  table,
-  ...,
-  .params = list(),
-  .cache = NULL,
-  .base_url = tg_base_url()
-)
+tg_contar(module, table, ..., .cache = NULL, .base_url = NULL)
 ```
 
 ## Arguments
@@ -34,8 +20,8 @@ tg_contar(
 
   A module name from
   [`tg_modules()`](https://strategicprojects.github.io/transferegovr/reference/tg_modules.md):
-  `"transferenciasespeciais"`, `"fundoafundo"` or `"ted"`. Aliases such
-  as `"fundo_a_fundo"` are accepted.
+  `"especiais"`, `"fundoafundo"` or `"parcerias"`. Aliases such as
+  `"fundo_a_fundo"` are accepted.
 
 - table:
 
@@ -44,15 +30,8 @@ tg_contar(
 
 - ...:
 
-  Filters, named after the columns they apply to. See
+  Filters, named after the parameters they set. See
   [`tg_get()`](https://strategicprojects.github.io/transferegovr/reference/tg_get.md).
-
-- .params:
-
-  Extra query parameters passed to the API verbatim, as a named list.
-  This is the escape hatch for 'PostgREST' features the package does not
-  model, such as
-  `list(or = "(aa_ano_plano_acao.eq.2024,\ aa_ano_plano_acao.eq.2025)")`.
 
 - .cache:
 
@@ -80,7 +59,7 @@ Other queries:
 
 ``` r
 if (interactive()) {
-  tg_count("ted", "plano_acao")
-  tg_count("ted", "plano_acao", aa_ano_plano_acao = 2024)
+  tg_count("parcerias", "proposta")
+  tg_count("parcerias", "proposta", situacao_proposta = "Aprovada")
 }
 ```

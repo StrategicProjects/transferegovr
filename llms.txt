@@ -6,17 +6,40 @@ An R interface to the open data APIs of **TransfereGov**, the Brazilian
 federal government’s platform for transfers to states, municipalities
 and civil society.
 
-The platform publishes three APIs, covering **48 tables** in all:
+## What this package covers
+
+The package targets the public API host,
+`api-publica.transferegov.gestao.gov.br`, which publishes three modules
+and **55 tables** in all:
 
 | Module | Covers | Tables |
 |----|----|----|
-| `transferenciasespeciais` | Special transfers, created by Constitutional Amendment 105/2019 for individual parliamentary amendments | 14 |
-| `fundoafundo` | Fund-to-fund transfers, from federal funds directly to state, district and municipal funds | 21 |
-| `ted` | Decentralized credit between federal bodies (*termo de execução descentralizada*) | 13 |
+| `especiais` | Special transfers, created by Constitutional Amendment 105/2019 for individual parliamentary amendments | 20 |
+| `fundoafundo` | Fund-to-fund transfers, from federal funds directly to state, district and municipal funds | 20 |
+| `parcerias` | Partnership management: programs, proposals, partnerships, their financial execution and bank statements | 15 |
 
-All three are [PostgREST](https://postgrest.org) services, so this
-package exposes their filtering, column selection and ordering directly,
-rather than wrapping each table in a function of its own.
+Every table in the three published data models is reachable. Where the
+API folds a child table into its parent rather than giving it an
+endpoint of its own, it arrives as a list column — 5 of them in
+`fundoafundo`, 13 in `parcerias` — and `tg_fields(nested = )` describes
+what is inside.
+
+### What it does not cover
+
+- **`ted`**, decentralized credit between federal bodies (*termo de
+  execução descentralizada*), 13 tables. It has not been published on
+  the public API host; it exists only on the older
+  `api.transferegov.gestao.gov.br` service, which this package no longer
+  uses.
+- **The older PostgREST endpoints** for special and fund-to-fund
+  transfers on that same host. They are still up and still answer, but
+  they are a different and largely superseded contract — different
+  column names, a handful of columns each way, and a
+  `historico_pagamento_especial` table that the new service does not
+  carry.
+- **SICONV agreement data**, published as daily CSV extracts at
+  <https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos/download-dados>.
+  A separate source, not an API.
 
 ## Installation
 
@@ -33,69 +56,75 @@ pak::pak("StrategicProjects/transferegovr")
 library(transferegovr)
 
 tg_modules()
-tg_tables("ted")
-tg_fields("ted", "plano_acao")
+tg_tables("parcerias")
+tg_fields("parcerias", "proposta")
+tg_params("parcerias", "proposta")
 ```
 
 [`tg_get()`](https://strategicprojects.github.io/transferegovr/reference/tg_get.md)
-retrieves rows. Name each filter after the column it applies to:
-
-``` r
-
-tg_get("ted", "plano_acao", aa_ano_plano_acao = 2024)
-```
-
-A bare value means “equals”, a bare vector means “is one of”, and the
-operators from
-[`tg_operators()`](https://strategicprojects.github.io/transferegovr/reference/tg_operators.md)
-cover the rest:
+retrieves rows. Each filter is named after one of the endpoint’s own
+query parameters, and parameters combine with AND:
 
 ``` r
 
 tg_get(
-  "ted", "plano_acao",
-  aa_ano_plano_acao = gte(2024),
-  sigla_unidade_descentralizada = c("CNPq", "CAPES"),
-  tx_objeto_plano_acao = ilike("*pesquisa*"),
-  .select = c("id_plano_acao", "vl_total_plano_acao", "dt_inicio_vigencia"),
-  .order = "vl_total_plano_acao.desc",
+  "parcerias", "proposta",
+  sg_uf_recebedor = "PE",
+  situacao_proposta = "Aprovada",
   .limit = 20
 )
 ```
 
-Several conditions on one column go in a list, and the API combines them
-with AND:
+That is the whole filtering vocabulary. These services compare for
+equality and nothing else — no greater-than, no pattern match, no “is
+one of” — and they publish no ordering or column-selection parameter.
+[`tg_params()`](https://strategicprojects.github.io/transferegovr/reference/tg_params.md)
+lists what each table accepts, including the permitted values of the
+enumerated parameters.
+
+## A typo must not look like an answer
+
+These services **ignore a query parameter they do not recognize** and
+answer `200` with the whole table. Misspell `situacao_proposta` and you
+get 88,666 rows where the filter would have given 84,258 — a plausible
+number, quietly wrong.
+
+So every parameter name is checked against the packaged schema before a
+request goes out:
 
 ``` r
 
-tg_get(
-  "fundoafundo", "plano_acao",
-  data_inicio_vigencia_plano_acao = list(gte("2024-01-01"), lt("2025-01-01"))
-)
+tg_count("parcerias", "proposta", in_situacao_proposta = "Aprovada")
+#> Error in `tg_count()`:
+#> ! Unknown filter: "in_situacao_proposta".
+#> ✖ The API ignores a parameter it does not recognize and returns every row, so
+#>   this would look like a query that matched nothing in particular.
+#> ℹ Did you mean "situacao_proposta"?
 ```
+
+Enumerated values are checked the same way, before the round trip rather
+than after it.
 
 ## Size first, download second
 
-The service returns at most 1000 rows per request, and these tables are
-not small — the largest holds over a million rows, which is more than a
-thousand requests. Ask before you fetch:
+The services return at most 200 rows per request, and these tables are
+not small. Ask before you fetch:
 
 ``` r
 
-tg_count("fundoafundo", "gestao_financeira_lancamentos")
-#> [1] 1115444
+tg_count("especiais", "meta_especiais")
+#> [1] 156060
 ```
 
-`.limit` counts rows, not pages. Anything above 1000 is collected page
-by page, in an explicit order so that the pages cannot overlap or skip
-rows, and the total collected is checked against what the API reported:
+`.limit` counts rows, not pages. Anything above 200 is collected page by
+page, and the total collected is checked against what the API reported:
 
 ``` r
 
-plans <- tg_get("ted", "plano_acao", .limit = Inf)
+metas <- tg_get("especiais", "meta_especiais", .limit = Inf)
 
-tg_metadata(plans)$total_rows
-tg_metadata(plans)$pages
+tg_metadata(metas)$total_rows
+tg_metadata(metas)$pages
 ```
 
 ## Types
@@ -106,15 +135,25 @@ class on the next:
 
 ``` r
 
-plans <- tg_get("ted", "plano_acao", .limit = 5)
+proposals <- tg_get("parcerias", "proposta", .limit = 5)
 
-class(plans$dt_inicio_vigencia)
+class(proposals$dt_proposta)
 #> [1] "Date"
-class(plans$in_forma_execucao_direta)
-#> [1] "logical"
+class(proposals$intervenientes_proposta)
+#> [1] "list"
 ```
 
-## Caching
+## Freshness and caching
+
+Each module reports when it was last loaded, which is the only freshness
+signal these APIs give — they send no `ETag`, `Cache-Control` or
+`Last-Modified`:
+
+``` r
+
+tg_updated_at("parcerias")
+#> [1] "2026-08-03 UTC"
+```
 
 Responses are cached for an hour in the session’s temporary directory,
 so nothing is written outside the session unless you ask for it. To keep
@@ -131,55 +170,59 @@ empties it.
 
 ## How it works
 
-![Architecture of transferegovr: the public verbs pass through filter
+![Architecture of transferegovr: the public verbs pass through parameter
 and schema validation, the pagination loop, and the HTTP client and its
-cache, reach the three PostgREST services, and return through the parser
-as a typed tibble.](reference/figures/architecture.svg)
+cache, reach the three services, and return through the parser as a
+typed tibble.](reference/figures/architecture.svg)
 
-Two things in that picture are worth stating plainly, because they are
-where a naive client of these APIs loses data:
+Two things in that picture are where a naive client of these APIs loses
+data:
 
-- **The 1000-row cap is silent.** Ask for more and the service returns
-  1000 rows with a `206`, and nothing in the body says the result was
-  cut short. Only `Content-Range` does. `.limit` counts rows and is met
-  by fetching pages.
-- **Offset pagination needs an order.** A Postgres query without
-  `ORDER BY` has no defined row order, so page two can repeat page one
-  and skip rows elsewhere. Every request this package sends carries an
-  explicit order, and the rows collected are checked against the total
-  the API reported.
+- **An unrecognized parameter is ignored, not rejected.** The request
+  succeeds and returns everything. Validating names client-side is the
+  only defense, which is why the packaged schema freezes the parameter
+  list and not just the columns.
+- **Repeating a parameter does not combine conditions.** The service
+  keeps the last occurrence and discards the rest without saying so, so
+  the package refuses a repeated or multi-valued filter rather than
+  sending one.
+
+Page order is the server’s — these APIs publish no ordering parameter —
+so it was verified rather than assumed: the same rows come back in the
+same sequence across page sizes, across repeated calls, 100,000 rows
+deep, on tables with no key, and on tables with nested columns.
+`tests/testthat/test-live.R` keeps checking it.
 
 ## Column names are in Portuguese
 
-Table names, column names and categorical values belong to the API and
-are left as the government publishes them. The package’s own functions,
-arguments and documentation are in English, with Portuguese aliases
+Table names, column names, parameter names and categorical values belong
+to the API and are left as the government publishes them. The package’s
+own functions, arguments and documentation are in English, with
+Portuguese aliases
 ([`tg_obter()`](https://strategicprojects.github.io/transferegovr/reference/tg_get.md),
 [`tg_contar()`](https://strategicprojects.github.io/transferegovr/reference/tg_count.md),
 [`tg_tabelas()`](https://strategicprojects.github.io/transferegovr/reference/tg_tables.md),
-[`tg_campos()`](https://strategicprojects.github.io/transferegovr/reference/tg_fields.md))
+[`tg_campos()`](https://strategicprojects.github.io/transferegovr/reference/tg_fields.md),
+[`tg_parametros()`](https://strategicprojects.github.io/transferegovr/reference/tg_params.md),
+[`tg_atualizado_em()`](https://strategicprojects.github.io/transferegovr/reference/tg_updated_at.md))
 for the exported verbs.
 
 ## Related
 
 - [obrasgovr](https://github.com/StrategicProjects/obrasgovr) — the
   ObrasGov public works API.
-- The TransfereGov platform also publishes daily CSV extracts of SICONV
-  agreement data at
-  <https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos/download-dados>.
-  Those files are a separate source and are not covered by this package.
 
 ## Official documentation
 
-- <https://docs.api.transferegov.gestao.gov.br/transferenciasespeciais/>
-- <https://docs.api.transferegov.gestao.gov.br/fundoafundo/>
-- <https://docs.api.transferegov.gestao.gov.br/ted/>
+- <https://api-publica.transferegov.gestao.gov.br/especiais/docs>
+- <https://api-publica.transferegov.gestao.gov.br/fundoafundo/docs>
+- <https://api-publica.transferegov.gestao.gov.br/parcerias/docs>
 
 # Package index
 
 ## Queries
 
-Retrieving rows from the three TransfereGov APIs.
+Retrieving rows from the three TransfereGov API modules.
 
 - [`tg_get()`](https://strategicprojects.github.io/transferegovr/reference/tg_get.md)
   [`tg_obter()`](https://strategicprojects.github.io/transferegovr/reference/tg_get.md)
@@ -187,42 +230,18 @@ Retrieving rows from the three TransfereGov APIs.
 - [`tg_count()`](https://strategicprojects.github.io/transferegovr/reference/tg_count.md)
   [`tg_contar()`](https://strategicprojects.github.io/transferegovr/reference/tg_count.md)
   : Count the rows a query matches
-- [`tg_ted()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
+- [`tg_parcerias()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
   [`tg_fundo_a_fundo()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
-  [`tg_transferencias_especiais()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
+  [`tg_especiais()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
   : Query a single module
 - [`tg_metadata()`](https://strategicprojects.github.io/transferegovr/reference/tg_metadata.md)
   [`tg_metadados()`](https://strategicprojects.github.io/transferegovr/reference/tg_metadata.md)
   : Inspect what a query retrieved
 
-## Filters
-
-The comparison operators the APIs accept. Each topic also lists its
-Portuguese alias, which shares the same help page.
-
-- [`eq()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`neq()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`gt()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`gte()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`lt()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`lte()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`like()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`ilike()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`re_match()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`re_imatch()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`in_()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`is_null()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`is_true()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`is_false()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  [`not()`](https://strategicprojects.github.io/transferegovr/reference/filters.md)
-  : Filter operators
-- [`tg_operators()`](https://strategicprojects.github.io/transferegovr/reference/tg_operators.md)
-  [`tg_operadores()`](https://strategicprojects.github.io/transferegovr/reference/tg_operators.md)
-  : List the available filter operators
-
 ## Discovery
 
-What the APIs publish, without making a request.
+What the APIs publish, without making a request. Each topic also lists
+its Portuguese alias, which shares the same help page.
 
 - [`tg_modules()`](https://strategicprojects.github.io/transferegovr/reference/tg_modules.md)
   [`tg_modulos()`](https://strategicprojects.github.io/transferegovr/reference/tg_modules.md)
@@ -233,6 +252,12 @@ What the APIs publish, without making a request.
 - [`tg_fields()`](https://strategicprojects.github.io/transferegovr/reference/tg_fields.md)
   [`tg_campos()`](https://strategicprojects.github.io/transferegovr/reference/tg_fields.md)
   : List the columns of a table
+- [`tg_params()`](https://strategicprojects.github.io/transferegovr/reference/tg_params.md)
+  [`tg_parametros()`](https://strategicprojects.github.io/transferegovr/reference/tg_params.md)
+  : List the parameters a table accepts as filters
+- [`tg_updated_at()`](https://strategicprojects.github.io/transferegovr/reference/tg_updated_at.md)
+  [`tg_atualizado_em()`](https://strategicprojects.github.io/transferegovr/reference/tg_updated_at.md)
+  : When a module's data was last refreshed
 - [`tg_schema_date()`](https://strategicprojects.github.io/transferegovr/reference/tg_schema_date.md)
   : Report the frozen schema's build date
 

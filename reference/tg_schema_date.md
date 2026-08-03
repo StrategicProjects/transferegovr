@@ -20,11 +20,13 @@ A `Date`.
 Other discovery:
 [`tg_fields()`](https://strategicprojects.github.io/transferegovr/reference/tg_fields.md),
 [`tg_modules()`](https://strategicprojects.github.io/transferegovr/reference/tg_modules.md),
-[`tg_tables()`](https://strategicprojects.github.io/transferegovr/reference/tg_tables.md)
+[`tg_params()`](https://strategicprojects.github.io/transferegovr/reference/tg_params.md),
+[`tg_tables()`](https://strategicprojects.github.io/transferegovr/reference/tg_tables.md),
+[`tg_updated_at()`](https://strategicprojects.github.io/transferegovr/reference/tg_updated_at.md)
 
 ## Examples
 
 ``` r
 tg_schema_date()
-#> [1] "2026-07-31"
+#> [1] "2026-08-03"
 ```

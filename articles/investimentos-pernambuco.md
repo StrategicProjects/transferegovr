@@ -4,8 +4,8 @@
 Dois terços deles, porque o próprio governo não concluiu a análise no
 prazo.*
 
-> **Sobre esta análise.** Os números vêm de extrações feitas em **31 de
-> julho de 2026** da API de dados abertos do TransfereGov, com o pacote
+> **Sobre esta análise.** Os números vêm de extrações feitas em **3 de
+> agosto de 2026** da API de dados abertos do TransfereGov, com o pacote
 > [transferegovr](https://strategicprojects.github.io/transferegovr/). O
 > código está reproduzido ao longo do texto. Os dados são atualizados
 > diariamente; refazer a extração em outra data produzirá números
@@ -29,13 +29,15 @@ para Pernambuco.
 library(transferegovr)
 library(dplyr)
 
-planos <- tg_get(
-  "transferenciasespeciais", "plano_acao_especial",
-  uf_beneficiario_plano_acao = "PE",
-  .limit = Inf
-)
+# O plano de ação não carrega a UF: ela vive no beneficiário.
+beneficiarios <- tg_get("especiais", "beneficiarios_especiais", .limit = Inf)
+pe <- beneficiarios |> filter(uf_beneficiario == "PE")
 
-planos <- planos |>
+nrow(pe)
+#> [1] 184
+
+planos <- tg_get("especiais", "planos_acao_especiais", .limit = Inf) |>
+  semi_join(pe, by = "id_beneficiario") |>
   mutate(
     valor = coalesce(valor_custeio_plano_acao, 0) +
       coalesce(valor_investimento_plano_acao, 0)
@@ -54,20 +56,20 @@ custeio.
 
 ![A trilha do dinheiro nas transferências especiais em Pernambuco, em
 cinco etapas: emenda parlamentar de 42 parlamentares; plano de ação,
-1.962 planos e R\$ 1,71 bilhão na tabela plano_acao_especial; empenho,
-2.111 empenhos e R\$ 1,71 bilhão em empenho_especial; documento hábil,
-2.030 documentos e R\$ 1,56 bilhão em documento_habil_especial; ordem de
-pagamento e ordem bancária, 1.932 ordens todas emitidas; e a conta do
+1.962 planos e R\$ 1,71 bilhão na tabela planos_acao_especiais; empenho,
+2.111 empenhos e R\$ 1,71 bilhão em empenhos_especiais; documento hábil,
+2.030 documentos e R\$ 1,56 bilhão em documentos_habeis_especiais; ordem
+de pagamento e ordem bancária, 1.932 ordens todas emitidas; e a conta do
 beneficiário. Entre empenho e documento hábil, um desvio marca 204
 planos impedidos, 207 empenhos e R\$ 151,8 milhões que não seguem
 adiante.](figures/trilha-do-dinheiro.svg)
 
 A trilha do dinheiro nas transferências especiais em Pernambuco, em
 cinco etapas: emenda parlamentar de 42 parlamentares; plano de ação,
-1.962 planos e R\$ 1,71 bilhão na tabela plano_acao_especial; empenho,
-2.111 empenhos e R\$ 1,71 bilhão em empenho_especial; documento hábil,
-2.030 documentos e R\$ 1,56 bilhão em documento_habil_especial; ordem de
-pagamento e ordem bancária, 1.932 ordens todas emitidas; e a conta do
+1.962 planos e R\$ 1,71 bilhão na tabela planos_acao_especiais; empenho,
+2.111 empenhos e R\$ 1,71 bilhão em empenhos_especiais; documento hábil,
+2.030 documentos e R\$ 1,56 bilhão em documentos_habeis_especiais; ordem
+de pagamento e ordem bancária, 1.932 ordens todas emitidas; e a conta do
 beneficiário. Entre empenho e documento hábil, um desvio marca 204
 planos impedidos, 207 empenhos e R\$ 151,8 milhões que não seguem
 adiante.
@@ -111,11 +113,11 @@ A faixa vermelha é o assunto do próximo trecho.
 planos |>
   count(situacao_plano_acao, wt = valor / 1e6, name = "milhoes")
 #> # A tibble: 3 × 2
-#>   situacao_plano_acao              milhoes
-#>   <chr>                              <dbl>
-#> 1 CIENTE                            1557.9
-#> 2 IMPEDIDO                           128.7
-#> 3 IMPEDIDO_REJEICAO_PLANO_TRABALHO    23.1
+#>   situacao_plano_acao                        milhoes
+#>   <chr>                                        <dbl>
+#> 1 CIENTE                                      1557.9
+#> 2 IMPEDIDO                                     128.7
+#> 3 Impedido por Rejeição do Plano de Trabalho    23.1
 ```
 
 **204 planos estão impedidos, somando R\$ 151,8 milhões.** Todos foram
@@ -145,16 +147,20 @@ planos |>
   filter(!is.na(motivo_impedimento_plano_acao)) |>
   count(motivo_impedimento_plano_acao, sort = TRUE)
 #> 1 "Impedido por falta de análise conclusiva no prazo estabelecido."      91
-#> 2 "Conforme Lei Complementar n° 210/2024, Artigo 10, Inciso X; …"        29
+#> 2 "Conforme Lei Complementar n° 210/2024, Artigo 10, Inciso X; …"        23
 #> 3 "Impedido por Rejeição do Plano de Trabalho"                           21
 #> 4 "Impedimento por falta de complementação/ajuste do plano de trabalho…" 11
-#> 5 "Impedido por Restrição Técnica - inobservância da aplicação mínima…"   6
+#> 5 "Conforme Lei Complementar n° 210/2024, … (não apresentação de …)"      6
+#> 6 "Impedido por Restrição Técnica - inobservância da aplicação mínima…"   6
 ```
 
-**Noventa e três dos 141 impedimentos de 2025 — dois terços — são “falta
-de análise conclusiva no prazo estabelecido”.** Não é o município que
-errou o formulário, não é restrição técnica, não é rejeição de mérito. É
-o prazo de análise vencendo sem que a análise saísse.
+As duas primeiras linhas e a quinta são a mesma norma em redações
+diferentes; somadas, a Lei Complementar 210/2024 responde por 29 casos.
+
+**Noventa e três dos 141 impedimentos de 2025 — dois terços — são falta
+de análise conclusiva no prazo.** Não é o município que errou o
+formulário, não é restrição técnica, não é rejeição de mérito. É o prazo
+de análise vencendo sem que a análise saísse.
 
 Vale a cautela: os planos de 2025 e 2026 são os mais recentes, e é
 natural que concentrem pendências que o tempo resolveria. Mas “falta de
@@ -174,17 +180,18 @@ prefeitura pudesse ter feito diferente.
 ``` r
 
 planos |>
-  group_by(nome_beneficiario_plano_acao) |>
+  left_join(pe, by = "id_beneficiario") |>
+  group_by(nome_beneficiario) |>
   summarise(planos = n(), milhoes = round(sum(valor) / 1e6, 1)) |>
   arrange(desc(milhoes))
 #> # A tibble: 184 × 3
-#>   nome_beneficiario_plano_acao planos milhoes
-#>   <chr>                         <int>   <dbl>
-#> 1 MUNICIPIO DE SAO CAITANO         28    57.5
-#> 2 MUNICIPIO DO BOM JARDIM          46    52.5
-#> 3 MUNICIPIO DE BREJINHO            36    44.7
-#> 4 ESTADO DE PERNAMBUCO             26    38.0
-#> 5 MUNICIPIO DE PAUDALHO            19    29.2
+#>   nome_beneficiario        planos milhoes
+#>   <chr>                     <int>   <dbl>
+#> 1 MUNICIPIO DE SAO CAITANO     28    57.5
+#> 2 MUNICIPIO DO BOM JARDIM      46    52.5
+#> 3 MUNICIPIO DE BREJINHO        36    44.7
+#> 4 ESTADO DE PERNAMBUCO         26    38.0
+#> 5 MUNICIPIO DE PAUDALHO        19    29.2
 #> # ℹ 179 more rows
 ```
 
@@ -222,10 +229,9 @@ assistência social, educação:
 
 ``` r
 
-ff <- tg_get("fundoafundo", "plano_acao", .limit = Inf)
-
-ff |>
-  filter(uf_ente_recebedor_plano_acao == "PE") |>
+# Aqui a UF é parâmetro do endpoint, então o filtro roda no servidor.
+tg_get("fundoafundo", "planos_acao",
+       uf_ente_recebedor_plano_acao = "PE", .limit = Inf) |>
   summarise(planos = n(),
             milhoes = sum(valor_total_plano_acao, na.rm = TRUE) / 1e6)
 #> # A tibble: 1 × 2
@@ -247,6 +253,8 @@ o código do estado:
 ``` r
 
 uf_do_codigo <- c("26" = "PE", "25" = "PB", "27" = "AL", "29" = "BA")  # etc.
+
+ff <- tg_get("fundoafundo", "planos_acao", .limit = Inf)
 
 ff |>
   filter(!is.na(uf_ente_recebedor_plano_acao),
@@ -323,7 +331,7 @@ Três coisas, todas baratas:
 1.  **Acompanhar o prazo de análise, não só o de execução.** Os R\$ 96,4
     milhões travados em 2025 não dependeram de nenhum município. Um
     alerta sobre planos com análise próxima do vencimento é uma consulta
-    a `plano_acao_especial` filtrando por `situacao_plano_acao`.
+    a `planos_acao_especiais` filtrando por `situacao_plano_acao`.
 2.  **Ler as duas portas juntas.** Nenhum sistema mostra quanto um
     município recebe no total. O código IBGE permite somar transferência
     especial e fundo a fundo, e essa soma é o número que um secretário
@@ -336,10 +344,11 @@ Três coisas, todas baratas:
 
 ## Limites desta análise
 
-- **Recorte.** Transferências especiais com
-  `uf_beneficiario_plano_acao = "PE"` e planos fundo a fundo com ente
-  recebedor em PE. Recursos que chegam ao estado por outras vias — TED,
-  convênios do SICONV, execução direta federal — ficam de fora.
+- **Recorte.** Transferências especiais cujo beneficiário tem
+  `uf_beneficiario = "PE"` e planos fundo a fundo com ente recebedor em
+  PE. Recursos que chegam ao estado por outras vias — TED, convênios do
+  SICONV, execução direta federal — ficam de fora. O TED, aliás, não é
+  coberto pelo pacote: o governo não o publicou na API pública.
 - **“Impedido” é situação corrente, não sentença.** Um plano impedido em
   julho de 2026 pode ser desimpedido depois. O que os dados sustentam é
   a fotografia da data de extração.
@@ -364,6 +373,10 @@ cerca de 2 mil planos, 2 mil empenhos e 26 mil planos fundo a fundo —
 poucos minutos, com o limite de requisições que o pacote já respeita
 sozinho.
 
-Uma ressalva prática: a trilha do empenho ao documento hábil usa
-`id_empenho = in_(...)` com milhares de valores, e uma lista muito longa
-estoura o tamanho da URL. Faça em lotes de algumas centenas.
+Uma ressalva prática: estas APIs não têm operador “está em”. A trilha do
+empenho ao documento hábil não é feita por filtro, e sim baixando a
+tabela e cruzando em R com
+[`semi_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)
+— que é o que o código acima faz. Como o teto de página é 200 linhas,
+`planos_acao_especiais` (57.827 linhas no país) leva cerca de 290
+requisições, e vale deixar o cache ligado entre as etapas.

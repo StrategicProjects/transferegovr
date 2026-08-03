@@ -11,7 +11,6 @@
 <url><loc>https://strategicprojects.github.io/transferegovr/authors.html</loc></url>
 <url><loc>https://strategicprojects.github.io/transferegovr/index.html</loc></url>
 <url><loc>https://strategicprojects.github.io/transferegovr/news/index.html</loc></url>
-<url><loc>https://strategicprojects.github.io/transferegovr/reference/filters.html</loc></url>
 <url><loc>https://strategicprojects.github.io/transferegovr/reference/index.html</loc></url>
 <url><loc>https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.html</loc></url>
 <url><loc>https://strategicprojects.github.io/transferegovr/reference/tg_base_url.html</loc></url>
@@ -22,9 +21,10 @@
 <url><loc>https://strategicprojects.github.io/transferegovr/reference/tg_get.html</loc></url>
 <url><loc>https://strategicprojects.github.io/transferegovr/reference/tg_metadata.html</loc></url>
 <url><loc>https://strategicprojects.github.io/transferegovr/reference/tg_modules.html</loc></url>
-<url><loc>https://strategicprojects.github.io/transferegovr/reference/tg_operators.html</loc></url>
+<url><loc>https://strategicprojects.github.io/transferegovr/reference/tg_params.html</loc></url>
 <url><loc>https://strategicprojects.github.io/transferegovr/reference/tg_schema_date.html</loc></url>
 <url><loc>https://strategicprojects.github.io/transferegovr/reference/tg_tables.html</loc></url>
+<url><loc>https://strategicprojects.github.io/transferegovr/reference/tg_updated_at.html</loc></url>
 <url><loc>https://strategicprojects.github.io/transferegovr/reference/transferegovr-package.html</loc></url>
 </urlset>
 

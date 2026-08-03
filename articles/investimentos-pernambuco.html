@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">transferegovr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@ barrado. Dois terços deles, porque o próprio governo não concluiu a
 análise no prazo.</em></p>
 <blockquote>
 <p><strong>Sobre esta análise.</strong> Os números vêm de extrações
-feitas em <strong>31 de julho de 2026</strong> da API de dados abertos
+feitas em <strong>3 de agosto de 2026</strong> da API de dados abertos
 do TransfereGov, com o pacote <a href="https://strategicprojects.github.io/transferegovr/">transferegovr</a>.
 O código está reproduzido ao longo do texto. Os dados são atualizados
 diariamente; refazer a extração em outra data produzirá números
@@ -104,13 +104,15 @@ faz isso para Pernambuco.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/StrategicProjects/transferegovr" class="external-link">transferegovr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">planos</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span></span>
-<span>  <span class="st">"transferenciasespeciais"</span>, <span class="st">"plano_acao_especial"</span>,</span>
-<span>  uf_beneficiario_plano_acao <span class="op">=</span> <span class="st">"PE"</span>,</span>
-<span>  .limit <span class="op">=</span> <span class="cn">Inf</span></span>
-<span><span class="op">)</span></span>
+<span><span class="co"># O plano de ação não carrega a UF: ela vive no beneficiário.</span></span>
+<span><span class="va">beneficiarios</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"especiais"</span>, <span class="st">"beneficiarios_especiais"</span>, .limit <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
+<span><span class="va">pe</span> <span class="op">&lt;-</span> <span class="va">beneficiarios</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">uf_beneficiario</span> <span class="op">==</span> <span class="st">"PE"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">planos</span> <span class="op">&lt;-</span> <span class="va">planos</span> <span class="op">|&gt;</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pe</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 184</span></span>
+<span></span>
+<span><span class="va">planos</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"especiais"</span>, <span class="st">"planos_acao_especiais"</span>, .limit <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">semi_join</a></span><span class="op">(</span><span class="va">pe</span>, by <span class="op">=</span> <span class="st">"id_beneficiario"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    valor <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/coalesce.html" class="external-link">coalesce</a></span><span class="op">(</span><span class="va">valor_custeio_plano_acao</span>, <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
 <span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/coalesce.html" class="external-link">coalesce</a></span><span class="op">(</span><span class="va">valor_investimento_plano_acao</span>, <span class="fl">0</span><span class="op">)</span></span>
@@ -125,13 +127,13 @@ julho de 2026. Vão para <strong>184 beneficiários</strong> — 183
 municípios e o Estado de Pernambuco — indicados por <strong>42
 parlamentares</strong>. Do total, 88% é investimento e 12% custeio.</p>
 <div class="float">
-<img src="figures/trilha-do-dinheiro.svg" alt="A trilha do dinheiro nas transferências especiais em Pernambuco, em cinco etapas: emenda parlamentar de 42 parlamentares; plano de ação, 1.962 planos e R$ 1,71 bilhão na tabela plano_acao_especial; empenho, 2.111 empenhos e R$ 1,71 bilhão em empenho_especial; documento hábil, 2.030 documentos e R$ 1,56 bilhão em documento_habil_especial; ordem de pagamento e ordem bancária, 1.932 ordens todas emitidas; e a conta do beneficiário. Entre empenho e documento hábil, um desvio marca 204 planos impedidos, 207 empenhos e R$ 151,8 milhões que não seguem adiante."><div class="figcaption">A trilha do dinheiro nas transferências
+<img src="figures/trilha-do-dinheiro.svg" alt="A trilha do dinheiro nas transferências especiais em Pernambuco, em cinco etapas: emenda parlamentar de 42 parlamentares; plano de ação, 1.962 planos e R$ 1,71 bilhão na tabela planos_acao_especiais; empenho, 2.111 empenhos e R$ 1,71 bilhão em empenhos_especiais; documento hábil, 2.030 documentos e R$ 1,56 bilhão em documentos_habeis_especiais; ordem de pagamento e ordem bancária, 1.932 ordens todas emitidas; e a conta do beneficiário. Entre empenho e documento hábil, um desvio marca 204 planos impedidos, 207 empenhos e R$ 151,8 milhões que não seguem adiante."><div class="figcaption">A trilha do dinheiro nas transferências
 especiais em Pernambuco, em cinco etapas: emenda parlamentar de 42
 parlamentares; plano de ação, 1.962 planos e R$ 1,71 bilhão na tabela
-plano_acao_especial; empenho, 2.111 empenhos e R$ 1,71 bilhão em
-empenho_especial; documento hábil, 2.030 documentos e R$ 1,56 bilhão em
-documento_habil_especial; ordem de pagamento e ordem bancária, 1.932
-ordens todas emitidas; e a conta do beneficiário. Entre empenho e
+planos_acao_especiais; empenho, 2.111 empenhos e R$ 1,71 bilhão em
+empenhos_especiais; documento hábil, 2.030 documentos e R$ 1,56 bilhão
+em documentos_habeis_especiais; ordem de pagamento e ordem bancária,
+1.932 ordens todas emitidas; e a conta do beneficiário. Entre empenho e
 documento hábil, um desvio marca 204 planos impedidos, 207 empenhos e R$
 151,8 milhões que não seguem adiante.</div>
 </div>
@@ -166,11 +168,11 @@ milhões. A modalidade deixou de ser marginal.</p>
 <code class="sourceCode R"><span><span class="va">planos</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">situacao_plano_acao</span>, wt <span class="op">=</span> <span class="va">valor</span> <span class="op">/</span> <span class="fl">1e6</span>, name <span class="op">=</span> <span class="st">"milhoes"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 3 × 2</span></span>
-<span><span class="co">#&gt;   situacao_plano_acao              milhoes</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;                              &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 CIENTE                            1557.9</span></span>
-<span><span class="co">#&gt; 2 IMPEDIDO                           128.7</span></span>
-<span><span class="co">#&gt; 3 IMPEDIDO_REJEICAO_PLANO_TRABALHO    23.1</span></span></code></pre></div>
+<span><span class="co">#&gt;   situacao_plano_acao                        milhoes</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                                        &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 CIENTE                                      1557.9</span></span>
+<span><span class="co">#&gt; 2 IMPEDIDO                                     128.7</span></span>
+<span><span class="co">#&gt; 3 Impedido por Rejeição do Plano de Trabalho    23.1</span></span></code></pre></div>
 <p><strong>204 planos estão impedidos, somando R$ 151,8
 milhões.</strong> Todos foram empenhados — o dinheiro chegou a ser
 reservado no orçamento — e nenhum gerou documento hábil. Ficam num
@@ -245,15 +247,18 @@ zero.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">motivo_impedimento_plano_acao</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">motivo_impedimento_plano_acao</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 1 "Impedido por falta de análise conclusiva no prazo estabelecido."      91</span></span>
-<span><span class="co">#&gt; 2 "Conforme Lei Complementar n° 210/2024, Artigo 10, Inciso X; …"        29</span></span>
+<span><span class="co">#&gt; 2 "Conforme Lei Complementar n° 210/2024, Artigo 10, Inciso X; …"        23</span></span>
 <span><span class="co">#&gt; 3 "Impedido por Rejeição do Plano de Trabalho"                           21</span></span>
 <span><span class="co">#&gt; 4 "Impedimento por falta de complementação/ajuste do plano de trabalho…" 11</span></span>
-<span><span class="co">#&gt; 5 "Impedido por Restrição Técnica - inobservância da aplicação mínima…"   6</span></span></code></pre></div>
+<span><span class="co">#&gt; 5 "Conforme Lei Complementar n° 210/2024, … (não apresentação de …)"      6</span></span>
+<span><span class="co">#&gt; 6 "Impedido por Restrição Técnica - inobservância da aplicação mínima…"   6</span></span></code></pre></div>
+<p>As duas primeiras linhas e a quinta são a mesma norma em redações
+diferentes; somadas, a Lei Complementar 210/2024 responde por 29
+casos.</p>
 <p><strong>Noventa e três dos 141 impedimentos de 2025 — dois terços —
-são “falta de análise conclusiva no prazo estabelecido”.</strong> Não é
-o município que errou o formulário, não é restrição técnica, não é
-rejeição de mérito. É o prazo de análise vencendo sem que a análise
-saísse.</p>
+são falta de análise conclusiva no prazo.</strong> Não é o município que
+errou o formulário, não é restrição técnica, não é rejeição de mérito. É
+o prazo de análise vencendo sem que a análise saísse.</p>
 <p>Vale a cautela: os planos de 2025 e 2026 são os mais recentes, e é
 natural que concentrem pendências que o tempo resolveria. Mas “falta de
 análise conclusiva no prazo” não é pendência aberta — é prazo esgotado,
@@ -271,17 +276,18 @@ prefeitura pudesse ter feito diferente.</p>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">planos</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">nome_beneficiario_plano_acao</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">pe</span>, by <span class="op">=</span> <span class="st">"id_beneficiario"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">nome_beneficiario</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>planos <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>, milhoes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">valor</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1e6</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">milhoes</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 184 × 3</span></span>
-<span><span class="co">#&gt;   nome_beneficiario_plano_acao planos milhoes</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 MUNICIPIO DE SAO CAITANO         28    57.5</span></span>
-<span><span class="co">#&gt; 2 MUNICIPIO DO BOM JARDIM          46    52.5</span></span>
-<span><span class="co">#&gt; 3 MUNICIPIO DE BREJINHO            36    44.7</span></span>
-<span><span class="co">#&gt; 4 ESTADO DE PERNAMBUCO             26    38.0</span></span>
-<span><span class="co">#&gt; 5 MUNICIPIO DE PAUDALHO            19    29.2</span></span>
+<span><span class="co">#&gt;   nome_beneficiario        planos milhoes</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                     &lt;int&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 MUNICIPIO DE SAO CAITANO     28    57.5</span></span>
+<span><span class="co">#&gt; 2 MUNICIPIO DO BOM JARDIM      46    52.5</span></span>
+<span><span class="co">#&gt; 3 MUNICIPIO DE BREJINHO        36    44.7</span></span>
+<span><span class="co">#&gt; 4 ESTADO DE PERNAMBUCO         26    38.0</span></span>
+<span><span class="co">#&gt; 5 MUNICIPIO DE PAUDALHO        19    29.2</span></span>
 <span><span class="co">#&gt; # ℹ 179 more rows</span></span></code></pre></div>
 <p>São Caitano é o maior destino da modalidade no estado, à frente do
 próprio Estado de Pernambuco. Não há nada de irregular nisso — a
@@ -311,10 +317,9 @@ dispersão é notável: o primeiro colocado responde por 5,6% do total. Não
 <code>fundoafundo</code> cobre repasses de fundo federal para fundo
 estadual ou municipal — saúde, assistência social, educação:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"fundoafundo"</span>, <span class="st">"plano_acao"</span>, .limit <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">ff</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">uf_ente_recebedor_plano_acao</span> <span class="op">==</span> <span class="st">"PE"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="co"># Aqui a UF é parâmetro do endpoint, então o filtro roda no servidor.</span></span>
+<span><span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"fundoafundo"</span>, <span class="st">"planos_acao"</span>,</span>
+<span>       uf_ente_recebedor_plano_acao <span class="op">=</span> <span class="st">"PE"</span>, .limit <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>planos <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>            milhoes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">valor_total_plano_acao</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1e6</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 2</span></span>
@@ -331,6 +336,8 @@ UF declarada e o código IBGE do município, cujos dois primeiros dígitos
 são o código do estado:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">uf_do_codigo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"26"</span> <span class="op">=</span> <span class="st">"PE"</span>, <span class="st">"25"</span> <span class="op">=</span> <span class="st">"PB"</span>, <span class="st">"27"</span> <span class="op">=</span> <span class="st">"AL"</span>, <span class="st">"29"</span> <span class="op">=</span> <span class="st">"BA"</span><span class="op">)</span>  <span class="co"># etc.</span></span>
+<span></span>
+<span><span class="va">ff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"fundoafundo"</span>, <span class="st">"planos_acao"</span>, .limit <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">ff</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">uf_ente_recebedor_plano_acao</span><span class="op">)</span>,</span>
@@ -398,7 +405,7 @@ não é cadastro melhor; é cadastro que pede menos.</p>
 <strong>Acompanhar o prazo de análise, não só o de
 execução.</strong> Os R$ 96,4 milhões travados em 2025 não dependeram de
 nenhum município. Um alerta sobre planos com análise próxima do
-vencimento é uma consulta a <code>plano_acao_especial</code> filtrando
+vencimento é uma consulta a <code>planos_acao_especiais</code> filtrando
 por <code>situacao_plano_acao</code>.</li>
 <li>
 <strong>Ler as duas portas juntas.</strong> Nenhum sistema mostra
@@ -418,11 +425,12 @@ aqui.</li>
 </h2>
 <ul>
 <li>
-<strong>Recorte.</strong> Transferências especiais com
-<code>uf_beneficiario_plano_acao = "PE"</code> e planos fundo a fundo
-com ente recebedor em PE. Recursos que chegam ao estado por outras vias
-— TED, convênios do SICONV, execução direta federal — ficam de
-fora.</li>
+<strong>Recorte.</strong> Transferências especiais cujo beneficiário
+tem <code>uf_beneficiario = "PE"</code> e planos fundo a fundo com ente
+recebedor em PE. Recursos que chegam ao estado por outras vias — TED,
+convênios do SICONV, execução direta federal — ficam de fora. O TED,
+aliás, não é coberto pelo pacote: o governo não o publicou na API
+pública.</li>
 <li>
 <strong>“Impedido” é situação corrente, não sentença.</strong> Um
 plano impedido em julho de 2026 pode ser desimpedido depois. O que os
@@ -449,10 +457,12 @@ longa; a malha municipal usada é a de 2022.</li>
 baixa cerca de 2 mil planos, 2 mil empenhos e 26 mil planos fundo a
 fundo — poucos minutos, com o limite de requisições que o pacote já
 respeita sozinho.</p>
-<p>Uma ressalva prática: a trilha do empenho ao documento hábil usa
-<code>id_empenho = in_(...)</code> com milhares de valores, e uma lista
-muito longa estoura o tamanho da URL. Faça em lotes de algumas
-centenas.</p>
+<p>Uma ressalva prática: estas APIs não têm operador “está em”. A trilha
+do empenho ao documento hábil não é feita por filtro, e sim baixando a
+tabela e cruzando em R com <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">semi_join()</a></code> — que é o que o
+código acima faz. Como o teto de página é 200 linhas,
+<code>planos_acao_especiais</code> (57.827 linhas no país) leva cerca de
+290 requisições, e vale deixar o cache ligado entre as etapas.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">transferegovr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,7 @@
     <div class="section level2">
       <h2 id="queries">Queries<a class="anchor" aria-label="anchor" href="#queries"></a></h2>
 
-      <div class="section-desc"><p>Retrieving rows from the three TransfereGov APIs.</p></div>
+      <div class="section-desc"><p>Retrieving rows from the three TransfereGov API modules.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -67,7 +67,7 @@
 
         <dt>
 
-          <code><a href="module_shortcuts.html">tg_ted()</a></code> <code><a href="module_shortcuts.html">tg_fundo_a_fundo()</a></code> <code><a href="module_shortcuts.html">tg_transferencias_especiais()</a></code>
+          <code><a href="module_shortcuts.html">tg_parcerias()</a></code> <code><a href="module_shortcuts.html">tg_fundo_a_fundo()</a></code> <code><a href="module_shortcuts.html">tg_especiais()</a></code>
 
         </dt>
         <dd>Query a single module</dd>
@@ -79,32 +79,9 @@
         </dt>
         <dd>Inspect what a query retrieved</dd>
       </dl></div><div class="section level2">
-      <h2 id="filters">Filters<a class="anchor" aria-label="anchor" href="#filters"></a></h2>
-
-      <div class="section-desc"><p>The comparison operators the APIs accept. Each topic also lists its Portuguese alias, which shares the same help page.</p></div>
-
-      <dl></dl></div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="filters.html">eq()</a></code> <code><a href="filters.html">neq()</a></code> <code><a href="filters.html">gt()</a></code> <code><a href="filters.html">gte()</a></code> <code><a href="filters.html">lt()</a></code> <code><a href="filters.html">lte()</a></code> <code><a href="filters.html">like()</a></code> <code><a href="filters.html">ilike()</a></code> <code><a href="filters.html">re_match()</a></code> <code><a href="filters.html">re_imatch()</a></code> <code><a href="filters.html">in_()</a></code> <code><a href="filters.html">is_null()</a></code> <code><a href="filters.html">is_true()</a></code> <code><a href="filters.html">is_false()</a></code> <code><a href="filters.html">not()</a></code>
-
-        </dt>
-        <dd>Filter operators</dd>
-
-        <dt>
-
-          <code><a href="tg_operators.html">tg_operators()</a></code> <code><a href="tg_operators.html">tg_operadores()</a></code>
-
-        </dt>
-        <dd>List the available filter operators</dd>
-      </dl></div><div class="section level2">
       <h2 id="discovery">Discovery<a class="anchor" aria-label="anchor" href="#discovery"></a></h2>
 
-      <div class="section-desc"><p>What the APIs publish, without making a request.</p></div>
+      <div class="section-desc"><p>What the APIs publish, without making a request. Each topic also lists its Portuguese alias, which shares the same help page.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -131,6 +108,20 @@
 
         </dt>
         <dd>List the columns of a table</dd>
+
+        <dt>
+
+          <code><a href="tg_params.html">tg_params()</a></code> <code><a href="tg_params.html">tg_parametros()</a></code>
+
+        </dt>
+        <dd>List the parameters a table accepts as filters</dd>
+
+        <dt>
+
+          <code><a href="tg_updated_at.html">tg_updated_at()</a></code> <code><a href="tg_updated_at.html">tg_atualizado_em()</a></code>
+
+        </dt>
+        <dd>When a module's data was last refreshed</dd>
 
         <dt>
 

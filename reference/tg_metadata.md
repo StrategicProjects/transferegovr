@@ -21,8 +21,8 @@ tg_metadados(x)
 
 A list holding the module and table queried, the total number of
 matching rows the API reported, how many rows and pages were retrieved,
-the offset, page size, order and selection used, and when the query ran.
-`NULL` for any other object.
+the offset, page size and filters used, and when the query ran. `NULL`
+for any other object.
 
 ## See also
 

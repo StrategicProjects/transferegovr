@@ -7,11 +7,11 @@ with the module fixed, for code that stays within one API.
 ## Usage
 
 ``` r
-tg_ted(table, ...)
+tg_parcerias(table, ...)
 
 tg_fundo_a_fundo(table, ...)
 
-tg_transferencias_especiais(table, ...)
+tg_especiais(table, ...)
 ```
 
 ## Arguments
@@ -45,8 +45,8 @@ Other queries:
 
 ``` r
 if (interactive()) {
-  tg_ted("plano_acao", .limit = 10)
-  tg_fundo_a_fundo("programa", .limit = 10)
-  tg_transferencias_especiais("programa_especial")
+  tg_parcerias("proposta", .limit = 10)
+  tg_fundo_a_fundo("programas", .limit = 10)
+  tg_especiais("programas_especiais", .limit = 10)
 }
 ```

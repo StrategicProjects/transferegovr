@@ -3,15 +3,15 @@
 Provides a modern interface to the open data application programming
 interfaces of the Brazilian federal government's 'TransfereGov' platform
 (<https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos>).
-Covers the special transfers, fund-to-fund transfers, and decentralized
-credit ('TED') modules, which together publish forty-eight tables on
-action plans, programs, budget commitments, financial execution,
-management reports, and payment orders. The APIs are built on
-'PostgREST', so the package exposes its filtering, column selection, and
-ordering operators directly, and returns tidy tibbles with types taken
-from the published schema. Automatic pagination, request throttling,
-retries with exponential backoff, and an optional response cache are
-included.
+Covers the special transfers, fund-to-fund transfers, and partnership
+management modules, which together publish fifty-five tables on action
+plans, programs, proposals, partnerships, budget commitments, financial
+execution, management reports, and payment orders. Filters are the
+services' own typed query parameters, validated against the published
+schema before a request is made, and results are returned as tidy
+tibbles with types taken from that schema. Automatic pagination, request
+throttling, retries with exponential backoff, and an optional response
+cache are included.
 
 ## See also
 

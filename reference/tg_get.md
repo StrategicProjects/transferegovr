@@ -1,8 +1,8 @@
 # Retrieve rows from a TransfereGov table
 
-Queries one of the forty-eight tables published by the three
-TransfereGov open data APIs and returns them as a tibble, with columns
-typed from the API's own schema.
+Queries one of the fifty-five tables published by the TransfereGov open
+data APIs and returns them as a tibble, with columns typed from the
+API's own schema.
 
 ## Usage
 
@@ -11,30 +11,24 @@ tg_get(
   module,
   table,
   ...,
-  .select = NULL,
-  .order = NULL,
   .limit = 1000,
   .offset = 0,
-  .page_size = 1000,
-  .params = list(),
+  .page_size = 200,
   .progress = NULL,
   .cache = NULL,
-  .base_url = tg_base_url()
+  .base_url = NULL
 )
 
 tg_obter(
   module,
   table,
   ...,
-  .select = NULL,
-  .order = NULL,
   .limit = 1000,
   .offset = 0,
-  .page_size = 1000,
-  .params = list(),
+  .page_size = 200,
   .progress = NULL,
   .cache = NULL,
-  .base_url = tg_base_url()
+  .base_url = NULL
 )
 ```
 
@@ -44,8 +38,8 @@ tg_obter(
 
   A module name from
   [`tg_modules()`](https://strategicprojects.github.io/transferegovr/reference/tg_modules.md):
-  `"transferenciasespeciais"`, `"fundoafundo"` or `"ted"`. Aliases such
-  as `"fundo_a_fundo"` are accepted.
+  `"especiais"`, `"fundoafundo"` or `"parcerias"`. Aliases such as
+  `"fundo_a_fundo"` are accepted.
 
 - table:
 
@@ -54,21 +48,7 @@ tg_obter(
 
 - ...:
 
-  Filters, named after the columns they apply to. See the Filters
-  section.
-
-- .select:
-
-  Columns to return, as a character vector. `NULL`, the default, returns
-  every column. Selecting fewer columns makes large queries markedly
-  faster.
-
-- .order:
-
-  Sort order, as a character vector of column names, each optionally
-  suffixed with `.asc` or `.desc`, and optionally with `.nullsfirst` or
-  `.nullslast`. `NULL` uses the default order described under
-  Pagination.
+  Filters, named after the parameters they set. See the Filters section.
 
 - .limit:
 
@@ -80,14 +60,7 @@ tg_obter(
 
 - .page_size:
 
-  Rows per request, between 1 and 1000.
-
-- .params:
-
-  Extra query parameters passed to the API verbatim, as a named list.
-  This is the escape hatch for 'PostgREST' features the package does not
-  model, such as
-  `list(or = "(aa_ano_plano_acao.eq.2024,\ aa_ano_plano_acao.eq.2025)")`.
+  Rows per request, between 1 and 200.
 
 - .progress:
 
@@ -109,43 +82,48 @@ tg_obter(
 
 A tibble.
 [`tg_metadata()`](https://strategicprojects.github.io/transferegovr/reference/tg_metadata.md)
-reports the totals the API gave and how many pages were fetched.
+reports the totals the API gave and how many pages were fetched. A
+column the API sends as an array of objects comes back as a list column;
+[`tg_fields()`](https://strategicprojects.github.io/transferegovr/reference/tg_fields.md)
+describes what is inside it.
 
 ## Filters
 
-Name each filter after the column it applies to and give it a value or
-an operator from
-[`tg_operators()`](https://strategicprojects.github.io/transferegovr/reference/tg_operators.md).
-A bare value means "equals", a bare vector means "is one of", and a list
-of operators applies several conditions to the same column:
+Name each filter after one of the table's query parameters and give it a
+single value. Parameters are combined with AND:
 
-    tg_get("ted", "plano_acao", aa_ano_plano_acao = 2024)
-    tg_get("ted", "plano_acao", aa_ano_plano_acao = c(2024, 2025))
+    tg_get("parcerias", "proposta", situacao_proposta = "Aprovada")
     tg_get(
-      "ted", "plano_acao",
-      dt_inicio_vigencia = list(gte("2024-01-01"), lt("2025-01-01"))
+      "parcerias", "proposta",
+      sg_uf_recebedor = "PE", ano_proposta = 2025
     )
 
-Column names and categorical values are in Portuguese because they
-belong to the API. Use
-[`tg_fields()`](https://strategicprojects.github.io/transferegovr/reference/tg_fields.md)
-to see them.
+The services compare for equality and nothing else: there is no
+greater-than, no pattern match and no "is one of". A parameter takes one
+value, so query each value and bind the results when you need several.
+
+Parameter names, and the permitted values of the enumerated ones, are in
+Portuguese because they belong to the API. Use
+[`tg_params()`](https://strategicprojects.github.io/transferegovr/reference/tg_params.md)
+to see them. A name the packaged schema does not know is an error rather
+than a request: these services ignore a parameter they do not recognize
+and answer with the whole table, so an unchecked typo would return
+plausible, wrong data.
 
 ## Pagination
 
-The service returns at most 1000 rows per request, whatever is asked of
-it, so `.limit` above that is met by fetching successive pages. `.limit`
-counts rows, not pages; use `Inf` for every matching row. Several tables
-hold hundreds of thousands of rows, so check the size with
+The services return at most 200 rows per request, so `.limit` above that
+is met by fetching successive pages. `.limit` counts rows, not pages;
+use `Inf` for every matching row. Several tables hold hundreds of
+thousands of rows, so check the size with
 [`tg_count()`](https://strategicprojects.github.io/transferegovr/reference/tg_count.md)
 first.
 
-Pages are fetched with an explicit `.order` because offset pagination
-over an unordered query has no defined row order and could repeat or
-skip rows. The default order is the table's primary key when the API
-declares one, and its identifier columns otherwise. The number of rows
-collected is checked against the total the API reports, and a mismatch
-is reported as a warning.
+Row order is the server's and cannot be set: these APIs publish no
+ordering parameter. It was checked to be stable across page sizes,
+across repeated calls and at depth, which is what makes multi-page
+collection safe. The number of rows collected is checked against the
+total the API reports, and a mismatch is reported as a warning.
 
 ## See also
 
@@ -158,13 +136,8 @@ Other queries:
 
 ``` r
 if (interactive()) {
-  tg_get("ted", "plano_acao", aa_ano_plano_acao = gte(2024), .limit = 50)
+  tg_get("parcerias", "proposta", sg_uf_recebedor = "PE", .limit = 50)
 
-  tg_get(
-    "fundoafundo", "plano_acao",
-    .select = c("id_plano_acao", "vl_total_plano_acao"),
-    .order = "vl_total_plano_acao.desc",
-    .limit = 10
-  )
+  tg_get("fundoafundo", "planos_acao", .limit = 10)
 }
 ```

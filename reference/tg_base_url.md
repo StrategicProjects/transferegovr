@@ -18,5 +18,5 @@ A single string.
 
 ``` r
 tg_base_url()
-#> [1] "https://api.transferegov.gestao.gov.br"
+#> [1] "https://api-publica.transferegov.gestao.gov.br"
 ```

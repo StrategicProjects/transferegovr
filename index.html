@@ -17,9 +17,9 @@
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <meta property="og:title" content="transferegovr | Brazilian federal transfers data in R">
-<meta name="description" content="R interface to the TransfereGov open data APIs: special transfers, fund-to-fund transfers, and decentralized credit.
+<meta name="description" content="R interface to the TransfereGov open data APIs: special transfers, fund-to-fund transfers, and partnership management.
 ">
-<meta property="og:description" content="R interface to the TransfereGov open data APIs: special transfers, fund-to-fund transfers, and decentralized credit.
+<meta property="og:description" content="R interface to the TransfereGov open data APIs: special transfers, fund-to-fund transfers, and partnership management.
 ">
 <meta property="og:image" content="https://strategicprojects.github.io/transferegovr/logo.svg">
 </head>
@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="index.html">transferegovr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,7 +77,10 @@
 <!-- badges: start -->
 
 <p>An R interface to the open data APIs of <strong>TransfereGov</strong>, the Brazilian federal government’s platform for transfers to states, municipalities and civil society.</p>
-<p>The platform publishes three APIs, covering <strong>48 tables</strong> in all:</p>
+<div class="section level2">
+<h2 id="what-this-package-covers">What this package covers<a class="anchor" aria-label="anchor" href="#what-this-package-covers"></a>
+</h2>
+<p>The package targets the public API host, <code>api-publica.transferegov.gestao.gov.br</code>, which publishes three modules and <strong>55 tables</strong> in all:</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -91,23 +94,36 @@
 </tr></thead>
 <tbody>
 <tr>
-<td><code>transferenciasespeciais</code></td>
+<td><code>especiais</code></td>
 <td>Special transfers, created by Constitutional Amendment 105/2019 for individual parliamentary amendments</td>
-<td>14</td>
+<td>20</td>
 </tr>
 <tr>
 <td><code>fundoafundo</code></td>
 <td>Fund-to-fund transfers, from federal funds directly to state, district and municipal funds</td>
-<td>21</td>
+<td>20</td>
 </tr>
 <tr>
-<td><code>ted</code></td>
-<td>Decentralized credit between federal bodies (<em>termo de execução descentralizada</em>)</td>
-<td>13</td>
+<td><code>parcerias</code></td>
+<td>Partnership management: programs, proposals, partnerships, their financial execution and bank statements</td>
+<td>15</td>
 </tr>
 </tbody>
 </table>
-<p>All three are <a href="https://postgrest.org" class="external-link">PostgREST</a> services, so this package exposes their filtering, column selection and ordering directly, rather than wrapping each table in a function of its own.</p>
+<p>Every table in the three published data models is reachable. Where the API folds a child table into its parent rather than giving it an endpoint of its own, it arrives as a list column — 5 of them in <code>fundoafundo</code>, 13 in <code>parcerias</code> — and <code>tg_fields(nested = )</code> describes what is inside.</p>
+<div class="section level3">
+<h3 id="what-it-does-not-cover">What it does not cover<a class="anchor" aria-label="anchor" href="#what-it-does-not-cover"></a>
+</h3>
+<ul>
+<li>
+<strong><code>ted</code></strong>, decentralized credit between federal bodies (<em>termo de execução descentralizada</em>), 13 tables. It has not been published on the public API host; it exists only on the older <code>api.transferegov.gestao.gov.br</code> service, which this package no longer uses.</li>
+<li>
+<strong>The older PostgREST endpoints</strong> for special and fund-to-fund transfers on that same host. They are still up and still answer, but they are a different and largely superseded contract — different column names, a handful of columns each way, and a <code>historico_pagamento_especial</code> table that the new service does not carry.</li>
+<li>
+<strong>SICONV agreement data</strong>, published as daily CSV extracts at <a href="https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos/download-dados" class="external-link uri">https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos/download-dados</a>. A separate source, not an API.</li>
+</ul>
+</div>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -122,58 +138,66 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/StrategicProjects/transferegovr" class="external-link">transferegovr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/tg_modules.html">tg_modules</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/tg_tables.html">tg_tables</a></span><span class="op">(</span><span class="st">"ted"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/tg_fields.html">tg_fields</a></span><span class="op">(</span><span class="st">"ted"</span>, <span class="st">"plano_acao"</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="reference/tg_get.html">tg_get()</a></code> retrieves rows. Name each filter after the column it applies to:</p>
+<span><span class="fu"><a href="reference/tg_tables.html">tg_tables</a></span><span class="op">(</span><span class="st">"parcerias"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/tg_fields.html">tg_fields</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"proposta"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/tg_params.html">tg_params</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"proposta"</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="reference/tg_get.html">tg_get()</a></code> retrieves rows. Each filter is named after one of the endpoint’s own query parameters, and parameters combine with AND:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"ted"</span>, <span class="st">"plano_acao"</span>, aa_ano_plano_acao <span class="op">=</span> <span class="fl">2024</span><span class="op">)</span></span></code></pre></div>
-<p>A bare value means “equals”, a bare vector means “is one of”, and the operators from <code><a href="reference/tg_operators.html">tg_operators()</a></code> cover the rest:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/tg_get.html">tg_get</a></span><span class="op">(</span></span>
-<span>  <span class="st">"ted"</span>, <span class="st">"plano_acao"</span>,</span>
-<span>  aa_ano_plano_acao <span class="op">=</span> <span class="fu"><a href="reference/filters.html">gte</a></span><span class="op">(</span><span class="fl">2024</span><span class="op">)</span>,</span>
-<span>  sigla_unidade_descentralizada <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CNPq"</span>, <span class="st">"CAPES"</span><span class="op">)</span>,</span>
-<span>  tx_objeto_plano_acao <span class="op">=</span> <span class="fu"><a href="reference/filters.html">ilike</a></span><span class="op">(</span><span class="st">"*pesquisa*"</span><span class="op">)</span>,</span>
-<span>  .select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id_plano_acao"</span>, <span class="st">"vl_total_plano_acao"</span>, <span class="st">"dt_inicio_vigencia"</span><span class="op">)</span>,</span>
-<span>  .order <span class="op">=</span> <span class="st">"vl_total_plano_acao.desc"</span>,</span>
+<span>  <span class="st">"parcerias"</span>, <span class="st">"proposta"</span>,</span>
+<span>  sg_uf_recebedor <span class="op">=</span> <span class="st">"PE"</span>,</span>
+<span>  situacao_proposta <span class="op">=</span> <span class="st">"Aprovada"</span>,</span>
 <span>  .limit <span class="op">=</span> <span class="fl">20</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Several conditions on one column go in a list, and the API combines them with AND:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/tg_get.html">tg_get</a></span><span class="op">(</span></span>
-<span>  <span class="st">"fundoafundo"</span>, <span class="st">"plano_acao"</span>,</span>
-<span>  data_inicio_vigencia_plano_acao <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="reference/filters.html">gte</a></span><span class="op">(</span><span class="st">"2024-01-01"</span><span class="op">)</span>, <span class="fu"><a href="reference/filters.html">lt</a></span><span class="op">(</span><span class="st">"2025-01-01"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<p>That is the whole filtering vocabulary. These services compare for equality and nothing else — no greater-than, no pattern match, no “is one of” — and they publish no ordering or column-selection parameter. <code><a href="reference/tg_params.html">tg_params()</a></code> lists what each table accepts, including the permitted values of the enumerated parameters.</p>
+</div>
+<div class="section level2">
+<h2 id="a-typo-must-not-look-like-an-answer">A typo must not look like an answer<a class="anchor" aria-label="anchor" href="#a-typo-must-not-look-like-an-answer"></a>
+</h2>
+<p>These services <strong>ignore a query parameter they do not recognize</strong> and answer <code>200</code> with the whole table. Misspell <code>situacao_proposta</code> and you get 88,666 rows where the filter would have given 84,258 — a plausible number, quietly wrong.</p>
+<p>So every parameter name is checked against the packaged schema before a request goes out:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/tg_count.html">tg_count</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"proposta"</span>, in_situacao_proposta <span class="op">=</span> <span class="st">"Aprovada"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in `tg_count()`:</span></span>
+<span><span class="co">#&gt; ! Unknown filter: "in_situacao_proposta".</span></span>
+<span><span class="co">#&gt; ✖ The API ignores a parameter it does not recognize and returns every row, so</span></span>
+<span><span class="co">#&gt;   this would look like a query that matched nothing in particular.</span></span>
+<span><span class="co">#&gt; ℹ Did you mean "situacao_proposta"?</span></span></code></pre></div>
+<p>Enumerated values are checked the same way, before the round trip rather than after it.</p>
 </div>
 <div class="section level2">
 <h2 id="size-first-download-second">Size first, download second<a class="anchor" aria-label="anchor" href="#size-first-download-second"></a>
 </h2>
-<p>The service returns at most 1000 rows per request, and these tables are not small — the largest holds over a million rows, which is more than a thousand requests. Ask before you fetch:</p>
+<p>The services return at most 200 rows per request, and these tables are not small. Ask before you fetch:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/tg_count.html">tg_count</a></span><span class="op">(</span><span class="st">"especiais"</span>, <span class="st">"meta_especiais"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 156060</span></span></code></pre></div>
+<p><code>.limit</code> counts rows, not pages. Anything above 200 is collected page by page, and the total collected is checked against what the API reported:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/tg_count.html">tg_count</a></span><span class="op">(</span><span class="st">"fundoafundo"</span>, <span class="st">"gestao_financeira_lancamentos"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1115444</span></span></code></pre></div>
-<p><code>.limit</code> counts rows, not pages. Anything above 1000 is collected page by page, in an explicit order so that the pages cannot overlap or skip rows, and the total collected is checked against what the API reported:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plans</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"ted"</span>, <span class="st">"plano_acao"</span>, .limit <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">metas</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"especiais"</span>, <span class="st">"meta_especiais"</span>, .limit <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/tg_metadata.html">tg_metadata</a></span><span class="op">(</span><span class="va">plans</span><span class="op">)</span><span class="op">$</span><span class="va">total_rows</span></span>
-<span><span class="fu"><a href="reference/tg_metadata.html">tg_metadata</a></span><span class="op">(</span><span class="va">plans</span><span class="op">)</span><span class="op">$</span><span class="va">pages</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/tg_metadata.html">tg_metadata</a></span><span class="op">(</span><span class="va">metas</span><span class="op">)</span><span class="op">$</span><span class="va">total_rows</span></span>
+<span><span class="fu"><a href="reference/tg_metadata.html">tg_metadata</a></span><span class="op">(</span><span class="va">metas</span><span class="op">)</span><span class="op">$</span><span class="va">pages</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="types">Types<a class="anchor" aria-label="anchor" href="#types"></a>
 </h2>
 <p>Columns are typed from the API’s own schema rather than guessed, so a column that happens to be entirely null on one page does not change class on the next:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plans</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"ted"</span>, <span class="st">"plano_acao"</span>, .limit <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">proposals</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"proposta"</span>, .limit <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">plans</span><span class="op">$</span><span class="va">dt_inicio_vigencia</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">proposals</span><span class="op">$</span><span class="va">dt_proposta</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Date"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">plans</span><span class="op">$</span><span class="va">in_forma_execucao_direta</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "logical"</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">proposals</span><span class="op">$</span><span class="va">intervenientes_proposta</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "list"</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="caching">Caching<a class="anchor" aria-label="anchor" href="#caching"></a>
+<h2 id="freshness-and-caching">Freshness and caching<a class="anchor" aria-label="anchor" href="#freshness-and-caching"></a>
 </h2>
+<p>Each module reports when it was last loaded, which is the only freshness signal these APIs give — they send no <code>ETag</code>, <code>Cache-Control</code> or <code>Last-Modified</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/tg_updated_at.html">tg_updated_at</a></span><span class="op">(</span><span class="st">"parcerias"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "2026-08-03 UTC"</span></span></code></pre></div>
 <p>Responses are cached for an hour in the session’s temporary directory, so nothing is written outside the session unless you ask for it. To keep them between sessions:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/tg_cache_dir.html">tg_cache_dir</a></span><span class="op">(</span><span class="fu">tools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/tools/userdir.html" class="external-link">R_user_dir</a></span><span class="op">(</span><span class="st">"transferegovr"</span>, <span class="st">"cache"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -182,19 +206,20 @@
 <div class="section level2">
 <h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
 </h2>
-<p><img class="architecture-diagram" src="reference/figures/architecture.svg" alt="Architecture of transferegovr: the public verbs pass through filter and schema validation, the pagination loop, and the HTTP client and its cache, reach the three PostgREST services, and return through the parser as a typed tibble." width="100%"></p>
-<p>Two things in that picture are worth stating plainly, because they are where a naive client of these APIs loses data:</p>
+<p><img class="architecture-diagram" src="reference/figures/architecture.svg" alt="Architecture of transferegovr: the public verbs pass through parameter and schema validation, the pagination loop, and the HTTP client and its cache, reach the three services, and return through the parser as a typed tibble." width="100%"></p>
+<p>Two things in that picture are where a naive client of these APIs loses data:</p>
 <ul>
 <li>
-<strong>The 1000-row cap is silent.</strong> Ask for more and the service returns 1000 rows with a <code>206</code>, and nothing in the body says the result was cut short. Only <code>Content-Range</code> does. <code>.limit</code> counts rows and is met by fetching pages.</li>
+<strong>An unrecognized parameter is ignored, not rejected.</strong> The request succeeds and returns everything. Validating names client-side is the only defense, which is why the packaged schema freezes the parameter list and not just the columns.</li>
 <li>
-<strong>Offset pagination needs an order.</strong> A Postgres query without <code>ORDER BY</code> has no defined row order, so page two can repeat page one and skip rows elsewhere. Every request this package sends carries an explicit order, and the rows collected are checked against the total the API reported.</li>
+<strong>Repeating a parameter does not combine conditions.</strong> The service keeps the last occurrence and discards the rest without saying so, so the package refuses a repeated or multi-valued filter rather than sending one.</li>
 </ul>
+<p>Page order is the server’s — these APIs publish no ordering parameter — so it was verified rather than assumed: the same rows come back in the same sequence across page sizes, across repeated calls, 100,000 rows deep, on tables with no key, and on tables with nested columns. <code>tests/testthat/test-live.R</code> keeps checking it.</p>
 </div>
 <div class="section level2">
 <h2 id="column-names-are-in-portuguese">Column names are in Portuguese<a class="anchor" aria-label="anchor" href="#column-names-are-in-portuguese"></a>
 </h2>
-<p>Table names, column names and categorical values belong to the API and are left as the government publishes them. The package’s own functions, arguments and documentation are in English, with Portuguese aliases (<code><a href="reference/tg_get.html">tg_obter()</a></code>, <code><a href="reference/tg_count.html">tg_contar()</a></code>, <code><a href="reference/tg_tables.html">tg_tabelas()</a></code>, <code><a href="reference/tg_fields.html">tg_campos()</a></code>) for the exported verbs.</p>
+<p>Table names, column names, parameter names and categorical values belong to the API and are left as the government publishes them. The package’s own functions, arguments and documentation are in English, with Portuguese aliases (<code><a href="reference/tg_get.html">tg_obter()</a></code>, <code><a href="reference/tg_count.html">tg_contar()</a></code>, <code><a href="reference/tg_tables.html">tg_tabelas()</a></code>, <code><a href="reference/tg_fields.html">tg_campos()</a></code>, <code><a href="reference/tg_params.html">tg_parametros()</a></code>, <code><a href="reference/tg_updated_at.html">tg_atualizado_em()</a></code>) for the exported verbs.</p>
 </div>
 <div class="section level2">
 <h2 id="related">Related<a class="anchor" aria-label="anchor" href="#related"></a>
@@ -202,16 +227,15 @@
 <ul>
 <li>
 <a href="https://github.com/StrategicProjects/obrasgovr" class="external-link">obrasgovr</a> — the ObrasGov public works API.</li>
-<li>The TransfereGov platform also publishes daily CSV extracts of SICONV agreement data at <a href="https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos/download-dados" class="external-link uri">https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos/download-dados</a>. Those files are a separate source and are not covered by this package.</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="official-documentation">Official documentation<a class="anchor" aria-label="anchor" href="#official-documentation"></a>
 </h2>
 <ul>
-<li><a href="https://docs.api.transferegov.gestao.gov.br/transferenciasespeciais/" class="external-link uri">https://docs.api.transferegov.gestao.gov.br/transferenciasespeciais/</a></li>
-<li><a href="https://docs.api.transferegov.gestao.gov.br/fundoafundo/" class="external-link uri">https://docs.api.transferegov.gestao.gov.br/fundoafundo/</a></li>
-<li><a href="https://docs.api.transferegov.gestao.gov.br/ted/" class="external-link uri">https://docs.api.transferegov.gestao.gov.br/ted/</a></li>
+<li><a href="https://api-publica.transferegov.gestao.gov.br/especiais/docs" class="external-link uri">https://api-publica.transferegov.gestao.gov.br/especiais/docs</a></li>
+<li><a href="https://api-publica.transferegov.gestao.gov.br/fundoafundo/docs" class="external-link uri">https://api-publica.transferegov.gestao.gov.br/fundoafundo/docs</a></li>
+<li><a href="https://api-publica.transferegov.gestao.gov.br/parcerias/docs" class="external-link uri">https://api-publica.transferegov.gestao.gov.br/parcerias/docs</a></li>
 </ul>
 </div>
 </div>

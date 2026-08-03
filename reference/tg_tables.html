@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">transferegovr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,7 @@
 <dt id="arg-counts">counts<a class="anchor" aria-label="anchor" href="#arg-counts"></a></dt>
 <dd><p>If <code>TRUE</code>, adds a <code>rows</code> column with the number of rows each
 table currently holds. This is the only part of this function that needs a
-network connection: it makes one request per table, so <code>tg_tables(counts = TRUE)</code> with no module makes forty-eight. Responses are cached.</p></dd>
+network connection: it makes one request per table, so <code>tg_tables(counts = TRUE)</code> with no module makes fifty-five. Responses are cached.</p></dd>
 
 
 <dt id="arg-modulo">modulo<a class="anchor" aria-label="anchor" href="#arg-modulo"></a></dt>
@@ -81,56 +81,62 @@ network connection: it makes one request per table, so <code>tg_tables(counts = 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble with one row per table: its module, name, number of columns,
-the primary key when the API declares one, and the description published in
-the API schema. With <code>counts = TRUE</code>, also the current number of rows.</p>
+    <p>A tibble with one row per table: its module, name, the endpoint path
+it maps to, its number of columns and filterable parameters, and the
+description published in the API schema. With <code>counts = TRUE</code>, also the
+current number of rows.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other discovery:
 <code><a href="tg_fields.html">tg_fields()</a></code>,
 <code><a href="tg_modules.html">tg_modules()</a></code>,
-<code><a href="tg_schema_date.html">tg_schema_date()</a></code></p></div>
+<code><a href="tg_params.html">tg_params()</a></code>,
+<code><a href="tg_schema_date.html">tg_schema_date()</a></code>,
+<code><a href="tg_updated_at.html">tg_updated_at()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">tg_tables</span><span class="op">(</span><span class="st">"ted"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 13 × 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    module table                      columns primary_key description</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> ted    evento                          10 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> ted    nota_credito                    11 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> ted    plano_acao                      20 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> ted    plano_acao_analise               5 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> ted    plano_acao_etapa                10 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> ted    plano_acao_meta                 10 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> ted    plano_acao_parecer               7 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> ted    programa                        24 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> ted    programa_acao_orcamentaria       3 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> ted    programa_beneficiario            4 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> ted    programacao_financeira          10 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> ted    termo_execucao                  10 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span> ted    trf                              6 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">tg_tables</span><span class="op">(</span><span class="st">"parcerias"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 15 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    module    table                           path     columns params description</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> parcerias analise_proposta                analise…       7      5 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> parcerias beneficiario_emenda_parlamentar benefic…      16     14 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> parcerias cronograma_desembolso           cronogr…       7      7 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> parcerias distribuicao_recurso_proposta   distrib…       8      8 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> parcerias documento_habil                 documen…      15     15 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> parcerias empenho_parceria                empenho…      24     24 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> parcerias extrato_bancario                extrato…      13     13 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> parcerias item_proposta                   item-pr…      14     13 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> parcerias meta_proposta                   meta-pr…       6     12 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> parcerias ordem_pagamento                 ordem-p…      11     11 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> parcerias parceria                        parceria      16     20 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> parcerias parceria_conta                  parceri…      23     28 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span> parcerias programa                        programa      51     52 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">14</span> parcerias proposta                        proposta      43     45 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">15</span> parcerias proposta_resultado_indicador    propost…       6      6 Retorna um…</span>
 <span class="r-in"><span><span class="fu">tg_tables</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 48 × 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    module                  table                 columns primary_key description</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> transferenciasespeciais documento_habil_espe…      23 id_dh       <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> transferenciasespeciais empenho_especial           27 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> transferenciasespeciais executor_especial          17 <span style="color: #BB0000;">NA</span>          Informaçõe…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> transferenciasespeciais finalidade_especial         5 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> transferenciasespeciais historico_pagamento_…       5 id_histori… <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> transferenciasespeciais meta_especial              16 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> transferenciasespeciais ordem_pagamento_orde…      13 id_op_ob    <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> transferenciasespeciais orgao_analise_penden…       4 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> transferenciasespeciais plano_acao_especial        27 id_plano_a… <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> transferenciasespeciais plano_trabalho_anali…      10 <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 38 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 55 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    module    table                              path  columns params description</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> especiais beneficiarios_especiais            bene…       5      5 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> especiais documentos_habeis_especiais        docu…      25     25 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> especiais empenhos_especiais                 empe…      24     24 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> especiais executores_especiais               exec…      17     17 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> especiais finalidade_especiais               fina…       5      5 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> especiais gestao_financeira_lancamentos_esp… gest…      34     30 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> especiais gestao_financeira_subtransacoes_e… gest…      14     12 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> especiais meta_especiais                     meta…      16     16 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> especiais ordens_pagamentos_ordens_bancaria… orde…      13     13 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> especiais orgaos_analises_pendentes_especia… orga…       4      4 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 45 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="co"># How big is everything, largest first?</span></span></span>
-<span class="r-in"><span>  <span class="fu">tg_tables</span><span class="op">(</span>counts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="fu">tg_tables</span><span class="op">(</span>counts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">$</span><span class="va">rows</span><span class="op">)</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="va">sizes</span> <span class="op">&lt;-</span> <span class="fu">tg_tables</span><span class="op">(</span>counts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">sizes</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="va">sizes</span><span class="op">$</span><span class="va">rows</span><span class="op">)</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

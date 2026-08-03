@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">transferegovr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,27 +43,73 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0" id="transferegovr-020">transferegovr 0.2.0<a class="anchor" aria-label="anchor" href="#transferegovr-020"></a></h2>
+<p>The package now targets the public API host, <code>api-publica.transferegov.gestao.gov.br</code>. That host serves a different kind of service from the ‘PostgREST’ one the package was built against, so this release rewrites the client rather than extending it. Code written against 0.1.0 will need changing.</p>
+<div class="section level3">
+<h3 id="what-is-covered-0-2-0">What is covered<a class="anchor" aria-label="anchor" href="#what-is-covered-0-2-0"></a></h3>
+<ul><li>
+<strong><code>parcerias</code> is new</strong>: partnership management, 15 tables, including 88,666 partnerships and their proposals, budget commitments, payment orders and bank statements. It has no equivalent in the previous release.</li>
+<li>
+<strong><code>especiais</code> replaces <code>transferenciasespeciais</code></strong>, and grows from 14 tables to 20. The additions are the financial ones: transaction entries, sub-entries, account balances, beneficiaries, and three history tables.</li>
+<li>
+<strong><code>fundoafundo</code> stays</strong>, at 20 tables against the previous 21, with several child tables folded into their parents as nested columns.</li>
+<li>
+<code>"transferenciasespeciais"</code> still resolves, as an alias for <code>"especiais"</code>.</li>
+<li>
+<strong><code>ted</code> is gone.</strong> Decentralized credit has not been published on the public API host; it exists only on the older service, which this package no longer uses. <code>tg_ted()</code> and <code>tg_transferencias_especiais()</code> are removed, and <code><a href="../reference/module_shortcuts.html">tg_parcerias()</a></code> and <code><a href="../reference/module_shortcuts.html">tg_especiais()</a></code> take their place alongside <code><a href="../reference/module_shortcuts.html">tg_fundo_a_fundo()</a></code>.</li>
+</ul><p>55 tables and 811 columns in all, against 48 and 599.</p>
+</div>
+<div class="section level3">
+<h3 id="filters-0-2-0">Filters<a class="anchor" aria-label="anchor" href="#filters-0-2-0"></a></h3>
+<ul><li>Filters are now the endpoints’ own typed query parameters rather than ‘PostgREST’ operators. <code><a href="../reference/tg_params.html">tg_params()</a></code> lists what each table accepts, with the permitted values of the enumerated ones.</li>
+<li>
+<strong>The comparison operators are removed</strong> — <code>eq()</code>, <code>neq()</code>, <code>gt()</code>, <code>gte()</code>, <code>lt()</code>, <code>lte()</code>, <code>like()</code>, <code>ilike()</code>, <code>re_match()</code>, <code>re_imatch()</code>, <code>in_()</code>, <code>is_null()</code>, <code>is_true()</code>, <code>is_false()</code>, <code>not()</code> and <code>tg_operators()</code>. These services compare for equality and nothing else.</li>
+<li>
+<strong>An unknown parameter name is an error.</strong> These services ignore a parameter they do not recognize and answer <code>200</code> with the whole table, so a typo would return a plausible, unfiltered result. Names are checked against the frozen schema before the request is made, and a near miss is suggested.</li>
+<li>Enumerated values are checked client-side too, so a bad value fails before the round trip rather than as a 422 after it.</li>
+<li>A filter with several values, or a parameter given twice, is refused. The service keeps the last occurrence of a repeated parameter and discards the rest without reporting it, so there is no way to express either.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="pagination-0-2-0">Pagination<a class="anchor" aria-label="anchor" href="#pagination-0-2-0"></a></h3>
+<ul><li>Pagination is by page number, and the cap is 200 rows per request rather than
+<ol start="1000" style="list-style-type: decimal"><li>
+<code>.limit</code> still counts rows and <code>.offset</code> still counts rows, including when the offset falls inside a page.</li>
+</ol></li>
+<li>
+<strong><code>.order</code> and <code>.select</code> are removed.</strong> These APIs publish no ordering or column-selection parameter.</li>
+<li>Row order is therefore the server’s. It was verified rather than assumed: the same rows come back in the same sequence across page sizes, across repeated calls, 100,000 rows deep, on tables with no key, and on tables with nested columns.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="other-changes-0-2-0">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/tg_updated_at.html">tg_updated_at()</a></code> reports when a module’s data was last loaded, from the <code>/data-atualizacao</code> endpoint each module publishes. It is the only freshness signal these APIs give.</li>
+<li>
+<code><a href="../reference/tg_fields.html">tg_fields()</a></code> gains a <code>nested</code> argument, describing the columns of the objects inside a list column. 18 columns across <code>fundoafundo</code> and <code>parcerias</code> arrive as list columns because the API folds a child table into its parent.</li>
+<li>
+<code><a href="../reference/tg_fields.html">tg_fields()</a></code> reports <code>api_type</code> rather than <code>pg_type</code>, and no longer reports a primary key: these documents declare none.</li>
+<li>
+<code><a href="../reference/tg_tables.html">tg_tables()</a></code> gains <code>path</code>, the endpoint a table maps to, and <code>params</code>, how many filters it accepts. A table may be named with either a hyphen or an underscore.</li>
+<li>Integer columns are returned as double. These documents declare no <code>format</code>, so int32 and int64 cannot be told apart, and identifiers here genuinely exceed <code>.Machine$integer.max</code> — <code>cd_parceria</code> reaches 202500037062.</li>
+<li>HTTP errors surface the validation detail the service reports, naming the parameter it objected to.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="transferegovr-010">transferegovr 0.1.0<a class="anchor" aria-label="anchor" href="#transferegovr-010"></a></h2>
 <p>First release.</p>
-<ul><li>Covers the three TransfereGov open data APIs — special transfers (<code>transferenciasespeciais</code>), fund-to-fund transfers (<code>fundoafundo</code>) and decentralized credit (<code>ted</code>) — and the forty-eight tables they publish.</li>
+<ul><li>Covered the three ‘PostgREST’ TransfereGov open data APIs — special transfers (<code>transferenciasespeciais</code>), fund-to-fund transfers (<code>fundoafundo</code>) and decentralized credit (<code>ted</code>) — and the forty-eight tables they published.</li>
 <li>
-<code><a href="../reference/tg_get.html">tg_get()</a></code> and <code><a href="../reference/tg_count.html">tg_count()</a></code> query any table; <code><a href="../reference/module_shortcuts.html">tg_ted()</a></code>, <code><a href="../reference/module_shortcuts.html">tg_fundo_a_fundo()</a></code> and <code><a href="../reference/module_shortcuts.html">tg_transferencias_especiais()</a></code> fix the module.</li>
-<li>Filters are named after the columns they apply to. A bare value means “equals”, a bare vector means “is one of”, and <code><a href="../reference/tg_operators.html">tg_operators()</a></code> lists the fifteen comparison operators the services accept. Operators are evaluated in their own mask, so they work regardless of what the user has attached.</li>
-<li>Values carrying commas, parentheses or surrounding spaces are quoted, and numbers are never sent in scientific notation, so a filter matches what it reads as.</li>
+<code><a href="../reference/tg_get.html">tg_get()</a></code> and <code><a href="../reference/tg_count.html">tg_count()</a></code> queried any table; <code>tg_ted()</code>, <code><a href="../reference/module_shortcuts.html">tg_fundo_a_fundo()</a></code> and <code>tg_transferencias_especiais()</code> fixed the module.</li>
+<li>Filters were named after the columns they applied to. A bare value meant “equals”, a bare vector meant “is one of”, and <code>tg_operators()</code> listed the fifteen comparison operators the services accepted.</li>
 <li>
-<code><a href="../reference/tg_modules.html">tg_modules()</a></code>, <code><a href="../reference/tg_tables.html">tg_tables()</a></code> and <code><a href="../reference/tg_fields.html">tg_fields()</a></code> describe the APIs offline, from a copy of their OpenAPI documents frozen into the package and rebuilt by <code>data-raw/schema.R</code>.</li>
-<li>Columns are typed from that schema rather than inferred, so a column that is entirely null on one page keeps its class on the next, and an empty result still carries the table’s full set of columns. <code>bigint</code> columns are returned as double, because a value beyond <code>.Machine$integer.max</code> would become <code>NA</code> as an integer.</li>
-<li>Pagination collects as many rows as <code>.limit</code> asks for, in pages of at most 1000 — the service’s own cap, which it applies silently. Every request carries an explicit order, so pages cannot overlap or skip rows, and the number collected is checked against the total the API reports.</li>
-<li>
-<code><a href="../reference/tg_metadata.html">tg_metadata()</a></code> records the total the API reported, the rows and pages retrieved, the order and selection used, and whether the result was cached.</li>
-<li>Requests are throttled to sixty a minute and retried with exponential backoff on 429 and 5xx responses. A 400 is not retried, and its ‘PostgREST’ error body is surfaced with the offending column named.</li>
-<li>Responses are cached for an hour, by default in the session’s temporary directory. <code><a href="../reference/tg_cache_dir.html">tg_cache_dir()</a></code> switches to a persistent location and <code><a href="../reference/tg_cache_clear.html">tg_cache_clear()</a></code> empties it.</li>
-<li>
-<code>tg_tables(counts = TRUE)</code> reports how many rows each table currently holds, so sizing every table is one call rather than a loop over <code><a href="../reference/tg_count.html">tg_count()</a></code>. It is the only part of that function that needs a network connection.</li>
-<li>A request whose URL grows past what the service accepts fails with a message naming the cause — a filter built with <code><a href="../reference/filters.html">in_()</a></code> over a long vector. curl otherwise reports “Error in the HTTP2 framing layer”, which says nothing about the query.</li>
-<li>English is canonical throughout, with Portuguese aliases for the exported verbs. Table names, column names and categorical values stay in Portuguese because they are the APIs’ own contract.</li>
+<code><a href="../reference/tg_modules.html">tg_modules()</a></code>, <code><a href="../reference/tg_tables.html">tg_tables()</a></code> and <code><a href="../reference/tg_fields.html">tg_fields()</a></code> described the APIs offline, from a copy of their OpenAPI documents frozen into the package.</li>
+<li>Columns were typed from that schema rather than inferred.</li>
+<li>Pagination collected as many rows as <code>.limit</code> asked for, in pages of at most 1000 — the service’s own cap, which it applied silently. Every request carried an explicit order, so pages could not overlap or skip rows.</li>
+<li>Requests were throttled to sixty a minute and retried with exponential backoff on 429 and 5xx responses.</li>
+<li>Responses were cached for an hour, by default in the session’s temporary directory.</li>
+<li>English was canonical throughout, with Portuguese aliases for the exported verbs.</li>
 </ul></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

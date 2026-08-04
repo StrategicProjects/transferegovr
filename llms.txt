@@ -37,8 +37,8 @@ what is inside.
   different and largely superseded contract — different column names, a
   handful of columns each way, and a `historico_pagamento_especial`
   table that the new service does not carry.
-- **The ‘Discricionárias e Legais’ module (SICONV)**, which has no API:
-  it is published as CSV archives at
+- **The Discricionárias e Legais module (SICONV)**, which has no API: it
+  is published as CSV archives at
   <https://api-publica.transferegov.gestao.gov.br/downloads>. The
   government has announced APIs for it in four stages between July 2026
   and October 2027, starting with preparatory acts.

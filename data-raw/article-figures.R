@@ -46,16 +46,20 @@ tema <- theme_minimal(base_size = 12) +
 
 # 1. O ritmo das transferencias especiais -------------------------------------
 
-planos <- tg_get(
-  "transferenciasespeciais", "plano_acao_especial",
-  uf_beneficiario_plano_acao = "PE",
-  .limit = Inf
-) |>
+# O plano de acao nao carrega mais a UF: ela vive no beneficiario, entao o
+# recorte por estado e uma juncao e nao um filtro. E "impedido" aparece com
+# duas grafias, uma delas em caixa alta, por isso o teste ignora maiusculas.
+pe <- tg_get("especiais", "beneficiarios_especiais", .limit = Inf) |>
+  filter(uf_beneficiario == "PE")
+
+planos <- tg_get("especiais", "planos_acao_especiais", .limit = Inf) |>
+  semi_join(pe, by = "id_beneficiario") |>
   mutate(
     valor = coalesce(valor_custeio_plano_acao, 0) +
       coalesce(valor_investimento_plano_acao, 0),
     status = ifelse(
-      situacao_plano_acao == "CIENTE", "seguiu adiante", "impedido"
+      grepl("impedid", situacao_plano_acao, ignore.case = TRUE),
+      "impedido", "seguiu adiante"
     )
   )
 
@@ -88,8 +92,8 @@ ritmo <- ggplot(por_ano, aes(factor(ano), milhoes, fill = status)) +
     ),
     x = NULL, y = NULL,
     caption = paste0(
-      "Fonte: API TransfereGov, modulo transferenciasespeciais, ",
-      "extracao de 31/07/2026.\n",
+      "Fonte: API TransfereGov, modulo especiais, ",
+      "extracao de 03/08/2026.\n",
       "2026 e ano incompleto. Valor = custeio mais investimento do plano."
     )
   ) +

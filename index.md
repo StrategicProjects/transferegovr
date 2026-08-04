@@ -29,17 +29,19 @@ what is inside.
 - **`ted`**, decentralized credit between federal bodies (*termo de
   execução descentralizada*), 13 tables. It has not been published on
   the public API host; it exists only on the older
-  `api.transferegov.gestao.gov.br` service, which this package no longer
-  uses.
+  `api.transferegov.gestao.gov.br` service, **which the government is
+  decommissioning on 2026-08-31**. Unless TED is republished before
+  then, it stops being available as an API at all.
 - **The older PostgREST endpoints** for special and fund-to-fund
-  transfers on that same host. They are still up and still answer, but
-  they are a different and largely superseded contract — different
-  column names, a handful of columns each way, and a
-  `historico_pagamento_especial` table that the new service does not
-  carry.
-- **SICONV agreement data**, published as daily CSV extracts at
-  <https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos/download-dados>.
-  A separate source, not an API.
+  transfers on that same host, retired on the same date. They are a
+  different and largely superseded contract — different column names, a
+  handful of columns each way, and a `historico_pagamento_especial`
+  table that the new service does not carry.
+- **The ‘Discricionárias e Legais’ module (SICONV)**, which has no API:
+  it is published as CSV archives at
+  <https://api-publica.transferegov.gestao.gov.br/downloads>. The
+  government has announced APIs for it in four stages between July 2026
+  and October 2027, starting with preparatory acts.
 
 ## Installation
 

@@ -43,5 +43,5 @@ Other cache:
 
 ``` r
 tg_cache_dir()
-#> [1] "/tmp/RtmpqtLpnt/transferegovr-cache"
+#> [1] "/tmp/RtmpNGu5Qn/transferegovr-cache"
 ```

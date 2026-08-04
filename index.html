@@ -116,11 +116,11 @@
 </h3>
 <ul>
 <li>
-<strong><code>ted</code></strong>, decentralized credit between federal bodies (<em>termo de execução descentralizada</em>), 13 tables. It has not been published on the public API host; it exists only on the older <code>api.transferegov.gestao.gov.br</code> service, which this package no longer uses.</li>
+<strong><code>ted</code></strong>, decentralized credit between federal bodies (<em>termo de execução descentralizada</em>), 13 tables. It has not been published on the public API host; it exists only on the older <code>api.transferegov.gestao.gov.br</code> service, <strong>which the government is decommissioning on 2026-08-31</strong>. Unless TED is republished before then, it stops being available as an API at all.</li>
 <li>
-<strong>The older PostgREST endpoints</strong> for special and fund-to-fund transfers on that same host. They are still up and still answer, but they are a different and largely superseded contract — different column names, a handful of columns each way, and a <code>historico_pagamento_especial</code> table that the new service does not carry.</li>
+<strong>The older PostgREST endpoints</strong> for special and fund-to-fund transfers on that same host, retired on the same date. They are a different and largely superseded contract — different column names, a handful of columns each way, and a <code>historico_pagamento_especial</code> table that the new service does not carry.</li>
 <li>
-<strong>SICONV agreement data</strong>, published as daily CSV extracts at <a href="https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos/download-dados" class="external-link uri">https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos/download-dados</a>. A separate source, not an API.</li>
+<strong>The ‘Discricionárias e Legais’ module (SICONV)</strong>, which has no API: it is published as CSV archives at <a href="https://api-publica.transferegov.gestao.gov.br/downloads" class="external-link uri">https://api-publica.transferegov.gestao.gov.br/downloads</a>. The government has announced APIs for it in four stages between July 2026 and October 2027, starting with preparatory acts.</li>
 </ul>
 </div>
 </div>

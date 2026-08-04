@@ -90,7 +90,7 @@
   switch(type,
     logical = .tg_as_logical(values, missing),
     integer = .tg_as_integer(flat, name),
-    double = suppressWarnings(as.numeric(flat)),
+    double = .tg_as_double(flat, name),
     Date = .tg_as_date(flat, name),
     POSIXct = .tg_as_datetime(flat, name),
     flat
@@ -132,12 +132,33 @@
   out
 }
 
+# `as.numeric()` turns anything it cannot parse into NA with a warning that is
+# easy to miss, which would empty a column rather than report it. That is not
+# hypothetical here: the API declares
+# `codigo_conta_beneficiario_subtransacao_gestao_financeira` as an integer and
+# then sends "***" in it, a masked account number. Left unchecked the column
+# comes back all NA and reads as "the API has no value", which is wrong.
+.tg_as_double <- function(flat, name) {
+  parsed <- suppressWarnings(as.numeric(flat))
+
+  if (any(is.na(parsed) & !is.na(flat))) {
+    return(.tg_warn_unparsed(flat, name, "numeric"))
+  }
+
+  parsed
+}
+
 # `as.integer()` turns anything beyond .Machine$integer.max into NA with a
 # warning that is easy to miss, which would quietly empty an identifier column.
 # The schema types those columns as double, so reaching this branch means the
 # API sent something wider than it declared.
 .tg_as_integer <- function(flat, name) {
   numeric <- suppressWarnings(as.numeric(flat))
+
+  if (any(is.na(numeric) & !is.na(flat))) {
+    return(.tg_warn_unparsed(flat, name, "numeric"))
+  }
+
   present <- !is.na(numeric)
   overflow <- present & abs(numeric) > .Machine$integer.max
 

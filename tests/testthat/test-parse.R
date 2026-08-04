@@ -181,3 +181,34 @@ test_that("a null in a declared array column becomes an empty list", {
   expect_equal(out$a[[1]], list(list(x = 1)))
   expect_equal(out$a[[2]], list())
 })
+
+test_that("a number the API cannot mean is reported, not turned into NA", {
+  # `codigo_conta_beneficiario_subtransacao_gestao_financeira` is declared as
+  # an integer and arrives as "***", a masked account number. Coercing it
+  # silently would empty the column and read as "the API has no value".
+  rows <- rows_from('[{"a":"***"},{"a":"***"}]')
+
+  expect_warning(
+    out <- .tg_rows_to_tibble(rows, fields(a = "double")),
+    class = "transferegovr_type_warning"
+  )
+  expect_type(out$a, "character")
+  expect_equal(out$a, c("***", "***"))
+})
+
+test_that("the same guard applies to a column declared as integer", {
+  rows <- rows_from('[{"a":"***"}]')
+
+  expect_warning(
+    out <- .tg_rows_to_tibble(rows, fields(a = "integer")),
+    class = "transferegovr_type_warning"
+  )
+  expect_equal(out$a, "***")
+})
+
+test_that("a genuinely numeric column is still coerced without warning", {
+  rows <- rows_from('[{"a":1.5},{"a":2},{"a":null}]')
+
+  expect_no_warning(out <- .tg_rows_to_tibble(rows, fields(a = "double")))
+  expect_equal(out$a, c(1.5, 2, NA_real_))
+})

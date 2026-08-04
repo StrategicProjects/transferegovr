@@ -38,7 +38,12 @@
     filters named after the endpoint's own query parameters, which the services combine with AND
   </text>
 
-  <path d="M470 130V158" stroke="#5D7287" stroke-width="2" marker-end="url(#arrow)"/>
+  <g fill="none" stroke="#5D7287" stroke-width="2" stroke-linejoin="round">
+    <path d="M470 130V146"/>
+    <path d="M278 146H662"/>
+    <path d="M278 146V158" marker-end="url(#arrow)"/>
+    <path d="M662 146V158" marker-end="url(#arrow)"/>
+  </g>
 
   <!-- validation -->
   <rect x="100" y="162" width="356" height="96" rx="10" fill="#F4F8FB" stroke="#2E6FD9" stroke-width="1.2"/>
@@ -53,7 +58,12 @@
   <text x="662" y="226" text-anchor="middle" fill="#4A6076" font-size="11.5">55 tables · 811 columns · 817 parameters</text>
   <text x="662" y="246" text-anchor="middle" fill="#12805B" font-size="11.5" font-weight="600">rejects unknown names · checks enum values</text>
 
-  <path d="M470 258V288" stroke="#5D7287" stroke-width="2" marker-end="url(#arrow)"/>
+  <g fill="none" stroke="#5D7287" stroke-width="2" stroke-linejoin="round">
+    <path d="M278 258V274"/>
+    <path d="M662 258V274"/>
+    <path d="M278 274H662"/>
+    <path d="M470 274V288" marker-end="url(#arrow)"/>
+  </g>
 
   <!-- pagination -->
   <rect x="100" y="292" width="740" height="104" rx="10" fill="#F4F8FB" stroke="#2E6FD9" stroke-width="1.2"/>
@@ -68,7 +78,8 @@
     the envelope gives total_items; the rows collected are checked against it
   </text>
 
-  <path d="M470 396V426" stroke="#5D7287" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M470 396V412H330V426" fill="none" stroke="#5D7287" stroke-width="2"
+        stroke-linejoin="round" marker-end="url(#arrow)"/>
 
   <!-- transport, and the cache beside it -->
   <rect x="100" y="430" width="460" height="96" rx="10" fill="#F4F8FB" stroke="#2E6FD9" stroke-width="1.2"/>

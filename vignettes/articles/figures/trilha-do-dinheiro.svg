@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 906" width="940" height="906"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 1060" width="940" height="1060"
      role="img" aria-labelledby="trilha-title trilha-desc"
      font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
   <title id="trilha-title">A trilha do dinheiro nas transferências especiais</title>
@@ -21,10 +21,10 @@
     </marker>
   </defs>
 
-  <rect width="940" height="906" rx="16" fill="#FFFFFF" stroke="#D9E2EC" stroke-width="1.5"/>
+  <rect width="940" height="1060" rx="16" fill="#FFFFFF" stroke="#D9E2EC" stroke-width="1.5"/>
 
   <g fill="none" stroke="#2E6FD9" stroke-width="1" opacity="0.06">
-    <path d="M0 48H940M0 96H940M0 144H940M0 192H940M0 240H940M0 288H940M0 336H940M0 384H940M0 432H940M0 480H940M0 528H940M0 576H940M0 624H940M0 672H940M0 720H940M0 768H940M0 816H940M0 864H940M48 0V906M96 0V906M144 0V906M192 0V906M240 0V906M288 0V906M336 0V906M384 0V906M432 0V906M480 0V906M528 0V906M576 0V906M624 0V906M672 0V906M720 0V906M768 0V906M816 0V906M864 0V906M912 0V906"/>
+    <path d="M0 48H940M0 96H940M0 144H940M0 192H940M0 240H940M0 288H940M0 336H940M0 384H940M0 432H940M0 480H940M0 528H940M0 576H940M0 624H940M0 672H940M0 720H940M0 768H940M0 816H940M0 864H940M0 912H940M0 960H940M0 1008H940M0 1056H940M48 0V1060M96 0V1060M144 0V1060M192 0V1060M240 0V1060M288 0V1060M336 0V1060M384 0V1060M432 0V1060M480 0V1060M528 0V1060M576 0V1060M624 0V1060M672 0V1060M720 0V1060M768 0V1060M816 0V1060M864 0V1060M912 0V1060"/>
   </g>
 
   <text x="470" y="44" text-anchor="middle" fill="#0A2540" font-size="17" font-weight="700">
@@ -39,71 +39,71 @@
   <text x="470" y="112" text-anchor="middle" fill="#0A2540" font-size="14" font-weight="700">Emenda parlamentar individual</text>
   <text x="470" y="132" text-anchor="middle" fill="#4A6076" font-size="11.5">42 parlamentares indicaram recursos para PE</text>
 
-  <path d="M470 144V174" stroke="#5D7287" stroke-width="2" marker-end="url(#seta)"/>
+  <path d="M470 144V200" stroke="#5D7287" stroke-width="2" marker-end="url(#seta)"/>
 
   <!-- 2. plano de acao -->
-  <rect x="190" y="178" width="560" height="92" rx="10" fill="#F4F8FB" stroke="#12805B" stroke-width="1.5"/>
-  <text x="470" y="202" text-anchor="middle" fill="#0A2540" font-size="14.5" font-weight="700">Plano de ação</text>
-  <text x="470" y="222" text-anchor="middle" fill="#12805B" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">planos_acao_especiais</text>
-  <text x="470" y="243" text-anchor="middle" fill="#0A2540" font-size="12.5" font-weight="600">1.962 planos · R$ 1,71 bilhão</text>
-  <text x="470" y="261" text-anchor="middle" fill="#4A6076" font-size="11">184 beneficiários — municípios e o Estado · 88% investimento, 12% custeio</text>
+  <rect x="190" y="204" width="560" height="92" rx="10" fill="#F4F8FB" stroke="#12805B" stroke-width="1.5"/>
+  <text x="470" y="228" text-anchor="middle" fill="#0A2540" font-size="14.5" font-weight="700">Plano de ação</text>
+  <text x="470" y="248" text-anchor="middle" fill="#12805B" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">planos_acao_especiais</text>
+  <text x="470" y="269" text-anchor="middle" fill="#0A2540" font-size="12.5" font-weight="600">1.962 planos · R$ 1,71 bilhão</text>
+  <text x="470" y="287" text-anchor="middle" fill="#4A6076" font-size="11">184 beneficiários — municípios e o Estado · 88% investimento, 12% custeio</text>
 
-  <text x="486" y="290" fill="#5D7287" font-size="10.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">id_plano_acao</text>
-  <path d="M470 270V304" stroke="#5D7287" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="486" y="330" fill="#5D7287" font-size="10.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">id_plano_acao</text>
+  <path d="M470 296V352" stroke="#5D7287" stroke-width="2" marker-end="url(#seta)"/>
 
   <!-- 3. empenho -->
-  <rect x="190" y="308" width="560" height="80" rx="10" fill="#F4F8FB" stroke="#2E6FD9" stroke-width="1.2"/>
-  <text x="470" y="332" text-anchor="middle" fill="#0A2540" font-size="14.5" font-weight="700">Empenho</text>
-  <text x="470" y="352" text-anchor="middle" fill="#12805B" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">empenhos_especiais</text>
-  <text x="470" y="373" text-anchor="middle" fill="#0A2540" font-size="12.5" font-weight="600">2.111 empenhos · R$ 1,71 bilhão — todos os planos chegam aqui</text>
+  <rect x="190" y="356" width="560" height="80" rx="10" fill="#F4F8FB" stroke="#2E6FD9" stroke-width="1.2"/>
+  <text x="470" y="380" text-anchor="middle" fill="#0A2540" font-size="14.5" font-weight="700">Empenho</text>
+  <text x="470" y="400" text-anchor="middle" fill="#12805B" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">empenhos_especiais</text>
+  <text x="470" y="421" text-anchor="middle" fill="#0A2540" font-size="12.5" font-weight="600">2.111 empenhos · R$ 1,71 bilhão — todos os planos chegam aqui</text>
 
   <!-- desvio: os impedidos -->
-  <path d="M750 348H812V424" stroke="#C0392B" stroke-width="2" fill="none"
+  <path d="M750 396H812V498" stroke="#C0392B" stroke-width="2" fill="none"
         stroke-linejoin="round" marker-end="url(#seta-bloqueio)"/>
-  <rect x="700" y="428" width="224" height="96" rx="10" fill="#FDF1EF" stroke="#C0392B" stroke-width="1.5"/>
-  <text x="812" y="452" text-anchor="middle" fill="#B23325" font-size="13.5" font-weight="700">Impedidos</text>
-  <text x="812" y="472" text-anchor="middle" fill="#0A2540" font-size="12" font-weight="600">204 planos · 207 empenhos</text>
-  <text x="812" y="490" text-anchor="middle" fill="#B23325" font-size="13" font-weight="700">R$ 151,8 milhões</text>
-  <text x="812" y="510" text-anchor="middle" fill="#8C4A41" font-size="10.5">nenhum documento hábil emitido</text>
-  <text x="812" y="546" text-anchor="middle" fill="#4A6076" font-size="10">motivo mais comum: falta de</text>
-  <text x="812" y="560" text-anchor="middle" fill="#4A6076" font-size="10">análise conclusiva no prazo (91)</text>
+  <rect x="700" y="502" width="224" height="96" rx="10" fill="#FDF1EF" stroke="#C0392B" stroke-width="1.5"/>
+  <text x="812" y="526" text-anchor="middle" fill="#B23325" font-size="13.5" font-weight="700">Impedidos</text>
+  <text x="812" y="546" text-anchor="middle" fill="#0A2540" font-size="12" font-weight="600">204 planos · 207 empenhos</text>
+  <text x="812" y="564" text-anchor="middle" fill="#B23325" font-size="13" font-weight="700">R$ 151,8 milhões</text>
+  <text x="812" y="584" text-anchor="middle" fill="#8C4A41" font-size="10.5">nenhum documento hábil emitido</text>
+  <text x="812" y="620" text-anchor="middle" fill="#4A6076" font-size="10">motivo mais comum: falta de</text>
+  <text x="812" y="634" text-anchor="middle" fill="#4A6076" font-size="10">análise conclusiva no prazo (91)</text>
 
-  <text x="486" y="401" fill="#5D7287" font-size="10.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">id_empenho</text>
-  <path d="M470 388V406H425V424" fill="none" stroke="#5D7287" stroke-width="2"
+  <text x="486" y="462" fill="#5D7287" font-size="10.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">id_empenho</text>
+  <path d="M470 436V468H425V498" fill="none" stroke="#5D7287" stroke-width="2"
         stroke-linejoin="round" marker-end="url(#seta)"/>
 
   <!-- 4. documento habil -->
-  <rect x="190" y="428" width="470" height="80" rx="10" fill="#F4F8FB" stroke="#2E6FD9" stroke-width="1.2"/>
-  <text x="425" y="452" text-anchor="middle" fill="#0A2540" font-size="14.5" font-weight="700">Documento hábil</text>
-  <text x="425" y="472" text-anchor="middle" fill="#12805B" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">documentos_habeis_especiais</text>
-  <text x="425" y="493" text-anchor="middle" fill="#0A2540" font-size="12.5" font-weight="600">2.030 documentos · R$ 1,56 bilhão</text>
+  <rect x="190" y="502" width="470" height="80" rx="10" fill="#F4F8FB" stroke="#2E6FD9" stroke-width="1.2"/>
+  <text x="425" y="526" text-anchor="middle" fill="#0A2540" font-size="14.5" font-weight="700">Documento hábil</text>
+  <text x="425" y="546" text-anchor="middle" fill="#12805B" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">documentos_habeis_especiais</text>
+  <text x="425" y="567" text-anchor="middle" fill="#0A2540" font-size="12.5" font-weight="600">2.030 documentos · R$ 1,56 bilhão</text>
 
-  <text x="441" y="530" fill="#5D7287" font-size="10.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">id_dh</text>
-  <path d="M425 508V544" stroke="#5D7287" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="441" y="616" fill="#5D7287" font-size="10.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">id_dh</text>
+  <path d="M425 582V638" stroke="#5D7287" stroke-width="2" marker-end="url(#seta)"/>
 
   <!-- 5. ordem de pagamento / bancaria -->
-  <rect x="190" y="548" width="470" height="96" rx="10" fill="#F4F8FB" stroke="#2E6FD9" stroke-width="1.2"/>
-  <text x="425" y="572" text-anchor="middle" fill="#0A2540" font-size="14.5" font-weight="700">Ordem de pagamento e ordem bancária</text>
-  <text x="425" y="592" text-anchor="middle" fill="#12805B" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ordens_pagamentos_ordens_bancarias_especiais</text>
-  <text x="425" y="613" text-anchor="middle" fill="#0A2540" font-size="12.5" font-weight="600">1.932 ordens — todas com ordem bancária emitida</text>
-  <text x="425" y="632" text-anchor="middle" fill="#4A6076" font-size="11">o módulo não publica o histórico de situação de cada ordem</text>
+  <rect x="190" y="642" width="470" height="96" rx="10" fill="#F4F8FB" stroke="#2E6FD9" stroke-width="1.2"/>
+  <text x="425" y="666" text-anchor="middle" fill="#0A2540" font-size="14.5" font-weight="700">Ordem de pagamento e ordem bancária</text>
+  <text x="425" y="686" text-anchor="middle" fill="#12805B" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ordens_pagamentos_ordens_bancarias_especiais</text>
+  <text x="425" y="707" text-anchor="middle" fill="#0A2540" font-size="12.5" font-weight="600">1.932 ordens — todas com ordem bancária emitida</text>
+  <text x="425" y="726" text-anchor="middle" fill="#4A6076" font-size="11">o módulo não publica o histórico de situação de cada ordem</text>
 
-  <path d="M425 644V680" stroke="#5D7287" stroke-width="2" marker-end="url(#seta)"/>
+  <path d="M425 738V794" stroke="#5D7287" stroke-width="2" marker-end="url(#seta)"/>
 
   <!-- 6. conta -->
-  <rect x="190" y="684" width="470" height="64" rx="10" fill="#F4F8FB" stroke="#12805B" stroke-width="1.5"/>
-  <text x="425" y="710" text-anchor="middle" fill="#0A2540" font-size="14" font-weight="700">Conta do beneficiário</text>
-  <text x="425" y="730" text-anchor="middle" fill="#4A6076" font-size="11">agência e conta constam do próprio plano de ação</text>
+  <rect x="190" y="798" width="470" height="64" rx="10" fill="#F4F8FB" stroke="#12805B" stroke-width="1.5"/>
+  <text x="425" y="824" text-anchor="middle" fill="#0A2540" font-size="14" font-weight="700">Conta do beneficiário</text>
+  <text x="425" y="844" text-anchor="middle" fill="#4A6076" font-size="11">agência e conta constam do próprio plano de ação</text>
 
   <!-- fechamento aritmetico -->
-  <rect x="100" y="782" width="740" height="80" rx="10" fill="#EDF3F9" stroke="#12805B" stroke-width="1.2"/>
-  <text x="470" y="808" text-anchor="middle" fill="#0A2540" font-size="13" font-weight="700">
+  <rect x="100" y="912" width="740" height="80" rx="10" fill="#EDF3F9" stroke="#12805B" stroke-width="1.2"/>
+  <text x="470" y="938" text-anchor="middle" fill="#0A2540" font-size="13" font-weight="700">
     A conta fecha: R$ 1.709,6 mi empenhados − R$ 1.557,9 mi em documentos hábeis = R$ 151,8 mi
   </text>
-  <text x="470" y="830" text-anchor="middle" fill="#4A6076" font-size="11.5">
+  <text x="470" y="960" text-anchor="middle" fill="#4A6076" font-size="11.5">
     exatamente o valor dos planos impedidos. O dinheiro não some no caminho: ele para, e o sistema diz onde.
   </text>
-  <text x="470" y="850" text-anchor="middle" fill="#5D7287" font-size="10">
+  <text x="470" y="980" text-anchor="middle" fill="#5D7287" font-size="10">
     Fonte: API TransfereGov, módulo especiais, extração de 03/08/2026.
   </text>
 </svg>

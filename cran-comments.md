@@ -1,6 +1,15 @@
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 2 notes
+
+Both notes are expected and neither reflects a defect in the package:
+
+* `checking CRAN incoming feasibility ... NOTE / New submission` — the package
+  is not on CRAN yet.
+* `checking HTML version of manual ... NOTE / Skipping checking HTML
+  validation: 'tidy' doesn't look like recent enough HTML Tidy` — the HTML Tidy
+  shipped with macOS is older than the check wants. This is a property of the
+  submitting machine, not of the package.
 
 ## About this version
 

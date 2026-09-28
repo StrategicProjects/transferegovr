@@ -1,5 +1,10 @@
 # transferegovr (development version)
 
+* `vignette("joining-tables")` covers `ted`, the five tables published in
+  September 2026, and joining through list filters. Every link it draws was
+  checked against the data, including the ones the government's data models do
+  not document yet.
+
 # transferegovr 0.2.0
 
 The package now targets the public API host,

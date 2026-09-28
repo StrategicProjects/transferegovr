@@ -1,8 +1,8 @@
-test_that("the frozen schema covers three modules and fifty-five tables", {
-  expect_equal(nrow(tg_modules()), 3L)
-  expect_equal(nrow(tg_tables()), 55L)
-  expect_equal(sum(tg_tables()$columns), 811L)
-  expect_equal(sum(tg_tables()$params), 817L)
+test_that("the frozen schema covers four modules and seventy-four tables", {
+  expect_equal(nrow(tg_modules()), 4L)
+  expect_equal(nrow(tg_tables()), 74L)
+  expect_equal(sum(tg_tables()$columns), 1045L)
+  expect_equal(sum(tg_tables()$params), 1059L)
 })
 
 test_that("module names, aliases, case and punctuation all resolve", {
@@ -13,6 +13,9 @@ test_that("module names, aliases, case and punctuation all resolve", {
   expect_equal(.tg_match_module("fundo a fundo"), "fundoafundo")
   expect_equal(.tg_match_module("fund_to_fund"), "fundoafundo")
   expect_equal(.tg_match_module(" especiais "), "especiais")
+  expect_equal(.tg_match_module("ted"), "ted")
+  expect_equal(.tg_match_module("TED"), "ted")
+  expect_equal(.tg_match_module("decentralized credit"), "ted")
 })
 
 test_that("the old module name still resolves to the module that replaced it", {
@@ -123,7 +126,7 @@ test_that("asking for a nested column that is not one is an error", {
 
 test_that("tg_tables() lists one module or all of them", {
   expect_setequal(unique(tg_tables("parcerias")$module), "parcerias")
-  expect_equal(nrow(tg_tables("parcerias")), 15L)
+  expect_equal(nrow(tg_tables("parcerias")), 17L)
   expect_setequal(unique(tg_tables()$module), tg_modules()$module)
 })
 
@@ -131,7 +134,18 @@ test_that("tg_modules() reports each module's own base URL", {
   modules <- tg_modules()
 
   expect_true(all(grepl("^https://api-publica\\.", modules$url)))
-  expect_equal(sum(modules$tables), 55L)
+  expect_equal(sum(modules$tables), 74L)
+})
+
+test_that("each module reports the page limit its service declares", {
+  # Not one number: especiais and parcerias answer 422 above 200 rows a page,
+  # fundoafundo and ted above 1000.
+  limits <- stats::setNames(tg_modules()$max_page_size, tg_modules()$module)
+
+  expect_equal(
+    limits[c("especiais", "fundoafundo", "parcerias", "ted")],
+    c(especiais = 200L, fundoafundo = 1000L, parcerias = 200L, ted = 1000L)
+  )
 })
 
 test_that("Portuguese aliases are the same functions", {
@@ -164,14 +178,14 @@ test_that("counts = TRUE adds one row count per table", {
   # is made at all -- which is correct behaviour, and useless for this test.
   withr::local_options(transferegovr.cache = FALSE)
   recorded <- local_recorded_requests(
-    rep(list(mock_envelope("[]", total = 42)), 15)
+    rep(list(mock_envelope("[]", total = 42)), 17)
   )
 
   result <- tg_tables("parcerias", counts = TRUE)
 
-  expect_length(recorded$requests, 15L)
+  expect_length(recorded$requests, 17L)
   expect_true("rows" %in% names(result))
-  expect_equal(result$rows, rep(42, 15))
+  expect_equal(result$rows, rep(42, 17))
 })
 
 test_that("counts is validated before any request", {
@@ -183,15 +197,15 @@ test_that("counts is validated before any request", {
 test_that("the Portuguese alias takes the counts argument too", {
   withr::local_options(transferegovr.cache = FALSE)
   recorded <- local_recorded_requests(
-    rep(list(mock_envelope("[]", total = 7)), 15)
+    rep(list(mock_envelope("[]", total = 7)), 17)
   )
 
-  expect_equal(tg_tabelas("parcerias", contagens = TRUE)$rows, rep(7, 15))
-  expect_length(recorded$requests, 15L)
+  expect_equal(tg_tabelas("parcerias", contagens = TRUE)$rows, rep(7, 17))
+  expect_length(recorded$requests, 17L)
 })
 
 test_that("a repeated count is served from the cache", {
-  # 55 counts is 55 requests the first time and none the next, which is what
+  # 74 counts is 74 requests the first time and none the next, which is what
   # makes `tg_tables(counts = TRUE)` usable more than once in a session.
   dir <- withr::local_tempdir()
   withr::local_options(
@@ -199,12 +213,12 @@ test_that("a repeated count is served from the cache", {
     transferegovr.cache_dir = dir
   )
   recorded <- local_recorded_requests(
-    rep(list(mock_envelope("[]", total = 9)), 15)
+    rep(list(mock_envelope("[]", total = 9)), 17)
   )
 
   first <- tg_tables("parcerias", counts = TRUE)
   second <- tg_tables("parcerias", counts = TRUE)
 
-  expect_length(recorded$requests, 15L)
+  expect_length(recorded$requests, 17L)
   expect_equal(first$rows, second$rows)
 })

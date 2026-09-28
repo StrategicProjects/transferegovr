@@ -54,7 +54,7 @@ navbar:
 
 reference:
 - title: Queries
-  desc: Retrieving rows from the three TransfereGov API modules.
+  desc: Retrieving rows from the four TransfereGov API modules.
   contents:
   - tg_get
   - tg_count

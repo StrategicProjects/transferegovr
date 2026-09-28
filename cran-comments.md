@@ -1,27 +1,29 @@
 ## R CMD check results
 
-0 errors | 0 warnings | 2 notes
+0 errors | 0 warnings | 1 note
 
-Both notes are expected and neither reflects a defect in the package:
-
-* `checking CRAN incoming feasibility ... NOTE / New submission` — the package
-  is not on CRAN yet.
 * `checking HTML version of manual ... NOTE / Skipping checking HTML
   validation: 'tidy' doesn't look like recent enough HTML Tidy` — the HTML Tidy
   shipped with macOS is older than the check wants. This is a property of the
   submitting machine, not of the package.
 
+## Reverse dependencies
+
+There are none.
+
 ## About this version
 
-Version 0.1.0 was submitted on 2026-07-31 and covered the TransfereGov
-'PostgREST' services at `api.transferegov.gestao.gov.br`.
-
-The platform also publishes a second set of services, at
-`api-publica.transferegov.gestao.gov.br`, with a different contract:
+Version 0.1.0, published on 2026-08-08, covers the TransfereGov 'PostgREST'
+services at `api.transferegov.gestao.gov.br`. The government has announced
+the retirement of those services, and publishes their replacement at
+`api-publica.transferegov.gestao.gov.br`: a different contract, with
 page-number pagination, typed query parameters instead of operators, and a
-module ('parcerias') that the first host does not serve at all. Version 0.2.0
-targets those services instead. It is a rewrite rather than an addition, so it
-supersedes the pending 0.1.0 submission.
+module ('parcerias') that the first host does not serve at all.
+
+Version 0.2.0 moves the package to the replacement services. It is a rewrite
+rather than an addition, and it breaks code written against 0.1.0; `NEWS.md`
+lists every change. It follows 0.1.0 more closely than usual because the
+services 0.1.0 depends on are being withdrawn.
 
 ## Test environments
 

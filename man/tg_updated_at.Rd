@@ -11,8 +11,8 @@ tg_atualizado_em(module, .cache = NULL, .base_url = NULL)
 }
 \arguments{
 \item{module}{A module name from \code{\link[=tg_modules]{tg_modules()}}: \code{"especiais"},
-\code{"fundoafundo"} or \code{"parcerias"}. Aliases such as \code{"fundo_a_fundo"} are
-accepted.}
+\code{"fundoafundo"}, \code{"parcerias"} or \code{"ted"}. Aliases such as
+\code{"fundo_a_fundo"} are accepted.}
 
 \item{.cache}{Whether to serve the request from the response cache. \code{NULL}
 follows the \code{transferegovr.cache} option. See \code{\link[=tg_cache_dir]{tg_cache_dir()}}.}

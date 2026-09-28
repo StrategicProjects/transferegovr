@@ -11,9 +11,9 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
 ```
 
-TransfereGov publishes three open data APIs on
-`api-publica.transferegov.gestao.gov.br`, covering fifty-five tables and about
-6.9 million rows between them. This vignette shows how to find your way around
+TransfereGov publishes four open data APIs on
+`api-publica.transferegov.gestao.gov.br`, covering seventy-four tables and about
+7.5 million rows between them. This vignette shows how to find your way around
 them and retrieve data without downloading more than you meant to.
 
 The code here is not run when the vignette is built, because it would call the
@@ -23,16 +23,17 @@ government's servers.
 library(transferegovr)
 ```
 
-## The three modules
+## The four modules
 
 ```{r}
 tg_modules()
-#> # A tibble: 3 × 4
-#>   module      label                  tables url
-#>   <chr>       <chr>                   <int> <chr>
-#> 1 especiais   Special transfers          20 https://api-publica.transferego…
-#> 2 fundoafundo Fund-to-fund transfers     20 https://api-publica.transferego…
-#> 3 parcerias   Partnerships               15 https://api-publica.transferego…
+#> # A tibble: 4 × 5
+#>   module      label                  tables max_page_size url
+#>   <chr>       <chr>                   <int>         <int> <chr>
+#> 1 especiais   Special transfers          23           200 https://api-publ…
+#> 2 fundoafundo Fund-to-fund transfers     20          1000 https://api-publ…
+#> 3 parcerias   Partnerships               17           200 https://api-publ…
+#> 4 ted         Decentralized credit       14          1000 https://api-publ…
 ```
 
 `especiais` covers **special transfers**, the mechanism created by
@@ -42,17 +43,18 @@ sign. `fundoafundo` covers **fund-to-fund transfers**, from a federal fund to a
 state or municipal one — health, social assistance, education. `parcerias`
 covers **partnerships** with civil society organizations, from the program
 that announces them through to the bank statement of the account they are paid
-from.
+from. `ted` covers **decentralized credit**, the *termos de execução
+descentralizada* through which one federal body passes budget to another to
+carry out a program on its behalf.
 
-What is *not* here: decentralized credit between federal bodies (`ted`), which
-the government has not published on this host, and SICONV agreement data, which
-is published as CSV downloads rather than as an API.
+What is *not* here: SICONV agreement data, which is published as CSV downloads
+rather than as an API.
 
 ## Finding a table
 
 ```{r}
 tg_tables("parcerias")
-#> # A tibble: 15 × 6
+#> # A tibble: 17 × 6
 #>    module    table                 path                  columns params
 #>    <chr>     <chr>                 <chr>                   <int>  <int>
 #>  1 parcerias analise_proposta      analise-proposta            7      5
@@ -98,11 +100,30 @@ propostas <- tg_get(
 )
 ```
 
-That is the entire filtering vocabulary. These services compare for equality and
-nothing else — there is no greater-than, no pattern match, no "is one of" — and
-they publish no ordering or column-selection parameter.
+That is almost the entire filtering vocabulary. These services compare for
+equality — there is no greater-than and no pattern match — and they publish no
+ordering or column-selection parameter.
 
-To filter on several values, query each and bind:
+The exception is on identifiers. Some parameters take several values in one
+request and match any of them. `tg_params()` marks them as `multiple`, with the
+most each accepts — 100 in `especiais`, 200 elsewhere:
+
+```{r}
+params <- tg_params("parcerias", "parceria")
+params[params$multiple, c("param", "max_values")]
+#> # A tibble: 2 × 2
+#>   param       max_values
+#>   <chr>            <int>
+#> 1 id_parceria        200
+#> 2 id_proposta        200
+
+tg_get("parcerias", "parceria", id_proposta = c(1, 2))
+```
+
+The OpenAPI documents do not say which parameters these are, and the names do
+not either, so the package asked the service when it froze the schema.
+
+For any other parameter, query each value and bind:
 
 ```{r}
 library(purrr)
@@ -123,10 +144,11 @@ Many parameters accept only a fixed set of values, and the package knows which:
 params <- tg_params("parcerias", "proposta")
 params[lengths(params$values) > 0, c("param", "values")]
 #> # A tibble: 5 × 2
-#>   param              values
-#>   <chr>              <list>
-#> 1 sg_uf_recebedor    <chr [27]>
-#> 2 situacao_proposta  <chr [5]>
+#>   param                  values
+#>   <chr>                  <list>
+#> 1 sg_uf_recebedor        <chr [27]>
+#> 2 situacao_proposta      <chr [5]>
+#> 3 in_situacao_analise    <chr [4]>
 #> …
 
 params$values[[match("situacao_proposta", params$param)]]
@@ -153,7 +175,7 @@ This is the one thing worth internalizing about these APIs.
 the request succeeds and returns the unfiltered table. The parameter on
 `/proposta` is `situacao_proposta`; write `in_situacao_proposta`, which is what
 the sibling `/parceria` endpoint calls its own version, and you get every one of
-the 88,666 proposals instead of the 84,258 that are approved. Nothing in the
+the 89,415 proposals instead of the 85,041 that are approved. Nothing in the
 response says so.
 
 So the package refuses to send a name the frozen schema does not know:

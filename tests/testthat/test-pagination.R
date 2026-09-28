@@ -302,6 +302,40 @@ test_that("the page size is bounded by what the service accepts", {
   expect_length(recorded$requests, 0L)
 })
 
+test_that("the page limit is the module's own, not one number for all", {
+  expect_error(
+    tg_get("fundoafundo", "planos_acao", .page_size = 1001),
+    "between 1 and 1000"
+  )
+  expect_error(
+    tg_get("ted", "termos_execucao", .page_size = 1001),
+    "between 1 and 1000"
+  )
+
+  recorded <- local_recorded_requests(mock_page(2, total = 2, page_size = 1000))
+  tg_get("ted", "termos_execucao", .page_size = 1000, .progress = FALSE)
+  expect_equal(
+    request_query(recorded$requests[[1]])[["tamanho_da_pagina"]], "1000"
+  )
+})
+
+test_that("the default page size is the largest the module serves", {
+  recorded <- local_recorded_requests(list(
+    mock_page(2, total = 2, page_size = 1000),
+    mock_page(2, total = 2, page_size = 200)
+  ))
+
+  tg_get("fundoafundo", "planos_acao", .progress = FALSE)
+  tg_get("parcerias", "parceria", .progress = FALSE)
+
+  expect_equal(
+    request_query(recorded$requests[[1]])[["tamanho_da_pagina"]], "1000"
+  )
+  expect_equal(
+    request_query(recorded$requests[[2]])[["tamanho_da_pagina"]], "200"
+  )
+})
+
 test_that("limit and offset must be whole numbers", {
   expect_error(tg_get("parcerias", "parceria", .limit = 1.5))
   expect_error(tg_get("parcerias", "parceria", .offset = -1))

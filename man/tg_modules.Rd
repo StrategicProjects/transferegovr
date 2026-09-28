@@ -11,7 +11,8 @@ tg_modulos()
 }
 \value{
 A tibble with one row per module: its name, the label used in this
-documentation, the number of tables it publishes, and its API base URL.
+documentation, the number of tables it publishes, the largest page it
+serves in one request, and its API base URL.
 }
 \description{
 List the TransfereGov API modules

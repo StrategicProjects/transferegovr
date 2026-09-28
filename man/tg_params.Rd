@@ -25,7 +25,8 @@ tg_parametros(modulo, tabela)
 A tibble with one row per parameter: its name, the R type a value
 should have, the type the API declares, the permitted values when the
 parameter is enumerated, the pattern a value must match when it has one,
-and its description.
+its description, whether it accepts several values (\code{multiple}), and how
+many at most (\code{max_values}).
 }
 \description{
 Every parameter may be passed to \code{\link[=tg_get]{tg_get()}} and \code{\link[=tg_count]{tg_count()}} as a named
@@ -38,6 +39,9 @@ tg_params("parcerias", "proposta")
 # Which parameters accept only a fixed set of values?
 params <- tg_params("parcerias", "proposta")
 params[lengths(params$values) > 0, c("param", "values")]
+
+# Which accept several values at once?
+params[params$multiple, c("param", "max_values")]
 }
 \seealso{
 Other discovery:

@@ -170,6 +170,69 @@ test_that("several values for one parameter are refused", {
   )
 })
 
+# Parameters that take a list ------------------------------------------------
+
+test_that("a list-taking parameter sends its values comma-separated", {
+  # The service reads `id_parceria=3,4` as "is one of"; it would read a
+  # repeated `id_parceria=3&id_parceria=4` as just 4.
+  expect_equal(filter_string(id_parceria = c(3, 4)), c(id_parceria = "3,4"))
+  expect_equal(filter_string(id_parceria = c("3", "4")), c(id_parceria = "3,4"))
+
+  recorded <- local_recorded_requests(mock_page(2, total = 2))
+  tg_get("parcerias", "parceria", id_parceria = c(3, 4), .progress = FALSE)
+  expect_equal(request_query(recorded$requests[[1]])[["id_parceria"]], "3,4")
+})
+
+test_that("large identifiers in a list are not in scientific notation", {
+  expect_equal(
+    filter_string(id_parceria = c(202500037062, 1e5)),
+    c(id_parceria = "202500037062,100000")
+  )
+})
+
+test_that("repeated values in a list are sent once", {
+  expect_equal(filter_string(id_parceria = c(3, 3, 4)), c(id_parceria = "3,4"))
+})
+
+test_that("a list is capped at what the parameter accepts", {
+  # 200 here, 100 in especiais: the limit is frozen per parameter.
+  expect_error(filter_string(id_parceria = 1:201), "at most 200",
+               class = "transferegovr_filter_error")
+  expect_length(filter_string(id_parceria = 1:200), 1L)
+
+  expect_error(
+    filter_string(id_devolucao = 1:101, module = "especiais",
+                  table = "devolucao_especiais"),
+    "at most 100",
+    class = "transferegovr_filter_error"
+  )
+
+  recorded <- local_recorded_requests(list())
+  expect_error(tg_get("parcerias", "parceria", id_parceria = 1:201))
+  expect_length(recorded$requests, 0L)
+})
+
+test_that("a list takes only whole numbers, and no missing ones", {
+  filter_error <- "transferegovr_filter_error"
+  expect_error(filter_string(id_parceria = c(1.5, 2)), class = filter_error)
+  expect_error(filter_string(id_parceria = c(-1, 2)), class = filter_error)
+  expect_error(filter_string(id_parceria = c("3", "x")), class = filter_error)
+  expect_error(filter_string(id_parceria = c(3, NA)), class = filter_error)
+  expect_error(filter_string(id_parceria = c(TRUE, FALSE)),
+               class = filter_error)
+})
+
+test_that("tg_params() marks which parameters take a list", {
+  params <- tg_params("parcerias", "parceria")
+
+  expect_true(params$multiple[[match("id_parceria", params$param)]])
+  expect_equal(params$max_values[[match("id_parceria", params$param)]], 200L)
+  expect_false(params$multiple[[match("in_situacao_parceria", params$param)]])
+  expect_equal(
+    params$max_values[[match("in_situacao_parceria", params$param)]], 1L
+  )
+})
+
 test_that("a repeated parameter is refused rather than silently truncated", {
   # The service keeps the last occurrence and discards the rest without
   # reporting it, which would make the first condition vanish.
@@ -219,7 +282,8 @@ test_that("tg_params() describes what the endpoint accepts", {
   expect_s3_class(params, "tbl_df")
   expect_named(
     params,
-    c("param", "r_type", "api_type", "values", "pattern", "description")
+    c("param", "r_type", "api_type", "values", "pattern", "description",
+      "multiple", "max_values")
   )
   expect_true("situacao_proposta" %in% params$param)
 })

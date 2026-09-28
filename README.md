@@ -24,34 +24,30 @@ and civil society.
 ## What this package covers
 
 The package targets the public API host,
-`api-publica.transferegov.gestao.gov.br`, which publishes three modules
-and **55 tables** in all:
+`api-publica.transferegov.gestao.gov.br`, which publishes four modules
+and **74 tables** in all:
 
 | Module | Covers | Tables |
 |----|----|----|
-| `especiais` | Special transfers, created by Constitutional Amendment 105/2019 for individual parliamentary amendments | 20 |
+| `especiais` | Special transfers, created by Constitutional Amendment 105/2019 for individual parliamentary amendments | 23 |
 | `fundoafundo` | Fund-to-fund transfers, from federal funds directly to state, district and municipal funds | 20 |
-| `parcerias` | Partnership management: programs, proposals, partnerships, their financial execution and bank statements | 15 |
+| `parcerias` | Partnership management: programs, proposals, partnerships, their financial execution and bank statements | 17 |
+| `ted` | Decentralized credit between federal bodies (*termo de execução descentralizada*): programs, action plans, credit notes and financial programming | 14 |
 
-Every table in the three published data models is reachable. Where the
-API folds a child table into its parent rather than giving it an
-endpoint of its own, it arrives as a list column — 5 of them in
-`fundoafundo`, 13 in `parcerias` — and `tg_fields(nested = )` describes
-what is inside.
+Every table in the published data models is reachable. Where the API
+folds a child table into its parent rather than giving it an endpoint of
+its own, it arrives as a list column — 5 of them in `fundoafundo`, 13 in
+`parcerias`, 4 in `ted` — and `tg_fields(nested = )` describes what is
+inside.
 
 ### What it does not cover
 
-- **`ted`**, decentralized credit between federal bodies (*termo de
-  execução descentralizada*), 13 tables. It has not been published on
-  the public API host; it exists only on the older
-  `api.transferegov.gestao.gov.br` service, **which the government is
-  decommissioning on 2026-08-31**. Unless TED is republished before
-  then, it stops being available as an API at all.
-- **The older PostgREST endpoints** for special and fund-to-fund
-  transfers on that same host, retired on the same date. They are a
-  different and largely superseded contract — different column names, a
-  handful of columns each way, and a `historico_pagamento_especial`
-  table that the new service does not carry.
+- **The older PostgREST endpoints** at `api.transferegov.gestao.gov.br`,
+  which version 0.1.0 of this package used. The government announced
+  their retirement for 2026-08-31. They are a different and largely
+  superseded contract — different column names, a handful of columns
+  each way, and a `historico_pagamento_especial` table that the new
+  service does not carry.
 - **The Discricionárias e Legais module (SICONV)**, which has no API: it
   is published as CSV archives at
   <https://api-publica.transferegov.gestao.gov.br/downloads>. The
@@ -59,6 +55,14 @@ what is inside.
   and October 2027, starting with preparatory acts.
 
 ## Installation
+
+From CRAN:
+
+``` r
+install.packages("transferegovr")
+```
+
+The development version, from GitHub:
 
 ``` r
 # install.packages("pak")
@@ -88,9 +92,16 @@ tg_get(
 )
 ```
 
-That is the whole filtering vocabulary. These services compare for
-equality and nothing else — no greater-than, no pattern match, no “is
-one of” — and they publish no ordering or column-selection parameter.
+That is almost the whole filtering vocabulary. These services compare
+for equality — no greater-than, no pattern match — and publish no
+ordering or column-selection parameter. The one extension is on
+identifiers: 113 of them take several values and match any, which
+`tg_params()` marks as `multiple`:
+
+``` r
+tg_get("ted", "planos_acao_metas", id_plano_acao = c(3, 4))
+```
+
 `tg_params()` lists what each table accepts, including the permitted
 values of the enumerated parameters.
 
@@ -98,7 +109,7 @@ values of the enumerated parameters.
 
 These services **ignore a query parameter they do not recognize** and
 answer `200` with the whole table. Misspell `situacao_proposta` and you
-get 88,666 rows where the filter would have given 84,258 — a plausible
+get 89,415 rows where the filter would have given 85,041 — a plausible
 number, quietly wrong.
 
 So every parameter name is checked against the packaged schema before a
@@ -118,16 +129,18 @@ than after it.
 
 ## Size first, download second
 
-The services return at most 200 rows per request, and these tables are
-not small. Ask before you fetch:
+Each request returns one page — at most 200 rows in `especiais` and
+`parcerias`, 1000 in `fundoafundo` and `ted` — and these tables are not
+small. Ask before you fetch:
 
 ``` r
 tg_count("especiais", "meta_especiais")
-#> [1] 156060
+#> [1] 156193
 ```
 
-`.limit` counts rows, not pages. Anything above 200 is collected page by
-page, and the total collected is checked against what the API reported:
+`.limit` counts rows, not pages. Anything above one page is collected
+page by page, and the total collected is checked against what the API
+reported:
 
 ``` r
 metas <- tg_get("especiais", "meta_especiais", .limit = Inf)
@@ -159,7 +172,7 @@ signal these APIs give — they send no `ETag`, `Cache-Control` or
 
 ``` r
 tg_updated_at("parcerias")
-#> [1] "2026-08-03 UTC"
+#> [1] "2026-09-28 UTC"
 ```
 
 Responses are cached for an hour in the session’s temporary directory,
@@ -175,7 +188,7 @@ empties it.
 
 ## How it works
 
-<img class="architecture-diagram" src="man/figures/architecture.svg" alt="Architecture of transferegovr: the public verbs pass through parameter and schema validation, the pagination loop, and the HTTP client and its cache, reach the three services, and return through the parser as a typed tibble." width="100%" />
+<img class="architecture-diagram" src="man/figures/architecture.svg" alt="Architecture of transferegovr: the public verbs pass through parameter and schema validation, the pagination loop, and the HTTP client and its cache, reach the four services, and return through the parser as a typed tibble." width="100%" />
 
 Two things in that picture are where a naive client of these APIs loses
 data:
@@ -185,9 +198,12 @@ data:
   only defense, which is why the packaged schema freezes the parameter
   list and not just the columns.
 - **Repeating a parameter does not combine conditions.** The service
-  keeps the last occurrence and discards the rest without saying so, so
-  the package refuses a repeated or multi-valued filter rather than
-  sending one.
+  keeps the last occurrence and discards the rest without saying so. A
+  parameter that takes several values wants them in one comma-separated
+  value instead, and which parameters do is not in the OpenAPI documents
+  — it was established by asking the service. So the package sends a
+  list only where the service reads it as one, and refuses a repeated or
+  multi-valued filter everywhere else.
 
 Page order is the server’s — these APIs publish no ordering parameter —
 so it was verified rather than assumed: the same rows come back in the
@@ -214,3 +230,4 @@ verbs.
 - <https://api-publica.transferegov.gestao.gov.br/especiais/docs>
 - <https://api-publica.transferegov.gestao.gov.br/fundoafundo/docs>
 - <https://api-publica.transferegov.gestao.gov.br/parcerias/docs>
+- <https://api-publica.transferegov.gestao.gov.br/ted/docs>

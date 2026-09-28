@@ -11,7 +11,7 @@ tg_get(
   ...,
   .limit = 1000,
   .offset = 0,
-  .page_size = 200,
+  .page_size = NULL,
   .progress = NULL,
   .cache = NULL,
   .base_url = NULL
@@ -23,7 +23,7 @@ tg_obter(
   ...,
   .limit = 1000,
   .offset = 0,
-  .page_size = 200,
+  .page_size = NULL,
   .progress = NULL,
   .cache = NULL,
   .base_url = NULL
@@ -31,8 +31,8 @@ tg_obter(
 }
 \arguments{
 \item{module}{A module name from \code{\link[=tg_modules]{tg_modules()}}: \code{"especiais"},
-\code{"fundoafundo"} or \code{"parcerias"}. Aliases such as \code{"fundo_a_fundo"} are
-accepted.}
+\code{"fundoafundo"}, \code{"parcerias"} or \code{"ted"}. Aliases such as
+\code{"fundo_a_fundo"} are accepted.}
 
 \item{table}{A table name from \code{\link[=tg_tables]{tg_tables()}}.}
 
@@ -44,7 +44,8 @@ row.}
 
 \item{.offset}{Number of matching rows to skip before the first one returned.}
 
-\item{.page_size}{Rows per request, between 1 and 200.}
+\item{.page_size}{Rows per request. \code{NULL}, the default, asks for the largest
+page the module serves, which \code{\link[=tg_modules]{tg_modules()}} reports as \code{max_page_size}.}
 
 \item{.progress}{Whether to show a progress bar while collecting pages.
 \code{NULL} shows one in interactive sessions when more than one page is needed.}
@@ -60,13 +61,13 @@ many pages were fetched. A column the API sends as an array of objects
 comes back as a list column; \code{\link[=tg_fields]{tg_fields()}} describes what is inside it.
 }
 \description{
-Queries one of the fifty-five tables published by the TransfereGov open data
-APIs and returns them as a tibble, with columns typed from the API's own
+Queries one of the seventy-four tables published by the TransfereGov open
+data APIs and returns them as a tibble, with columns typed from the API's own
 schema.
 }
 \section{Filters}{
 Name each filter after one of the table's query parameters and give it a
-single value. Parameters are combined with AND:
+value. Parameters are combined with AND:
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{tg_get("parcerias", "proposta", situacao_proposta = "Aprovada")
 tg_get(
@@ -75,9 +76,15 @@ tg_get(
 )
 }\if{html}{\out{</div>}}
 
-The services compare for equality and nothing else: there is no greater-than,
-no pattern match and no "is one of". A parameter takes one value, so query
-each value and bind the results when you need several.
+The services compare for equality: there is no greater-than and no pattern
+match. Most parameters take one value. Some identifier parameters take
+several and match any of them — \code{\link[=tg_params]{tg_params()}} marks them as \code{multiple}, with
+the most each accepts in \code{max_values}:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{tg_get("ted", "planos_acao_metas", id_plano_acao = c(3, 4))
+}\if{html}{\out{</div>}}
+
+For any other parameter, query each value and bind the results.
 
 Parameter names, and the permitted values of the enumerated ones, are in
 Portuguese because they belong to the API. Use \code{\link[=tg_params]{tg_params()}} to see them.
@@ -87,10 +94,11 @@ whole table, so an unchecked typo would return plausible, wrong data.
 }
 
 \section{Pagination}{
-The services return at most 200 rows per request, so \code{.limit} above that is
-met by fetching successive pages. \code{.limit} counts rows, not pages; use \code{Inf}
-for every matching row. Several tables hold hundreds of thousands of rows,
-so check the size with \code{\link[=tg_count]{tg_count()}} first.
+Each request returns one page of at most the module's page limit — 200 rows
+for \code{especiais} and \code{parcerias}, 1000 for \code{fundoafundo} and \code{ted} — so a
+larger \code{.limit} is met by fetching successive pages. \code{.limit} counts rows,
+not pages; use \code{Inf} for every matching row. Several tables hold hundreds of
+thousands of rows, so check the size with \code{\link[=tg_count]{tg_count()}} first.
 
 Row order is the server's and cannot be set: these APIs publish no ordering
 parameter. It was checked to be stable across page sizes, across repeated

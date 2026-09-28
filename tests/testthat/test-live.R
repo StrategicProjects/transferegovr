@@ -12,6 +12,14 @@ skip_unless_live <- function() {
   testthat::skip_if_offline()
 }
 
+# A request built by the package, so it is throttled and retried like any
+# other, but with its status left for the test to read.
+raw_response <- function(module, table, query) {
+  path <- paste0(module, "/", .tg_schema[[module]]$tables[[table]]$path)
+  .tg_request(path, query, .tg_module_base_url(module, NULL)) |>
+    httr2::req_perform()
+}
+
 test_that("every table in the frozen schema still answers", {
   skip_unless_live()
 
@@ -19,14 +27,37 @@ test_that("every table in the frozen schema still answers", {
 
   failures <- character()
 
+  # A warning counts as a failure too: a column whose type changed upstream
+  # still parses, as character with a warning, so an errors-only check let
+  # `proposta$in_formato_etapas` turning from an integer into an enum through.
+  #
+  # Except these: bank details declared as integers and sent masked as "***".
+  # The warning is the package working as intended, not drift.
+  masked <- c(
+    "codigo_agencia_favorecido_gestao_financeira",
+    "codigo_conta_favorecido_gestao_financeira",
+    "codigo_agencia_beneficiario_subtransacao_gestao_financeira",
+    "codigo_conta_beneficiario_subtransacao_gestao_financeira"
+  )
+  is_masked <- function(w) {
+    any(vapply(masked, grepl, logical(1), x = conditionMessage(w),
+               fixed = TRUE))
+  }
+
   for (i in seq_len(nrow(tables))) {
     result <- tryCatch(
-      tg_get(tables$module[[i]], tables$table[[i]], .limit = 1,
-             .progress = FALSE),
-      error = function(e) e
+      withCallingHandlers(
+        tg_get(tables$module[[i]], tables$table[[i]], .limit = 50,
+               .progress = FALSE),
+        warning = function(w) {
+          if (is_masked(w)) invokeRestart("muffleWarning")
+        }
+      ),
+      error = function(e) e,
+      warning = function(w) w
     )
 
-    if (inherits(result, "error")) {
+    if (inherits(result, "condition")) {
       failures <- c(
         failures,
         paste0(tables$module[[i]], "/", tables$table[[i]], ": ",
@@ -36,6 +67,28 @@ test_that("every table in the frozen schema still answers", {
   }
 
   expect_equal(failures, character())
+})
+
+test_that("each module's frozen page limit is the one its service enforces", {
+  skip_unless_live()
+
+  # The limit is not uniform -- 200 for some modules, 1000 for others -- so it
+  # is asserted per module, at the limit and one row past it.
+  status_at <- function(module, size) {
+    table <- tg_tables(module)$table[[1]]
+    httr2::resp_status(
+      raw_response(module, table, list(tamanho_da_pagina = size))
+    )
+  }
+
+  modules <- tg_modules()
+  for (i in seq_len(nrow(modules))) {
+    limit <- modules$max_page_size[[i]]
+    expect_equal(status_at(modules$module[[i]], limit), 200L,
+                 label = paste(modules$module[[i]], "at its limit"))
+    expect_equal(status_at(modules$module[[i]], limit + 1L), 422L,
+                 label = paste(modules$module[[i]], "past its limit"))
+  }
 })
 
 test_that("the frozen columns match what the services send", {
@@ -48,7 +101,11 @@ test_that("the frozen columns match what the services send", {
     module <- tables$module[[i]]
     table <- tables$table[[i]]
 
-    rows <- tg_get(module, table, .limit = 1, .progress = FALSE)
+    # Only names are compared here; the masked columns' warning is covered
+    # above.
+    rows <- suppressWarnings(
+      tg_get(module, table, .limit = 1, .progress = FALSE)
+    )
     if (nrow(rows) == 0L) {
       next
     }
@@ -108,6 +165,21 @@ test_that("the order is stable deep into a large table", {
   expect_equal(first$id_meta, again$id_meta)
 })
 
+test_that("pages of 1000 hold the same rows as pages of 200", {
+  skip_unless_live()
+
+  # The larger limit is only safe if the order does not depend on page size,
+  # which has to be shown at that size and at depth, not assumed from the
+  # modules capped at 200.
+  big <- tg_get("ted", "planos_acao_metas_etapas", .limit = 1000,
+                .offset = 20000, .page_size = 1000, .progress = FALSE)
+  small <- tg_get("ted", "planos_acao_metas_etapas", .limit = 1000,
+                  .offset = 20000, .page_size = 200, .progress = FALSE)
+
+  expect_equal(nrow(big), 1000L)
+  expect_equal(big$id_etapa, small$id_etapa)
+})
+
 test_that("an offset lands on the row it names", {
   skip_unless_live()
 
@@ -159,6 +231,58 @@ test_that("the enumerations the schema froze are the ones the service takes", {
   }
 })
 
+test_that("the parameters frozen as lists are the ones that take lists", {
+  skip_unless_live()
+
+  # The OpenAPI documents do not say which parameters take a list, so the
+  # schema builder asked the service. Ask again: a list-taking parameter
+  # rejects a non-integer with a message about comma-separated integers.
+  wrong <- character()
+  for (module in tg_modules()$module) {
+    for (table in tg_tables(module)$table) {
+      params <- tg_params(module, table)
+      for (param in params$param[params$multiple]) {
+        body <- httr2::resp_body_string(
+          raw_response(module, table, stats::setNames(list("x"), param))
+        )
+        if (!grepl("separados por v", body, fixed = TRUE)) {
+          wrong <- c(wrong, paste0(module, "/", table, " ", param))
+        }
+      }
+    }
+  }
+
+  expect_equal(wrong, character())
+})
+
+test_that("a list means any of its values, up to the frozen limit", {
+  skip_unless_live()
+
+  one <- tg_count("ted", "planos_acao_metas", id_plano_acao = 3)
+  other <- tg_count("ted", "planos_acao_metas", id_plano_acao = 4)
+  both <- tg_count("ted", "planos_acao_metas", id_plano_acao = c(3, 4))
+  expect_equal(both, one + other)
+
+  # The client refuses a list over the limit before sending it, so the
+  # server's own limit is checked with raw requests at the limit and past it.
+  for (case in list(
+    list("especiais", "devolucao_especiais", "id_devolucao"),
+    list("ted", "planos_acao", "id_plano_acao")
+  )) {
+    limit <- with(
+      tg_params(case[[1]], case[[2]]),
+      max_values[param == case[[3]]]
+    )
+    status <- vapply(c(limit, limit + 1L), function(n) {
+      query <- stats::setNames(
+        list(paste(seq_len(n), collapse = ",")), case[[3]]
+      )
+      httr2::resp_status(raw_response(case[[1]], case[[2]], query))
+    }, integer(1))
+    expect_equal(status, c(200L, 400L), label = paste(case, collapse = "/"))
+  }
+})
+
 # The property that motivates validating parameter names client-side ----------
 
 test_that("the service really does ignore an unknown parameter", {
@@ -174,6 +298,12 @@ test_that("the service really does ignore an unknown parameter", {
   bogus <- tg_count("parcerias", "proposta", in_situacao_proposta = "Aprovada")
 
   expect_equal(bogus, total)
+
+  # The newest module behaves the same way.
+  expect_equal(
+    tg_count("ted", "termos_execucao", tx_situacao = "x"),
+    tg_count("ted", "termos_execucao")
+  )
 })
 
 # Freshness -------------------------------------------------------------------

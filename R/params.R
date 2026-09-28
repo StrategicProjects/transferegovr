@@ -1,8 +1,8 @@
 # Query parameters ------------------------------------------------------------
 #
 # A filter is one of the endpoint's own query parameters. There is no operator
-# vocabulary: the services compare for equality and nothing else, and they
-# combine parameters with AND.
+# vocabulary: the services compare for equality, combine parameters with AND,
+# and on some identifier parameters accept a list meaning "is one of".
 #
 # Every name is checked against the frozen parameter list before the request
 # goes out. That check is load-bearing rather than a convenience. These
@@ -22,7 +22,8 @@
 #' @return A tibble with one row per parameter: its name, the R type a value
 #'   should have, the type the API declares, the permitted values when the
 #'   parameter is enumerated, the pattern a value must match when it has one,
-#'   and its description.
+#'   its description, whether it accepts several values (`multiple`), and how
+#'   many at most (`max_values`).
 #' @export
 #' @family discovery
 #' @examples
@@ -31,6 +32,9 @@
 #' # Which parameters accept only a fixed set of values?
 #' params <- tg_params("parcerias", "proposta")
 #' params[lengths(params$values) > 0, c("param", "values")]
+#'
+#' # Which accept several values at once?
+#' params[params$multiple, c("param", "max_values")]
 tg_params <- function(module, table) {
   module <- .tg_match_module(module)
   table <- .tg_match_table(module, table)
@@ -177,10 +181,17 @@ tg_parametros <- function(modulo, tabela) {
     )
   }
 
-  # There is no way to express "is one of" in one request: the services accept
-  # one value per parameter and silently keep the last of a repeated one. The
-  # honest answer is to refuse and say what to do instead, rather than issue
-  # several requests behind a signature that promises one.
+  index <- match(name, params$param)
+  multiple <- !is.na(index) && isTRUE(params$multiple[index])
+
+  if (length(value) > 1L && multiple) {
+    return(.tg_encode_list(value, name, params$max_values[[index]], call))
+  }
+
+  # Elsewhere there is no way to express "is one of" in one request: the
+  # parameter takes one value, and a repeated parameter silently keeps the
+  # last. The honest answer is to refuse and say what to do instead, rather
+  # than issue several requests behind a signature that promises one.
   if (length(value) > 1L) {
     cli::cli_abort(
       c(
@@ -188,7 +199,9 @@ tg_parametros <- function(modulo, tabela) {
          one.",
         "i" = "Query each value and bind the results, for example
                {.code purrr::list_rbind(lapply(values, function(v)
-               tg_get(module, table, {name} = v)))}."
+               tg_get(module, table, {name} = v)))}.",
+        "i" = "Only the parameters {.fn tg_params} marks as {.field multiple}
+               take several values in one request."
       ),
       class = "transferegovr_filter_error",
       call = call
@@ -210,6 +223,54 @@ tg_parametros <- function(modulo, tabela) {
   .tg_validate_value(encoded, name, params, call)
 
   encoded
+}
+
+# A list-taking parameter wants whole numbers separated by commas, and matches
+# rows holding any of them. The service rejects anything else with a 400 and
+# caps the count -- 100 in `especiais`, 200 elsewhere -- so both are checked
+# before the request rather than discovered after it.
+.tg_encode_list <- function(value, name, max_values, call) {
+  if (anyNA(value)) {
+    cli::cli_abort(
+      c(
+        "Filter {.arg {name}} must not contain missing values.",
+        "i" = "These APIs cannot filter for a null column."
+      ),
+      class = "transferegovr_filter_error",
+      call = call
+    )
+  }
+
+  whole <- if (is.numeric(value)) {
+    all(is.finite(value) & value >= 0 & value %% 1 == 0)
+  } else {
+    is.character(value) && all(grepl("^[0-9]+$", value))
+  }
+  if (!whole) {
+    cli::cli_abort(
+      "Filter {.arg {name}} takes whole numbers when given several values.",
+      class = "transferegovr_filter_error",
+      call = call
+    )
+  }
+
+  value <- unique(value)
+  if (length(value) > max_values) {
+    cli::cli_abort(
+      c(
+        "Filter {.arg {name}} has {length(value)} values, and the API accepts
+         at most {max_values}.",
+        "i" = "Split them into groups of {max_values} and bind the results."
+      ),
+      class = "transferegovr_filter_error",
+      call = call
+    )
+  }
+
+  paste(
+    vapply(value, .tg_encode_value, character(1), USE.NAMES = FALSE),
+    collapse = ","
+  )
 }
 
 .tg_encode_value <- function(x) {

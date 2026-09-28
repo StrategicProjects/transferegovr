@@ -298,8 +298,8 @@ Três coisas, todas baratas:
 - **Recorte.** Transferências especiais cujo beneficiário tem
   `uf_beneficiario = "PE"` e planos fundo a fundo com ente recebedor em PE.
   Recursos que chegam ao estado por outras vias — TED, convênios do SICONV,
-  execução direta federal — ficam de fora. O TED, aliás, não é coberto pelo
-  pacote: o governo não o publicou na API pública.
+  execução direta federal — ficam de fora. O TED é descentralização entre
+  órgãos federais, não repasse ao estado, e está no módulo `ted` do pacote.
 - **"Impedido" é situação corrente, não sentença.** Um plano impedido em julho de
   2026 pode ser desimpedido depois. O que os dados sustentam é a fotografia da
   data de extração.
@@ -321,8 +321,9 @@ Ambas as APIs são públicas e sem autenticação. A extração completa baixa c
 2 mil planos, 2 mil empenhos e 26 mil planos fundo a fundo — poucos minutos, com
 o limite de requisições que o pacote já respeita sozinho.
 
-Uma ressalva prática: estas APIs não têm operador "está em". A trilha do
-empenho ao documento hábil não é feita por filtro, e sim baixando a tabela e
-cruzando em R com `semi_join()` — que é o que o código acima faz. Como o teto
-de página é 200 linhas, `planos_acao_especiais` (57.827 linhas no país) leva
+Uma ressalva prática: as tabelas usadas aqui não têm operador "está em" — alguns
+identificadores de outras tabelas aceitam uma lista separada por vírgula, estes
+não. A trilha do empenho ao documento hábil não é feita por
+filtro, e sim baixando a tabela e cruzando em R com `semi_join()` — que é o que
+o código acima faz. Como o teto de página em `especiais` é 200 linhas, `planos_acao_especiais` (57.827 linhas no país) leva
 cerca de 290 requisições, e vale deixar o cache ligado entre as etapas.

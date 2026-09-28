@@ -24,7 +24,7 @@
 library(httr2)
 
 base_url <- "https://api-publica.transferegov.gestao.gov.br"
-modules <- c("especiais", "fundoafundo", "parcerias")
+modules <- c("especiais", "fundoafundo", "parcerias", "ted")
 
 # Parameters the client owns. They are stripped from the frozen parameter list
 # so that a caller cannot set them as if they were filters and desynchronise
@@ -210,13 +210,84 @@ build_params <- function(parameters) {
   )
 }
 
+# Multi-valued parameters -----------------------------------------------------
+
+# Some parameters take a comma-separated list and match any of its values -- an
+# "is one of" -- and the rest take a single value. The OpenAPI documents do not
+# say which: both are declared as a plain string. Nor does the name: 113
+# parameters take a list, two of them not named `id_*`, while several `id_*`
+# strings do not. So it is asked of the service, which is how every other
+# behaviour frozen here was established.
+#
+# A list-taking parameter rejects a non-integer with a 400 whose message says
+# it wants "números inteiros separados por vírgula"; any other parameter treats
+# "x" as an ordinary value. And sent more values than it allows, it answers
+# with the limit -- 100 in `especiais`, 200 elsewhere, so that is read per
+# parameter too. About 700 requests, a few minutes.
+list_marker <- "separados por v"
+limit_pattern <- "m\u00e1ximo de valores poss\u00edveis.* \u00e9 ([0-9]+)"
+
+probe <- function(module, path, query) {
+  request(base_url) |>
+    req_url_path_append(module, path) |>
+    req_url_query(!!!c(list(tamanho_da_pagina = 1), query)) |>
+    req_user_agent("transferegovr schema builder") |>
+    req_throttle(capacity = 300, fill_time_s = 60) |>
+    req_retry(max_tries = 4, is_transient = function(r) {
+      resp_status(r) %in% c(429L, 502L, 503L, 504L)
+    }) |>
+    req_error(is_error = function(r) FALSE) |>
+    req_timeout(120) |>
+    req_perform()
+}
+
+probe_lists <- function(module, path, params) {
+  params$multiple <- rep(FALSE, nrow(params))
+  params$max_values <- rep(1L, nrow(params))
+
+  candidates <- which(
+    params$api_type == "string" &
+      lengths(params$values) == 0L &
+      is.na(params$pattern)
+  )
+
+  for (i in candidates) {
+    response <- probe(
+      module, path, stats::setNames(list("x"), params$param[[i]])
+    )
+    body <- resp_body_string(response)
+    if (resp_status(response) != 400L || !grepl(list_marker, body)) {
+      next
+    }
+
+    too_many <- paste(seq_len(1001), collapse = ",")
+    response <- probe(
+      module, path, stats::setNames(list(too_many), params$param[[i]])
+    )
+    limit <- regmatches(
+      resp_body_string(response),
+      regexec(limit_pattern, resp_body_string(response))
+    )[[1]]
+    if (length(limit) != 2L) {
+      stop(module, "/", path, " ", params$param[[i]],
+           " takes a list but did not report its limit", call. = FALSE)
+    }
+
+    params$multiple[[i]] <- TRUE
+    params$max_values[[i]] <- as.integer(limit[[2]])
+  }
+
+  params
+}
+
 # Modules ---------------------------------------------------------------------
 
 # An endpoint path is the table's identity upstream, but `-` is not usable as a
-# bare argument name in R and the three modules are not even consistent with
-# each other: `especiais` publishes `/planos_acao_especiais` while `fundoafundo`
-# publishes `/planos-acao`. The underscore form is the name the package
-# exposes; `path` keeps what the URL needs.
+# bare argument name in R, and the spelling is not stable: `especiais` published
+# `/planos_acao_especiais` until September 2026 and `/planos-acao-especiais`
+# after it, with every older spelling answering 404. The underscore form is the
+# name the package exposes, so that change never reaches a caller's code;
+# `path` keeps what the URL needs.
 table_name <- function(path) {
   gsub("-", "_", sub("^/", "", path), fixed = TRUE)
 }
@@ -237,7 +308,10 @@ build_module <- function(module) {
     properties <- schemas[[item]]$properties
 
     fields <- build_fields(properties)
-    params <- build_params(operation$parameters %||% list())
+    params <- probe_lists(
+      module, sub("^/", "", path),
+      build_params(operation$parameters %||% list())
+    )
 
     # These documents describe the query parameters but leave every response
     # column undescribed. Nearly every column is also filterable under its own
@@ -279,8 +353,35 @@ build_module <- function(module) {
     base_url = base_url,
     title = trimws(spec$info$title %||% module),
     timestamp_path = timestamp_path,
+    max_page_size = max_page_size(spec, paths, module),
     tables = tables
   )
+}
+
+# The largest page a module serves. It is not the same everywhere: `especiais`
+# and `parcerias` declare 200, `fundoafundo` and `ted` 1000, and each service
+# answers 422 one row above its own limit. Read from the document rather than
+# assumed, and required to agree across a module's endpoints, since the client
+# applies it per module.
+max_page_size <- function(spec, paths, module) {
+  maxima <- vapply(paths, function(path) {
+    parameters <- spec$paths[[path]]$get$parameters %||% list()
+    size <- Filter(
+      function(p) identical(p$name, "tamanho_da_pagina"),
+      parameters
+    )
+    if (length(size) != 1L) {
+      stop(module, path, " declares no tamanho_da_pagina", call. = FALSE)
+    }
+    as.integer(unwrap_null(size[[1L]]$schema)$maximum %||% NA_integer_)
+  }, integer(1))
+
+  if (anyNA(maxima) || length(unique(maxima)) != 1L) {
+    stop(module, " declares inconsistent page size limits: ",
+         paste(unique(maxima), collapse = ", "), call. = FALSE)
+  }
+
+  maxima[[1L]]
 }
 
 .tg_schema <- lapply(modules, build_module)
@@ -290,7 +391,8 @@ names(.tg_schema) <- modules
 .tg_module_labels <- c(
   especiais = "Special transfers",
   fundoafundo = "Fund-to-fund transfers",
-  parcerias = "Partnerships"
+  parcerias = "Partnerships",
+  ted = "Decentralized credit"
 )
 
 .tg_module_aliases <- c(
@@ -303,15 +405,13 @@ names(.tg_schema) <- modules
   fundo_afundo = "fundoafundo",
   fund_to_fund = "fundoafundo",
   parceria = "parcerias",
-  partnerships = "parcerias"
+  partnerships = "parcerias",
+  termo_de_execucao_descentralizada = "ted",
+  termo_execucao_descentralizada = "ted",
+  decentralized_credit = "ted"
 )
 
 .tg_schema_built_at <- Sys.Date()
-
-# The page size the services cap a request at. Asking for more is a 422 rather
-# than a silent truncation, so this bound is enforced client-side only to give
-# a better error than the server's.
-.tg_max_page_size <- 200L
 
 counts <- vapply(.tg_schema, function(m) length(m$tables), integer(1))
 columns <- vapply(
@@ -328,17 +428,25 @@ params <- vapply(
 for (module in names(.tg_schema)) {
   message(
     "  ", module, ": ", counts[[module]], " tables, ",
-    columns[[module]], " columns, ", params[[module]], " parameters"
+    columns[[module]], " columns, ", params[[module]], " parameters, ",
+    "pages of up to ", .tg_schema[[module]]$max_page_size
   )
 }
 message(
   "total: ", sum(counts), " tables, ", sum(columns), " columns, ",
   sum(params), " parameters"
 )
+lists <- vapply(
+  .tg_schema,
+  function(m) sum(vapply(m$tables, function(t) sum(t$params$multiple), 1)),
+  numeric(1)
+)
+message("parameters taking a list: ", sum(lists), " (",
+        paste(names(lists), lists, sep = " ", collapse = ", "), ")")
 
 stopifnot(
-  length(.tg_schema) == 3L,
-  sum(counts) == 55L,
+  length(.tg_schema) == 4L,
+  sum(counts) == 74L,
   all(vapply(
     .tg_schema,
     function(m) {
@@ -353,7 +461,6 @@ save(
   .tg_module_labels,
   .tg_module_aliases,
   .tg_schema_built_at,
-  .tg_max_page_size,
   file = "R/sysdata.rda",
   version = 3,
   compress = "xz"

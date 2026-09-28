@@ -1,8 +1,8 @@
 # Schema access ---------------------------------------------------------------
 #
-# `.tg_schema`, `.tg_module_labels`, `.tg_module_aliases`, `.tg_max_page_size`
-# and `.tg_schema_built_at` live in R/sysdata.rda and are rebuilt by
-# data-raw/schema.R from the OpenAPI documents the APIs publish.
+# `.tg_schema` (including each module's `max_page_size`), `.tg_module_labels`,
+# `.tg_module_aliases` and `.tg_schema_built_at` live in R/sysdata.rda and are
+# rebuilt by data-raw/schema.R from the OpenAPI documents the APIs publish.
 
 .tg_match_module <- function(module, call = rlang::caller_env()) {
   if (!is.character(module) || length(module) != 1L || is.na(module)) {
@@ -93,7 +93,8 @@
 #' List the TransfereGov API modules
 #'
 #' @return A tibble with one row per module: its name, the label used in this
-#'   documentation, the number of tables it publishes, and its API base URL.
+#'   documentation, the number of tables it publishes, the largest page it
+#'   serves in one request, and its API base URL.
 #' @export
 #' @family discovery
 #' @examples
@@ -106,6 +107,10 @@ tg_modules <- function() {
     label = unname(.tg_module_labels[modules]),
     tables = vapply(
       .tg_schema[modules], function(m) length(m$tables), integer(1),
+      USE.NAMES = FALSE
+    ),
+    max_page_size = vapply(
+      .tg_schema[modules], function(m) m$max_page_size, integer(1),
       USE.NAMES = FALSE
     ),
     url = vapply(
@@ -128,7 +133,7 @@ tg_modulos <- tg_modules
 #' @param counts If `TRUE`, adds a `rows` column with the number of rows each
 #'   table currently holds. This is the only part of this function that needs a
 #'   network connection: it makes one request per table, so `tg_tables(counts =
-#'   TRUE)` with no module makes fifty-five. Responses are cached.
+#'   TRUE)` with no module makes seventy-four. Responses are cached.
 #' @param modulo Portuguese alias for `module`, available in [tg_tabelas()] and
 #'   [tg_campos()].
 #' @param contagens Portuguese alias for `counts`, available only in
@@ -199,7 +204,7 @@ tg_tabelas <- function(modulo = NULL, contagens = FALSE) {
   tg_tables(modulo, contagens)
 }
 
-# One request per table. A progress bar because fifty-five throttled requests
+# One request per table. A progress bar because seventy-four throttled requests
 # take the better part of a minute the first time, and none after that while
 # the cache is warm.
 .tg_row_counts <- function(modules, tables) {

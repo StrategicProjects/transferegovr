@@ -1,6 +1,6 @@
 # HTTP client -----------------------------------------------------------------
 #
-# The three modules are FastAPI services. A table query is a GET on the
+# The four modules are FastAPI services. A table query is a GET on the
 # endpoint, filters are typed query parameters, and the answer is an envelope
 # carrying the rows under `data` alongside the pagination state.
 
@@ -61,7 +61,8 @@ tg_base_url <- function() {
   invisible(NULL)
 }
 
-# `query` is a named list of single values. Unlike the PostgREST services these
+# `query` is a named list of single values; a list-taking parameter's several
+# values arrive already joined by commas. Unlike the PostgREST services these
 # replaced, repeating a parameter here does not combine two conditions: the
 # service keeps the last occurrence and discards the rest without saying so.
 # `.tg_eval_filters()` is what guarantees each name appears once.

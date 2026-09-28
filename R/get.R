@@ -2,14 +2,14 @@
 
 #' Retrieve rows from a TransfereGov table
 #'
-#' Queries one of the fifty-five tables published by the TransfereGov open data
-#' APIs and returns them as a tibble, with columns typed from the API's own
+#' Queries one of the seventy-four tables published by the TransfereGov open
+#' data APIs and returns them as a tibble, with columns typed from the API's own
 #' schema.
 #'
 #' # Filters
 #'
 #' Name each filter after one of the table's query parameters and give it a
-#' single value. Parameters are combined with AND:
+#' value. Parameters are combined with AND:
 #'
 #' ```r
 #' tg_get("parcerias", "proposta", situacao_proposta = "Aprovada")
@@ -19,9 +19,16 @@
 #' )
 #' ```
 #'
-#' The services compare for equality and nothing else: there is no greater-than,
-#' no pattern match and no "is one of". A parameter takes one value, so query
-#' each value and bind the results when you need several.
+#' The services compare for equality: there is no greater-than and no pattern
+#' match. Most parameters take one value. Some identifier parameters take
+#' several and match any of them — [tg_params()] marks them as `multiple`, with
+#' the most each accepts in `max_values`:
+#'
+#' ```r
+#' tg_get("ted", "planos_acao_metas", id_plano_acao = c(3, 4))
+#' ```
+#'
+#' For any other parameter, query each value and bind the results.
 #'
 #' Parameter names, and the permitted values of the enumerated ones, are in
 #' Portuguese because they belong to the API. Use [tg_params()] to see them.
@@ -31,10 +38,11 @@
 #'
 #' # Pagination
 #'
-#' The services return at most 200 rows per request, so `.limit` above that is
-#' met by fetching successive pages. `.limit` counts rows, not pages; use `Inf`
-#' for every matching row. Several tables hold hundreds of thousands of rows,
-#' so check the size with [tg_count()] first.
+#' Each request returns one page of at most the module's page limit — 200 rows
+#' for `especiais` and `parcerias`, 1000 for `fundoafundo` and `ted` — so a
+#' larger `.limit` is met by fetching successive pages. `.limit` counts rows,
+#' not pages; use `Inf` for every matching row. Several tables hold hundreds of
+#' thousands of rows, so check the size with [tg_count()] first.
 #'
 #' Row order is the server's and cannot be set: these APIs publish no ordering
 #' parameter. It was checked to be stable across page sizes, across repeated
@@ -43,15 +51,16 @@
 #' mismatch is reported as a warning.
 #'
 #' @param module A module name from [tg_modules()]: `"especiais"`,
-#'   `"fundoafundo"` or `"parcerias"`. Aliases such as `"fundo_a_fundo"` are
-#'   accepted.
+#'   `"fundoafundo"`, `"parcerias"` or `"ted"`. Aliases such as
+#'   `"fundo_a_fundo"` are accepted.
 #' @param table A table name from [tg_tables()].
 #' @param ... Filters, named after the parameters they set. See the Filters
 #'   section.
 #' @param .limit Maximum number of rows to return. Use `Inf` for every matching
 #'   row.
 #' @param .offset Number of matching rows to skip before the first one returned.
-#' @param .page_size Rows per request, between 1 and 200.
+#' @param .page_size Rows per request. `NULL`, the default, asks for the largest
+#'   page the module serves, which [tg_modules()] reports as `max_page_size`.
 #' @param .progress Whether to show a progress bar while collecting pages.
 #'   `NULL` shows one in interactive sessions when more than one page is needed.
 #' @param .cache Whether to serve the request from the response cache. `NULL`
@@ -75,7 +84,7 @@ tg_get <- function(
   ...,
   .limit = 1000,
   .offset = 0,
-  .page_size = 200,
+  .page_size = NULL,
   .progress = NULL,
   .cache = NULL,
   .base_url = NULL
@@ -91,7 +100,9 @@ tg_get <- function(
 
   .tg_check_count(.limit, ".limit", allow_infinite = TRUE)
   .tg_check_count(.offset, ".offset", minimum = 0)
-  .tg_check_count(.page_size, ".page_size", maximum = .tg_max_page_size)
+  max_page_size <- .tg_schema[[module]]$max_page_size
+  .page_size <- .page_size %||% max_page_size
+  .tg_check_count(.page_size, ".page_size", maximum = max_page_size)
 
   collected <- .tg_collect(
     module = module,
@@ -223,6 +234,7 @@ tg_atualizado_em <- tg_updated_at
 #'   tg_parcerias("proposta", .limit = 10)
 #'   tg_fundo_a_fundo("programas", .limit = 10)
 #'   tg_especiais("programas_especiais", .limit = 10)
+#'   tg_ted("termos_execucao", .limit = 10)
 #' }
 NULL
 
@@ -242,6 +254,12 @@ tg_fundo_a_fundo <- function(table, ...) {
 #' @export
 tg_especiais <- function(table, ...) {
   tg_get("especiais", table, ...)
+}
+
+#' @rdname module_shortcuts
+#' @export
+tg_ted <- function(table, ...) {
+  tg_get("ted", table, ...)
 }
 
 # Result metadata -------------------------------------------------------------

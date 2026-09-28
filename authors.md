@@ -19,17 +19,17 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/StrategicProjects/transferegovr/blob/v0.2.0/inst/CITATION)
+[`inst/CITATION`](https://github.com/StrategicProjects/transferegovr/blob/main/inst/CITATION)
 
 Leite A, Wasiliew M, Vasconcelos H, Amorim C, Bezerra D, Nascimento
 Barreto J (2026). *transferegovr: Access the TransfereGov Open Data
-APIs*. R package version 0.2.0,
+APIs*. R package version 0.2.0.9000,
 <https://github.com/StrategicProjects/transferegovr>.
 
     @Manual{,
       title = {transferegovr: Access the TransfereGov Open Data APIs},
       author = {Andre Leite and Marcos Wasiliew and Hugo Vasconcelos and Carlos Amorim and Diogo Bezerra and Júlia {Nascimento Barreto}},
       year = {2026},
-      note = {R package version 0.2.0},
+      note = {R package version 0.2.0.9000},
       url = {https://github.com/StrategicProjects/transferegovr},
     }

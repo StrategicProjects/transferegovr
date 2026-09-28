@@ -1,5 +1,13 @@
 # Changelog
 
+## transferegovr (development version)
+
+- [`vignette("joining-tables")`](https://strategicprojects.github.io/transferegovr/articles/joining-tables.md)
+  covers `ted`, the five tables published in September 2026, and joining
+  through list filters. Every link it draws was checked against the
+  data, including the ones the government’s data models do not document
+  yet.
+
 ## transferegovr 0.2.0
 
 CRAN release: 2026-09-28

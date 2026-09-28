@@ -85,54 +85,61 @@ about knowing what a download will cost before starting it.</p>
 <div class="section level2">
 <h2 id="measure-first">Measure first<a class="anchor" aria-label="anchor" href="#measure-first"></a>
 </h2>
-<p>The fifty-five tables hold about 6.9 million rows between them,
-spread very unevenly — from 15 rows in
-<code>especiais/programas_especiais</code> to 1,121,046 in
-<code>fundoafundo/gestao_financeira_lancamentos</code>.</p>
+<p>The seventy-four tables hold about 7.5 million rows between them,
+spread very unevenly — from none at all in
+<code>especiais/orgaos_analises_pendentes_especiais</code> to 1,362,980
+in <code>parcerias/extrato_bancario</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_tables.html">tg_tables</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">sizes</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="va">sizes</span><span class="op">$</span><span class="va">rows</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"module"</span>, <span class="st">"table"</span>, <span class="st">"columns"</span>, <span class="st">"rows"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; # A tibble: 55 × 4</span></span>
+<span><span class="co">#&gt; # A tibble: 74 × 4</span></span>
 <span><span class="co">#&gt;    module      table                                   columns    rows</span></span>
 <span><span class="co">#&gt;    &lt;chr&gt;       &lt;chr&gt;                                     &lt;int&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 fundoafundo gestao_financeira_lancamentos                28 1121046</span></span>
-<span><span class="co">#&gt;  2 parcerias   extrato_bancario                             13 1108219</span></span>
-<span><span class="co">#&gt;  3 especiais   gestao_financeira_lancamentos_especiais      34  719363</span></span>
-<span><span class="co">#&gt;  4 especiais   planos_trabalho_historico                     5  460182</span></span>
-<span><span class="co">#&gt;  5 parcerias   item_proposta                                14  425405</span></span>
+<span><span class="co">#&gt;  1 parcerias   extrato_bancario                             13 1362980</span></span>
+<span><span class="co">#&gt;  2 fundoafundo gestao_financeira_lancamentos                28 1160094</span></span>
+<span><span class="co">#&gt;  3 especiais   gestao_financeira_lancamentos_especiais      34  735012</span></span>
+<span><span class="co">#&gt;  4 especiais   planos_trabalho_historico                     5  461164</span></span>
+<span><span class="co">#&gt;  5 parcerias   item_proposta                                14  428078</span></span>
 <span><span class="co">#&gt;  …</span></span></code></pre></div>
-<p>That call makes fifty-five requests, and caches them. For a single
+<p>That call makes seventy-four requests, and caches them. For a single
 table:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_count.html">tg_count</a></span><span class="op">(</span><span class="st">"fundoafundo"</span>, <span class="st">"gestao_financeira_lancamentos"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1121046</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 1160094</span></span></code></pre></div>
 <p><code><a href="../reference/tg_count.html">tg_count()</a></code> takes the same filters as
 <code><a href="../reference/tg_get.html">tg_get()</a></code>, so you can size the thing you actually want
 rather than the whole table:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_count.html">tg_count</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"proposta"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 88666</span></span>
+<span><span class="co">#&gt; [1] 89415</span></span>
 <span><span class="fu"><a href="../reference/tg_count.html">tg_count</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"proposta"</span>, sg_uf_recebedor <span class="op">=</span> <span class="st">"PE"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 3241</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 3258</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="what-a-page-costs">What a page costs<a class="anchor" aria-label="anchor" href="#what-a-page-costs"></a>
 </h2>
-<p>The services cap a page at <strong>200 rows</strong>. Unlike some
-APIs, they do not silently truncate a larger request — asking for 201 is
-a <code>422</code>, and the package refuses it before sending:</p>
+<p>Each module caps a page at its own size: <strong>200 rows</strong> in
+<code>especiais</code> and <code>parcerias</code>, <strong>1000</strong>
+in <code>fundoafundo</code> and <code>ted</code>.
+<code><a href="../reference/tg_modules.html">tg_modules()</a></code> reports it, and <code>.page_size</code>
+defaults to it. Unlike some APIs, these do not silently truncate a
+larger request — one row over the cap is a <code>422</code>, and the
+package refuses it before sending:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"proposta"</span>, .page_size <span class="op">=</span> <span class="fl">201</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error in `tg_get()`:</span></span>
 <span><span class="co">#&gt; ! `.page_size` must be a whole number between 1 and 200.</span></span></code></pre></div>
-<p>So the arithmetic is simple and worth doing. A million-row table is
-<code>ceiling(1121046 / 200)</code> = <strong>5,606 requests</strong>.
-At the default throttle of sixty a minute, that is over an hour and a
-half.</p>
+<p>So the arithmetic is simple and worth doing, and the cap matters as
+much as the size. The largest table,
+<code>parcerias/extrato_bancario</code>, is
+<code>ceiling(1362980 / 200)</code> = <strong>6,815 requests</strong> —
+at the default throttle of sixty a minute, nearly two hours. The second
+largest is barely smaller but lives in a module that serves pages of
+1000, so it takes 1,161 requests, about twenty minutes.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">rows</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_count.html">tg_count</a></span><span class="op">(</span><span class="st">"fundoafundo"</span>, <span class="st">"gestao_financeira_lancamentos"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">rows</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_count.html">tg_count</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"extrato_bancario"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="va">rows</span> <span class="op">/</span> <span class="fl">200</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 5606</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 6815</span></span></code></pre></div>
 <p>If you genuinely need a table that size, consider whether a filter
 narrows it first, and raise the throttle deliberately rather than by
 accident:</p>
@@ -169,7 +176,7 @@ page it lands in and dropping the rows before it:</p>
 <span><span class="co">#&gt; $table</span></span>
 <span><span class="co">#&gt; [1] "meta_especiais"</span></span>
 <span><span class="co">#&gt; $total_rows</span></span>
-<span><span class="co">#&gt; [1] 156060</span></span>
+<span><span class="co">#&gt; [1] 156193</span></span>
 <span><span class="co">#&gt; $rows_returned</span></span>
 <span><span class="co">#&gt; [1] 450</span></span>
 <span><span class="co">#&gt; $pages</span></span>
@@ -241,7 +248,7 @@ cache is the package’s own. Use <code><a href="../reference/tg_updated_at.html
 when a cached copy is stale:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_updated_at.html">tg_updated_at</a></span><span class="op">(</span><span class="st">"fundoafundo"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2026-08-03 UTC"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "2026-09-28 06:02:02 UTC"</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="a-pattern-for-very-large-tables">A pattern for very large tables<a class="anchor" aria-label="anchor" href="#a-pattern-for-very-large-tables"></a>

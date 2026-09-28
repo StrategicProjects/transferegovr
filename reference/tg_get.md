@@ -1,7 +1,7 @@
 # Retrieve rows from a TransfereGov table
 
-Queries one of the fifty-five tables published by the TransfereGov open
-data APIs and returns them as a tibble, with columns typed from the
+Queries one of the seventy-four tables published by the TransfereGov
+open data APIs and returns them as a tibble, with columns typed from the
 API's own schema.
 
 ## Usage
@@ -13,7 +13,7 @@ tg_get(
   ...,
   .limit = 1000,
   .offset = 0,
-  .page_size = 200,
+  .page_size = NULL,
   .progress = NULL,
   .cache = NULL,
   .base_url = NULL
@@ -25,7 +25,7 @@ tg_obter(
   ...,
   .limit = 1000,
   .offset = 0,
-  .page_size = 200,
+  .page_size = NULL,
   .progress = NULL,
   .cache = NULL,
   .base_url = NULL
@@ -38,8 +38,8 @@ tg_obter(
 
   A module name from
   [`tg_modules()`](https://strategicprojects.github.io/transferegovr/reference/tg_modules.md):
-  `"especiais"`, `"fundoafundo"` or `"parcerias"`. Aliases such as
-  `"fundo_a_fundo"` are accepted.
+  `"especiais"`, `"fundoafundo"`, `"parcerias"` or `"ted"`. Aliases such
+  as `"fundo_a_fundo"` are accepted.
 
 - table:
 
@@ -60,7 +60,10 @@ tg_obter(
 
 - .page_size:
 
-  Rows per request, between 1 and 200.
+  Rows per request. `NULL`, the default, asks for the largest page the
+  module serves, which
+  [`tg_modules()`](https://strategicprojects.github.io/transferegovr/reference/tg_modules.md)
+  reports as `max_page_size`.
 
 - .progress:
 
@@ -90,7 +93,7 @@ describes what is inside it.
 ## Filters
 
 Name each filter after one of the table's query parameters and give it a
-single value. Parameters are combined with AND:
+value. Parameters are combined with AND:
 
     tg_get("parcerias", "proposta", situacao_proposta = "Aprovada")
     tg_get(
@@ -98,9 +101,15 @@ single value. Parameters are combined with AND:
       sg_uf_recebedor = "PE", ano_proposta = 2025
     )
 
-The services compare for equality and nothing else: there is no
-greater-than, no pattern match and no "is one of". A parameter takes one
-value, so query each value and bind the results when you need several.
+The services compare for equality: there is no greater-than and no
+pattern match. Most parameters take one value. Some identifier
+parameters take several and match any of them —
+[`tg_params()`](https://strategicprojects.github.io/transferegovr/reference/tg_params.md)
+marks them as `multiple`, with the most each accepts in `max_values`:
+
+    tg_get("ted", "planos_acao_metas", id_plano_acao = c(3, 4))
+
+For any other parameter, query each value and bind the results.
 
 Parameter names, and the permitted values of the enumerated ones, are in
 Portuguese because they belong to the API. Use
@@ -112,10 +121,11 @@ plausible, wrong data.
 
 ## Pagination
 
-The services return at most 200 rows per request, so `.limit` above that
-is met by fetching successive pages. `.limit` counts rows, not pages;
-use `Inf` for every matching row. Several tables hold hundreds of
-thousands of rows, so check the size with
+Each request returns one page of at most the module's page limit — 200
+rows for `especiais` and `parcerias`, 1000 for `fundoafundo` and `ted` —
+so a larger `.limit` is met by fetching successive pages. `.limit`
+counts rows, not pages; use `Inf` for every matching row. Several tables
+hold hundreds of thousands of rows, so check the size with
 [`tg_count()`](https://strategicprojects.github.io/transferegovr/reference/tg_count.md)
 first.
 

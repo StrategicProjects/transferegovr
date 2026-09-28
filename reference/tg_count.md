@@ -20,8 +20,8 @@ tg_contar(module, table, ..., .cache = NULL, .base_url = NULL)
 
   A module name from
   [`tg_modules()`](https://strategicprojects.github.io/transferegovr/reference/tg_modules.md):
-  `"especiais"`, `"fundoafundo"` or `"parcerias"`. Aliases such as
-  `"fundo_a_fundo"` are accepted.
+  `"especiais"`, `"fundoafundo"`, `"parcerias"` or `"ted"`. Aliases such
+  as `"fundo_a_fundo"` are accepted.
 
 - table:
 

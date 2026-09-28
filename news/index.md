@@ -10,29 +10,36 @@ written against 0.1.0 will need changing.
 
 ### What is covered
 
-- **`parcerias` is new**: partnership management, 15 tables, including
-  88,666 partnerships and their proposals, budget commitments, payment
-  orders and bank statements. It has no equivalent in the previous
-  release.
+- **`parcerias` is new**: partnership management, 17 tables, including
+  about 89,000 partnerships and their proposals, budget commitments,
+  payment orders and bank statements. It has no equivalent in the
+  previous release.
 - **`especiais` replaces `transferenciasespeciais`**, and grows from 14
-  tables to 20. The additions are the financial ones: transaction
-  entries, sub-entries, account balances, beneficiaries, and three
-  history tables.
+  tables to 23. The additions are the financial ones: transaction
+  entries, sub-entries, account balances, beneficiaries, returned funds,
+  management report analyses and settlement documents, and three history
+  tables.
 - **`fundoafundo` stays**, at 20 tables against the previous 21, with
   several child tables folded into their parents as nested columns.
+- **`ted` stays**, moved to the public host with the others: 14 tables
+  against the previous 13. Its table and column names follow the new
+  service, which mostly means plurals — `evento` is now `eventos`,
+  `plano_acao` is `planos_acao`, and `trf` is
+  `programacoes_financeiras_trf` — so code written against 0.1.0 needs
+  its table names checked.
+  [`tg_ted()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
+  is kept.
 - `"transferenciasespeciais"` still resolves, as an alias for
-  `"especiais"`.
-- **`ted` is gone.** Decentralized credit has not been published on the
-  public API host; it exists only on the older service, which this
-  package no longer uses. `tg_ted()` and `tg_transferencias_especiais()`
-  are removed, and
+  `"especiais"`. `tg_transferencias_especiais()` is removed, and
   [`tg_parcerias()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
   and
   [`tg_especiais()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
-  take their place alongside
-  [`tg_fundo_a_fundo()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md).
+  join
+  [`tg_fundo_a_fundo()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
+  and
+  [`tg_ted()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md).
 
-55 tables and 811 columns in all, against 48 and 599.
+74 tables and 1,045 columns in all, against 48 and 599.
 
 ### Filters
 
@@ -44,8 +51,8 @@ written against 0.1.0 will need changing.
 - **The comparison operators are removed** — `eq()`, `neq()`, `gt()`,
   `gte()`, `lt()`, `lte()`, `like()`, `ilike()`, `re_match()`,
   `re_imatch()`, `in_()`, `is_null()`, `is_true()`, `is_false()`,
-  `not()` and `tg_operators()`. These services compare for equality and
-  nothing else.
+  `not()` and `tg_operators()`. These services compare for equality,
+  with “is one of” only on the identifiers described below.
 - **An unknown parameter name is an error.** These services ignore a
   parameter they do not recognize and answer `200` with the whole table,
   so a typo would return a plausible, unfiltered result. Names are
@@ -53,17 +60,26 @@ written against 0.1.0 will need changing.
   near miss is suggested.
 - Enumerated values are checked client-side too, so a bad value fails
   before the round trip rather than as a 422 after it.
-- A filter with several values, or a parameter given twice, is refused.
-  The service keeps the last occurrence of a repeated parameter and
-  discards the rest without reporting it, so there is no way to express
-  either.
+- **Some identifier parameters take several values**, sent as one
+  comma-separated value and matching any of them: 113 of them, in all
+  four modules.
+  [`tg_params()`](https://strategicprojects.github.io/transferegovr/reference/tg_params.md)
+  marks them as `multiple` and gives the most each accepts in
+  `max_values` — 100 in `especiais`, 200 elsewhere. The OpenAPI
+  documents do not say which parameters these are, so the schema builder
+  asks the service.
+- Any other filter with several values, and any parameter given twice,
+  is refused. The service keeps the last occurrence of a repeated
+  parameter and discards the rest without reporting it.
 
 ### Pagination
 
-- Pagination is by page number, and the cap is 200 rows per request
-  rather than
-  1000. `.limit` still counts rows and `.offset` still counts rows,
-        including when the offset falls inside a page.
+- Pagination is by page number, and the cap on rows per request is the
+  one each module declares: 200 for `especiais` and `parcerias`, 1000
+  for `fundoafundo` and `ted`. `.page_size` defaults to that cap, and
+  [`tg_modules()`](https://strategicprojects.github.io/transferegovr/reference/tg_modules.md)
+  reports it. `.limit` still counts rows and `.offset` still counts
+  rows, including when the offset falls inside a page.
 - **`.order` and `.select` are removed.** These APIs publish no ordering
   or column-selection parameter.
 - Row order is therefore the server’s. It was verified rather than
@@ -79,9 +95,9 @@ written against 0.1.0 will need changing.
   freshness signal these APIs give.
 - [`tg_fields()`](https://strategicprojects.github.io/transferegovr/reference/tg_fields.md)
   gains a `nested` argument, describing the columns of the objects
-  inside a list column. 18 columns across `fundoafundo` and `parcerias`
-  arrive as list columns because the API folds a child table into its
-  parent.
+  inside a list column. 22 columns across `fundoafundo`, `parcerias` and
+  `ted` arrive as list columns because the API folds a child table into
+  its parent.
 - [`tg_fields()`](https://strategicprojects.github.io/transferegovr/reference/tg_fields.md)
   reports `api_type` rather than `pg_type`, and no longer reports a
   primary key: these documents declare none.
@@ -98,6 +114,8 @@ written against 0.1.0 will need changing.
 
 ## transferegovr 0.1.0
 
+CRAN release: 2026-08-08
+
 First release.
 
 - Covered the three ‘PostgREST’ TransfereGov open data APIs — special
@@ -107,7 +125,8 @@ First release.
 - [`tg_get()`](https://strategicprojects.github.io/transferegovr/reference/tg_get.md)
   and
   [`tg_count()`](https://strategicprojects.github.io/transferegovr/reference/tg_count.md)
-  queried any table; `tg_ted()`,
+  queried any table;
+  [`tg_ted()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md),
   [`tg_fundo_a_fundo()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
   and `tg_transferencias_especiais()` fixed the module.
 - Filters were named after the columns they applied to. A bare value

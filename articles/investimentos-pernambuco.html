@@ -428,9 +428,9 @@ aqui.</li>
 <strong>Recorte.</strong> Transferências especiais cujo beneficiário
 tem <code>uf_beneficiario = "PE"</code> e planos fundo a fundo com ente
 recebedor em PE. Recursos que chegam ao estado por outras vias — TED,
-convênios do SICONV, execução direta federal — ficam de fora. O TED,
-aliás, não é coberto pelo pacote: o governo não o publicou na API
-pública.</li>
+convênios do SICONV, execução direta federal — ficam de fora. O TED é
+descentralização entre órgãos federais, não repasse ao estado, e está no
+módulo <code>ted</code> do pacote.</li>
 <li>
 <strong>“Impedido” é situação corrente, não sentença.</strong> Um
 plano impedido em julho de 2026 pode ser desimpedido depois. O que os
@@ -457,10 +457,12 @@ longa; a malha municipal usada é a de 2022.</li>
 baixa cerca de 2 mil planos, 2 mil empenhos e 26 mil planos fundo a
 fundo — poucos minutos, com o limite de requisições que o pacote já
 respeita sozinho.</p>
-<p>Uma ressalva prática: estas APIs não têm operador “está em”. A trilha
-do empenho ao documento hábil não é feita por filtro, e sim baixando a
-tabela e cruzando em R com <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">semi_join()</a></code> — que é o que o
-código acima faz. Como o teto de página é 200 linhas,
+<p>Uma ressalva prática: as tabelas usadas aqui não têm operador “está
+em” — alguns identificadores de outras tabelas aceitam uma lista
+separada por vírgula, estes não. A trilha do empenho ao documento hábil
+não é feita por filtro, e sim baixando a tabela e cruzando em R com
+<code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">semi_join()</a></code> — que é o que o código acima faz. Como o teto
+de página em <code>especiais</code> é 200 linhas,
 <code>planos_acao_especiais</code> (57.827 linhas no país) leva cerca de
 290 requisições, e vale deixar o cache ligado entre as etapas.</p>
 </div>

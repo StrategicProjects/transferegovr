@@ -45,8 +45,9 @@ tg_parametros(modulo, tabela)
 
 A tibble with one row per parameter: its name, the R type a value should
 have, the type the API declares, the permitted values when the parameter
-is enumerated, the pattern a value must match when it has one, and its
-description.
+is enumerated, the pattern a value must match when it has one, its
+description, whether it accepts several values (`multiple`), and how
+many at most (`max_values`).
 
 ## See also
 
@@ -61,19 +62,19 @@ Other discovery:
 
 ``` r
 tg_params("parcerias", "proposta")
-#> # A tibble: 45 × 6
-#>    param               r_type    api_type values    pattern          description
-#>    <chr>               <chr>     <chr>    <list>    <chr>            <chr>      
-#>  1 id_proposta         double    integer  <chr [0]> NA               Identifica…
-#>  2 id_programa         double    integer  <chr [0]> NA               Identifica…
-#>  3 cnpj_ente_recebedor character string   <chr [0]> ^[0-9]{14}       CNPJ do en…
-#>  4 nm_ente_recebedor   character string   <chr [0]> NA               Nome compl…
-#>  5 ed_cep              character string   <chr [0]> ^[0-9]{5}-[0-9]… CEP do end…
-#>  6 ed_logradouro       character string   <chr [0]> NA               Logradouro…
-#>  7 ed_numero           character string   <chr [0]> NA               Número do …
-#>  8 ed_complemento      character string   <chr [0]> NA               Complement…
-#>  9 ed_bairro           character string   <chr [0]> NA               Bairro do …
-#> 10 cd_ibge_recebedor   double    integer  <chr [0]> NA               Código IBG…
+#> # A tibble: 45 × 8
+#>    param          r_type api_type values pattern description multiple max_values
+#>    <chr>          <chr>  <chr>    <list> <chr>   <chr>       <lgl>         <int>
+#>  1 id_proposta    chara… string   <chr>  NA      Identifica… TRUE            200
+#>  2 id_programa    chara… string   <chr>  NA      Identifica… TRUE            200
+#>  3 cnpj_ente_rec… chara… string   <chr>  ^[0-9]… CNPJ do en… FALSE             1
+#>  4 nm_ente_receb… chara… string   <chr>  NA      Nome compl… FALSE             1
+#>  5 ed_cep         chara… string   <chr>  ^[0-9]… CEP do end… FALSE             1
+#>  6 ed_logradouro  chara… string   <chr>  NA      Logradouro… FALSE             1
+#>  7 ed_numero      chara… string   <chr>  NA      Número do … FALSE             1
+#>  8 ed_complemento chara… string   <chr>  NA      Complement… FALSE             1
+#>  9 ed_bairro      chara… string   <chr>  NA      Bairro do … FALSE             1
+#> 10 cd_ibge_receb… double integer  <chr>  NA      Código IBG… FALSE             1
 #> # ℹ 35 more rows
 
 # Which parameters accept only a fixed set of values?
@@ -87,4 +88,13 @@ params[lengths(params$values) > 0, c("param", "values")]
 #> 3 in_situacao_analise    <chr [4]> 
 #> 4 in_formato_etapas      <chr [3]> 
 #> 5 in_tipo_prazo_captacao <chr [2]> 
+
+# Which accept several values at once?
+params[params$multiple, c("param", "max_values")]
+#> # A tibble: 3 × 2
+#>   param                       max_values
+#>   <chr>                            <int>
+#> 1 id_proposta                        200
+#> 2 id_programa                        200
+#> 3 id_programa_unidade_gestora        200
 ```

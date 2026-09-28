@@ -66,7 +66,7 @@
 <dt id="arg-counts">counts<a class="anchor" aria-label="anchor" href="#arg-counts"></a></dt>
 <dd><p>If <code>TRUE</code>, adds a <code>rows</code> column with the number of rows each
 table currently holds. This is the only part of this function that needs a
-network connection: it makes one request per table, so <code>tg_tables(counts = TRUE)</code> with no module makes fifty-five. Responses are cached.</p></dd>
+network connection: it makes one request per table, so <code>tg_tables(counts = TRUE)</code> with no module makes seventy-four. Responses are cached.</p></dd>
 
 
 <dt id="arg-modulo">modulo<a class="anchor" aria-label="anchor" href="#arg-modulo"></a></dt>
@@ -99,39 +99,41 @@ current number of rows.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">tg_tables</span><span class="op">(</span><span class="st">"parcerias"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 15 × 6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    module    table                           path     columns params description</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> parcerias analise_proposta                analise…       7      5 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> parcerias beneficiario_emenda_parlamentar benefic…      16     14 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> parcerias cronograma_desembolso           cronogr…       7      7 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> parcerias distribuicao_recurso_proposta   distrib…       8      8 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> parcerias documento_habil                 documen…      15     15 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> parcerias empenho_parceria                empenho…      24     24 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> parcerias extrato_bancario                extrato…      13     13 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> parcerias item_proposta                   item-pr…      14     13 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> parcerias meta_proposta                   meta-pr…       6     12 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> parcerias ordem_pagamento                 ordem-p…      11     11 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> parcerias parceria                        parceria      16     20 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> parcerias parceria_conta                  parceri…      23     28 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span> parcerias programa                        programa      51     52 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">14</span> parcerias proposta                        proposta      43     45 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">15</span> parcerias proposta_resultado_indicador    propost…       6      6 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 17 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    module    table                              path  columns params description</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> parcerias analise_proposta                   anal…       7      5 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> parcerias beneficiario_emenda_parlamentar    bene…      16     14 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> parcerias cronograma_desembolso              cron…       7      7 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> parcerias distribuicao_recurso_proposta      dist…       9      9 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> parcerias documento_habil                    docu…      15     15 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> parcerias empenho_parceria                   empe…      24     24 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> parcerias extrato_bancario                   extr…      13     13 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> parcerias indicacao_beneficiario_emenda_par… indi…       5      5 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> parcerias item_proposta                      item…      14     13 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> parcerias meta_proposta                      meta…       6     13 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> parcerias opp                                opp        12     12 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> parcerias ordem_pagamento                    orde…      11     11 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span> parcerias parceria                           parc…      18     24 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">14</span> parcerias parceria_conta                     parc…      23     28 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">15</span> parcerias programa                           prog…      51     52 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">16</span> parcerias proposta                           prop…      43     45 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">17</span> parcerias proposta_resultado_indicador       prop…       6      6 Retorna um…</span>
 <span class="r-in"><span><span class="fu">tg_tables</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 55 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 74 × 6</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    module    table                              path  columns params description</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> especiais beneficiarios_especiais            bene…       5      5 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> especiais documentos_habeis_especiais        docu…      25     25 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> especiais empenhos_especiais                 empe…      24     24 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> especiais executores_especiais               exec…      17     17 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> especiais finalidade_especiais               fina…       5      5 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> especiais gestao_financeira_lancamentos_esp… gest…      34     30 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> especiais gestao_financeira_subtransacoes_e… gest…      14     12 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> especiais meta_especiais                     meta…      16     16 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> especiais ordens_pagamentos_ordens_bancaria… orde…      13     13 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> especiais orgaos_analises_pendentes_especia… orga…       4      4 Retorna um…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 45 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> especiais devolucao_especiais                devo…      22     22 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> especiais documentos_habeis_especiais        docu…      25     25 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> especiais empenhos_especiais                 empe…      24     24 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> especiais executores_especiais               exec…      17     17 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> especiais finalidade_especiais               fina…       5      5 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> especiais gestao_financeira_lancamentos_esp… gest…      34     30 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> especiais gestao_financeira_subtransacoes_e… gest…      14     12 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> especiais meta_especiais                     meta…      16     16 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> especiais ordens_pagamentos_ordens_bancaria… orde…      13     13 Retorna um…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 64 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="co"># How big is everything, largest first?</span></span></span>

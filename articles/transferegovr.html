@@ -77,26 +77,27 @@
 
     
     
-<p>TransfereGov publishes three open data APIs on
-<code>api-publica.transferegov.gestao.gov.br</code>, covering fifty-five
-tables and about 6.9 million rows between them. This vignette shows how
-to find your way around them and retrieve data without downloading more
-than you meant to.</p>
+<p>TransfereGov publishes four open data APIs on
+<code>api-publica.transferegov.gestao.gov.br</code>, covering
+seventy-four tables and about 7.5 million rows between them. This
+vignette shows how to find your way around them and retrieve data
+without downloading more than you meant to.</p>
 <p>The code here is not run when the vignette is built, because it would
 call the government’s servers.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/StrategicProjects/transferegovr" class="external-link">transferegovr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="the-three-modules">The three modules<a class="anchor" aria-label="anchor" href="#the-three-modules"></a>
+<h2 id="the-four-modules">The four modules<a class="anchor" aria-label="anchor" href="#the-four-modules"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_modules.html">tg_modules</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 3 × 4</span></span>
-<span><span class="co">#&gt;   module      label                  tables url</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;                   &lt;int&gt; &lt;chr&gt;</span></span>
-<span><span class="co">#&gt; 1 especiais   Special transfers          20 https://api-publica.transferego…</span></span>
-<span><span class="co">#&gt; 2 fundoafundo Fund-to-fund transfers     20 https://api-publica.transferego…</span></span>
-<span><span class="co">#&gt; 3 parcerias   Partnerships               15 https://api-publica.transferego…</span></span></code></pre></div>
+<span><span class="co">#&gt; # A tibble: 4 × 5</span></span>
+<span><span class="co">#&gt;   module      label                  tables max_page_size url</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;                   &lt;int&gt;         &lt;int&gt; &lt;chr&gt;</span></span>
+<span><span class="co">#&gt; 1 especiais   Special transfers          23           200 https://api-publ…</span></span>
+<span><span class="co">#&gt; 2 fundoafundo Fund-to-fund transfers     20          1000 https://api-publ…</span></span>
+<span><span class="co">#&gt; 3 parcerias   Partnerships               17           200 https://api-publ…</span></span>
+<span><span class="co">#&gt; 4 ted         Decentralized credit       14          1000 https://api-publ…</span></span></code></pre></div>
 <p><code>especiais</code> covers <strong>special transfers</strong>, the
 mechanism created by Constitutional Amendment 105/2019 that lets an
 individual parliamentary amendment send money straight to a
@@ -106,18 +107,19 @@ from a federal fund to a state or municipal one — health, social
 assistance, education. <code>parcerias</code> covers
 <strong>partnerships</strong> with civil society organizations, from the
 program that announces them through to the bank statement of the account
-they are paid from.</p>
-<p>What is <em>not</em> here: decentralized credit between federal
-bodies (<code>ted</code>), which the government has not published on
-this host, and SICONV agreement data, which is published as CSV
-downloads rather than as an API.</p>
+they are paid from. <code>ted</code> covers <strong>decentralized
+credit</strong>, the <em>termos de execução descentralizada</em> through
+which one federal body passes budget to another to carry out a program
+on its behalf.</p>
+<p>What is <em>not</em> here: SICONV agreement data, which is published
+as CSV downloads rather than as an API.</p>
 </div>
 <div class="section level2">
 <h2 id="finding-a-table">Finding a table<a class="anchor" aria-label="anchor" href="#finding-a-table"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_tables.html">tg_tables</a></span><span class="op">(</span><span class="st">"parcerias"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 15 × 6</span></span>
+<span><span class="co">#&gt; # A tibble: 17 × 6</span></span>
 <span><span class="co">#&gt;    module    table                 path                  columns params</span></span>
 <span><span class="co">#&gt;    &lt;chr&gt;     &lt;chr&gt;                 &lt;chr&gt;                   &lt;int&gt;  &lt;int&gt;</span></span>
 <span><span class="co">#&gt;  1 parcerias analise_proposta      analise-proposta            7      5</span></span>
@@ -158,12 +160,28 @@ AND:</p>
 <span>  situacao_proposta <span class="op">=</span> <span class="st">"Aprovada"</span>,</span>
 <span>  .limit <span class="op">=</span> <span class="fl">100</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>That is the entire filtering vocabulary. These services compare for
-equality and nothing else — there is no greater-than, no pattern match,
-no “is one of” — and they publish no ordering or column-selection
-parameter.</p>
-<p>To filter on several values, query each and bind:</p>
+<p>That is almost the entire filtering vocabulary. These services
+compare for equality — there is no greater-than and no pattern match —
+and they publish no ordering or column-selection parameter.</p>
+<p>The exception is on identifiers. Some parameters take several values
+in one request and match any of them. <code><a href="../reference/tg_params.html">tg_params()</a></code> marks
+them as <code>multiple</code>, with the most each accepts — 100 in
+<code>especiais</code>, 200 elsewhere:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_params.html">tg_params</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"parceria"</span><span class="op">)</span></span>
+<span><span class="va">params</span><span class="op">[</span><span class="va">params</span><span class="op">$</span><span class="va">multiple</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"param"</span>, <span class="st">"max_values"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 2</span></span>
+<span><span class="co">#&gt;   param       max_values</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;            &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 id_parceria        200</span></span>
+<span><span class="co">#&gt; 2 id_proposta        200</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"parceria"</span>, id_proposta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The OpenAPI documents do not say which parameters these are, and the
+names do not either, so the package asked the service when it froze the
+schema.</p>
+<p>For any other parameter, query each value and bind:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nordeste</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PE"</span>, <span class="st">"PB"</span>, <span class="st">"AL"</span>, <span class="st">"RN"</span>, <span class="st">"CE"</span>, <span class="st">"SE"</span>, <span class="st">"BA"</span>, <span class="st">"PI"</span>, <span class="st">"MA"</span><span class="op">)</span></span>
@@ -177,21 +195,22 @@ parameter.</p>
 </h3>
 <p>Many parameters accept only a fixed set of values, and the package
 knows which:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_params.html">tg_params</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"proposta"</span><span class="op">)</span></span>
 <span><span class="va">params</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/lengths.html" class="external-link">lengths</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">values</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"param"</span>, <span class="st">"values"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt; # A tibble: 5 × 2</span></span>
-<span><span class="co">#&gt;   param              values</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;              &lt;list&gt;</span></span>
-<span><span class="co">#&gt; 1 sg_uf_recebedor    &lt;chr [27]&gt;</span></span>
-<span><span class="co">#&gt; 2 situacao_proposta  &lt;chr [5]&gt;</span></span>
+<span><span class="co">#&gt;   param                  values</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                  &lt;list&gt;</span></span>
+<span><span class="co">#&gt; 1 sg_uf_recebedor        &lt;chr [27]&gt;</span></span>
+<span><span class="co">#&gt; 2 situacao_proposta      &lt;chr [5]&gt;</span></span>
+<span><span class="co">#&gt; 3 in_situacao_analise    &lt;chr [4]&gt;</span></span>
 <span><span class="co">#&gt; …</span></span>
 <span></span>
 <span><span class="va">params</span><span class="op">$</span><span class="va">values</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="st">"situacao_proposta"</span>, <span class="va">params</span><span class="op">$</span><span class="va">param</span><span class="op">)</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="co">#&gt; [1] "Em Análise"    "Rejeitada"     "Aprovada"      "Em Elaboração"</span></span>
 <span><span class="co">#&gt; [5] "Inativada"</span></span></code></pre></div>
 <p>A value outside the set fails before the request is made:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_count.html">tg_count</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"proposta"</span>, situacao_proposta <span class="op">=</span> <span class="st">"Aprovado"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error in `tg_count()`:</span></span>
 <span><span class="co">#&gt; ! "Aprovado" is not a permitted value for `situacao_proposta`.</span></span>
@@ -209,11 +228,11 @@ No warning, no 400 — the request succeeds and returns the unfiltered
 table. The parameter on <code>/proposta</code> is
 <code>situacao_proposta</code>; write <code>in_situacao_proposta</code>,
 which is what the sibling <code>/parceria</code> endpoint calls its own
-version, and you get every one of the 88,666 proposals instead of the
-84,258 that are approved. Nothing in the response says so.</p>
+version, and you get every one of the 89,415 proposals instead of the
+85,041 that are approved. Nothing in the response says so.</p>
 <p>So the package refuses to send a name the frozen schema does not
 know:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_count.html">tg_count</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"proposta"</span>, in_situacao_proposta <span class="op">=</span> <span class="st">"Aprovada"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error in `tg_count()`:</span></span>
 <span><span class="co">#&gt; ! Unknown filter: "in_situacao_proposta".</span></span>
@@ -236,7 +255,7 @@ quietly mean <code>"PB"</code>.</p>
 the values, so a column that happens to be entirely null on one page
 does not come back logical while the next page returns it as
 character.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">propostas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"proposta"</span>, .limit <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">propostas</span><span class="op">$</span><span class="va">dt_proposta</span><span class="op">)</span></span>
@@ -253,7 +272,7 @@ be <code>NA</code>.</p>
 </h3>
 <p>Some tables have no endpoint of their own: the API folds them into
 their parent as an array. Those arrive as list columns.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">programas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_get.html">tg_get</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"programa"</span>, .limit <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fields</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tg_fields.html">tg_fields</a></span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"programa"</span><span class="op">)</span></span>
@@ -269,7 +288,7 @@ their parent as an array. Those arrive as list columns.</p>
 <span><span class="co">#&gt; 2 sg_uf   character string   NA     NA</span></span>
 <span><span class="co">#&gt; 3 cd_ibge double    integer  NA     NA</span></span></code></pre></div>
 <p>To flatten one:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
 <span></span>
@@ -289,7 +308,7 @@ signal these APIs give — they send no <code>ETag</code>,
 <code>Cache-Control</code> or <code>Last-Modified</code> header, which
 is also why the package caches responses itself rather than relying on
 HTTP caching.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tg_updated_at.html">tg_updated_at</a></span><span class="op">(</span><span class="st">"parcerias"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "2026-08-03 UTC"</span></span></code></pre></div>
 </div>

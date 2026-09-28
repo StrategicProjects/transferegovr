@@ -28,5 +28,5 @@ Other discovery:
 
 ``` r
 tg_schema_date()
-#> [1] "2026-08-03"
+#> [1] "2026-09-28"
 ```

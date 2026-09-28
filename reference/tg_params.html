@@ -88,7 +88,8 @@ because they belong to the API.</p>
     <p>A tibble with one row per parameter: its name, the R type a value
 should have, the type the API declares, the permitted values when the
 parameter is enumerated, the pattern a value must match when it has one,
-and its description.</p>
+its description, whether it accepts several values (<code>multiple</code>), and how
+many at most (<code>max_values</code>).</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -103,19 +104,19 @@ and its description.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">tg_params</span><span class="op">(</span><span class="st">"parcerias"</span>, <span class="st">"proposta"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 45 × 6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    param               r_type    api_type values    pattern          description</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> id_proposta         double    integer  <span style="color: #949494;">&lt;chr [0]&gt;</span> <span style="color: #BB0000;">NA</span>               Identifica…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> id_programa         double    integer  <span style="color: #949494;">&lt;chr [0]&gt;</span> <span style="color: #BB0000;">NA</span>               Identifica…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> cnpj_ente_recebedor character string   <span style="color: #949494;">&lt;chr [0]&gt;</span> ^[0-9]{14}       CNPJ do en…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> nm_ente_recebedor   character string   <span style="color: #949494;">&lt;chr [0]&gt;</span> <span style="color: #BB0000;">NA</span>               Nome compl…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> ed_cep              character string   <span style="color: #949494;">&lt;chr [0]&gt;</span> ^[0-9]{5}-[0-9]… CEP do end…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> ed_logradouro       character string   <span style="color: #949494;">&lt;chr [0]&gt;</span> <span style="color: #BB0000;">NA</span>               Logradouro…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> ed_numero           character string   <span style="color: #949494;">&lt;chr [0]&gt;</span> <span style="color: #BB0000;">NA</span>               Número do …</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> ed_complemento      character string   <span style="color: #949494;">&lt;chr [0]&gt;</span> <span style="color: #BB0000;">NA</span>               Complement…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> ed_bairro           character string   <span style="color: #949494;">&lt;chr [0]&gt;</span> <span style="color: #BB0000;">NA</span>               Bairro do …</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> cd_ibge_recebedor   double    integer  <span style="color: #949494;">&lt;chr [0]&gt;</span> <span style="color: #BB0000;">NA</span>               Código IBG…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 45 × 8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    param          r_type api_type values pattern description multiple max_values</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> id_proposta    chara… string   <span style="color: #949494;">&lt;chr&gt;</span>  <span style="color: #BB0000;">NA</span>      Identifica… TRUE            200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> id_programa    chara… string   <span style="color: #949494;">&lt;chr&gt;</span>  <span style="color: #BB0000;">NA</span>      Identifica… TRUE            200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> cnpj_ente_rec… chara… string   <span style="color: #949494;">&lt;chr&gt;</span>  ^[0-9]… CNPJ do en… FALSE             1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> nm_ente_receb… chara… string   <span style="color: #949494;">&lt;chr&gt;</span>  <span style="color: #BB0000;">NA</span>      Nome compl… FALSE             1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> ed_cep         chara… string   <span style="color: #949494;">&lt;chr&gt;</span>  ^[0-9]… CEP do end… FALSE             1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> ed_logradouro  chara… string   <span style="color: #949494;">&lt;chr&gt;</span>  <span style="color: #BB0000;">NA</span>      Logradouro… FALSE             1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> ed_numero      chara… string   <span style="color: #949494;">&lt;chr&gt;</span>  <span style="color: #BB0000;">NA</span>      Número do … FALSE             1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> ed_complemento chara… string   <span style="color: #949494;">&lt;chr&gt;</span>  <span style="color: #BB0000;">NA</span>      Complement… FALSE             1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> ed_bairro      chara… string   <span style="color: #949494;">&lt;chr&gt;</span>  <span style="color: #BB0000;">NA</span>      Bairro do … FALSE             1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> cd_ibge_receb… double integer  <span style="color: #949494;">&lt;chr&gt;</span>  <span style="color: #BB0000;">NA</span>      Código IBG… FALSE             1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 35 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Which parameters accept only a fixed set of values?</span></span></span>
@@ -129,6 +130,15 @@ and its description.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> in_situacao_analise    <span style="color: #949494;">&lt;chr [4]&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> in_formato_etapas      <span style="color: #949494;">&lt;chr [3]&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> in_tipo_prazo_captacao <span style="color: #949494;">&lt;chr [2]&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Which accept several values at once?</span></span></span>
+<span class="r-in"><span><span class="va">params</span><span class="op">[</span><span class="va">params</span><span class="op">$</span><span class="va">multiple</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"param"</span>, <span class="st">"max_values"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   param                       max_values</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> id_proposta                        200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> id_programa                        200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> id_programa_unidade_gestora        200</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

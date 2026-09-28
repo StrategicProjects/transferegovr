@@ -11,32 +11,33 @@ library(transferegovr)
 
 ## Measure first
 
-The fifty-five tables hold about 6.9 million rows between them, spread
-very unevenly — from 15 rows in `especiais/programas_especiais` to
-1,121,046 in `fundoafundo/gestao_financeira_lancamentos`.
+The seventy-four tables hold about 7.5 million rows between them, spread
+very unevenly — from none at all in
+`especiais/orgaos_analises_pendentes_especiais` to 1,362,980 in
+`parcerias/extrato_bancario`.
 
 ``` r
 
 sizes <- tg_tables(counts = TRUE)
 sizes[order(-sizes$rows), c("module", "table", "columns", "rows")]
-#> # A tibble: 55 × 4
+#> # A tibble: 74 × 4
 #>    module      table                                   columns    rows
 #>    <chr>       <chr>                                     <int>   <dbl>
-#>  1 fundoafundo gestao_financeira_lancamentos                28 1121046
-#>  2 parcerias   extrato_bancario                             13 1108219
-#>  3 especiais   gestao_financeira_lancamentos_especiais      34  719363
-#>  4 especiais   planos_trabalho_historico                     5  460182
-#>  5 parcerias   item_proposta                                14  425405
+#>  1 parcerias   extrato_bancario                             13 1362980
+#>  2 fundoafundo gestao_financeira_lancamentos                28 1160094
+#>  3 especiais   gestao_financeira_lancamentos_especiais      34  735012
+#>  4 especiais   planos_trabalho_historico                     5  461164
+#>  5 parcerias   item_proposta                                14  428078
 #>  …
 ```
 
-That call makes fifty-five requests, and caches them. For a single
+That call makes seventy-four requests, and caches them. For a single
 table:
 
 ``` r
 
 tg_count("fundoafundo", "gestao_financeira_lancamentos")
-#> [1] 1121046
+#> [1] 1160094
 ```
 
 [`tg_count()`](https://strategicprojects.github.io/transferegovr/reference/tg_count.md)
@@ -47,16 +48,19 @@ so you can size the thing you actually want rather than the whole table:
 ``` r
 
 tg_count("parcerias", "proposta")
-#> [1] 88666
+#> [1] 89415
 tg_count("parcerias", "proposta", sg_uf_recebedor = "PE")
-#> [1] 3241
+#> [1] 3258
 ```
 
 ## What a page costs
 
-The services cap a page at **200 rows**. Unlike some APIs, they do not
-silently truncate a larger request — asking for 201 is a `422`, and the
-package refuses it before sending:
+Each module caps a page at its own size: **200 rows** in `especiais` and
+`parcerias`, **1000** in `fundoafundo` and `ted`.
+[`tg_modules()`](https://strategicprojects.github.io/transferegovr/reference/tg_modules.md)
+reports it, and `.page_size` defaults to it. Unlike some APIs, these do
+not silently truncate a larger request — one row over the cap is a
+`422`, and the package refuses it before sending:
 
 ``` r
 
@@ -65,15 +69,18 @@ tg_get("parcerias", "proposta", .page_size = 201)
 #> ! `.page_size` must be a whole number between 1 and 200.
 ```
 
-So the arithmetic is simple and worth doing. A million-row table is
-`ceiling(1121046 / 200)` = **5,606 requests**. At the default throttle
-of sixty a minute, that is over an hour and a half.
+So the arithmetic is simple and worth doing, and the cap matters as much
+as the size. The largest table, `parcerias/extrato_bancario`, is
+`ceiling(1362980 / 200)` = **6,815 requests** — at the default throttle
+of sixty a minute, nearly two hours. The second largest is barely
+smaller but lives in a module that serves pages of 1000, so it takes
+1,161 requests, about twenty minutes.
 
 ``` r
 
-rows <- tg_count("fundoafundo", "gestao_financeira_lancamentos")
+rows <- tg_count("parcerias", "extrato_bancario")
 ceiling(rows / 200)
-#> [1] 5606
+#> [1] 6815
 ```
 
 If you genuinely need a table that size, consider whether a filter
@@ -126,7 +133,7 @@ tg_metadata(metas)
 #> $table
 #> [1] "meta_especiais"
 #> $total_rows
-#> [1] 156060
+#> [1] 156193
 #> $rows_returned
 #> [1] 450
 #> $pages
@@ -213,7 +220,7 @@ to decide when a cached copy is stale:
 ``` r
 
 tg_updated_at("fundoafundo")
-#> [1] "2026-08-03 UTC"
+#> [1] "2026-09-28 06:02:02 UTC"
 ```
 
 ## A pattern for very large tables

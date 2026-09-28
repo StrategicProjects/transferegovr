@@ -2,7 +2,7 @@
 
 ## Queries
 
-Retrieving rows from the three TransfereGov API modules.
+Retrieving rows from the four TransfereGov API modules.
 
 - [`tg_get()`](https://strategicprojects.github.io/transferegovr/reference/tg_get.md)
   [`tg_obter()`](https://strategicprojects.github.io/transferegovr/reference/tg_get.md)
@@ -13,6 +13,7 @@ Retrieving rows from the three TransfereGov API modules.
 - [`tg_parcerias()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
   [`tg_fundo_a_fundo()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
   [`tg_especiais()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
+  [`tg_ted()`](https://strategicprojects.github.io/transferegovr/reference/module_shortcuts.md)
   : Query a single module
 - [`tg_metadata()`](https://strategicprojects.github.io/transferegovr/reference/tg_metadata.md)
   [`tg_metadados()`](https://strategicprojects.github.io/transferegovr/reference/tg_metadata.md)

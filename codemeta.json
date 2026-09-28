@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/StrategicProjects/transferegovr",
   "issueTracker": "https://github.com/StrategicProjects/transferegovr/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.2.0",
+  "version": "0.2.0.9000",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -254,7 +254,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "254.884KB",
+  "fileSize": "255.813KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -293,7 +293,7 @@
       ],
       "name": "transferegovr: Access the TransfereGov Open Data APIs",
       "url": "https://github.com/StrategicProjects/transferegovr",
-      "description": "R package version 0.2.0"
+      "description": "R package version 0.2.0.9000"
     }
   ],
   "releaseNotes": "https://github.com/StrategicProjects/transferegovr/blob/main/NEWS.md",

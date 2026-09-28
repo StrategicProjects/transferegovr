@@ -1,0 +1,303 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "transferegovr",
+  "description": "Provides a modern interface to the open data application programming interfaces of the Brazilian federal government's 'TransfereGov' platform (<https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos>). Covers the special transfers, fund-to-fund transfers, partnership management, and decentralized credit ('TED') modules, which together publish seventy-four tables on action plans, programs, proposals, partnerships, budget commitments, credit notes, financial execution, management reports, and payment orders. Filters are the services' own typed query parameters, validated against the published schema before a request is made, and results are returned as tidy tibbles with types taken from that schema. Automatic pagination, request throttling, retries with exponential backoff, and an optional response cache are included.",
+  "name": "transferegovr: Access the 'TransfereGov' Open Data APIs",
+  "relatedLink": "https://strategicprojects.github.io/transferegovr/",
+  "codeRepository": "https://github.com/StrategicProjects/transferegovr",
+  "issueTracker": "https://github.com/StrategicProjects/transferegovr/issues",
+  "license": "https://spdx.org/licenses/MIT",
+  "version": "0.2.0",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "R",
+    "url": "https://r-project.org"
+  },
+  "runtimePlatform": "R version 4.6.0 (2026-04-24)",
+  "provider": {
+    "@id": "https://cran.r-project.org",
+    "@type": "Organization",
+    "name": "Comprehensive R Archive Network (CRAN)",
+    "url": "https://cran.r-project.org"
+  },
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Andre",
+      "familyName": "Leite",
+      "email": "leite@castlab.org",
+      "@id": "https://orcid.org/0000-0002-4718-9766"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Marcos",
+      "familyName": "Wasiliew",
+      "email": "marcos.wasiliew@sepe.pe.gov.br"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Hugo",
+      "familyName": "Vasconcelos",
+      "email": "hugo.vasconcelos@ufpe.br",
+      "@id": "https://orcid.org/0000-0001-6249-0920"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Carlos",
+      "familyName": "Amorim",
+      "email": "carlos.agaf@ufpe.br",
+      "@id": "https://orcid.org/0000-0001-6315-8305"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Diogo",
+      "familyName": "Bezerra",
+      "email": "diogo.bezerra@ufpe.br",
+      "@id": "https://orcid.org/0000-0002-1216-8674"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Júlia",
+      "familyName": "Nascimento Barreto",
+      "email": "juliabarreto@gd.seplag.pe.gov.br"
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Andre",
+      "familyName": "Leite",
+      "email": "leite@castlab.org",
+      "@id": "https://orcid.org/0000-0002-4718-9766"
+    }
+  ],
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "covr",
+      "name": "covr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=covr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "dplyr",
+      "name": "dplyr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=dplyr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "jsonlite",
+      "name": "jsonlite",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=jsonlite"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "knitr",
+      "name": "knitr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=knitr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "rmarkdown",
+      "name": "rmarkdown",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rmarkdown"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "testthat",
+      "name": "testthat",
+      "version": ">= 3.2.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=testthat"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "tidyr",
+      "name": "tidyr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=tidyr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "withr",
+      "name": "withr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=withr"
+    }
+  ],
+  "softwareRequirements": {
+    "1": {
+      "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 4.1.0"
+    },
+    "2": {
+      "@type": "SoftwareApplication",
+      "identifier": "cli",
+      "name": "cli",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=cli"
+    },
+    "3": {
+      "@type": "SoftwareApplication",
+      "identifier": "httr2",
+      "name": "httr2",
+      "version": ">= 1.0.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=httr2"
+    },
+    "4": {
+      "@type": "SoftwareApplication",
+      "identifier": "purrr",
+      "name": "purrr",
+      "version": ">= 1.0.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=purrr"
+    },
+    "5": {
+      "@type": "SoftwareApplication",
+      "identifier": "rlang",
+      "name": "rlang",
+      "version": ">= 1.1.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rlang"
+    },
+    "6": {
+      "@type": "SoftwareApplication",
+      "identifier": "stats",
+      "name": "stats"
+    },
+    "7": {
+      "@type": "SoftwareApplication",
+      "identifier": "tibble",
+      "name": "tibble",
+      "version": ">= 3.2.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=tibble"
+    },
+    "8": {
+      "@type": "SoftwareApplication",
+      "identifier": "utils",
+      "name": "utils"
+    },
+    "SystemRequirements": null
+  },
+  "fileSize": "254.884KB",
+  "citation": [
+    {
+      "@type": "SoftwareSourceCode",
+      "datePublished": "2026",
+      "author": [
+        {
+          "@type": "Person",
+          "givenName": "Andre",
+          "familyName": "Leite"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Marcos",
+          "familyName": "Wasiliew"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Hugo",
+          "familyName": "Vasconcelos"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Carlos",
+          "familyName": "Amorim"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Diogo",
+          "familyName": "Bezerra"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Júlia",
+          "familyName": "Nascimento Barreto"
+        }
+      ],
+      "name": "transferegovr: Access the TransfereGov Open Data APIs",
+      "url": "https://github.com/StrategicProjects/transferegovr",
+      "description": "R package version 0.2.0"
+    }
+  ],
+  "releaseNotes": "https://github.com/StrategicProjects/transferegovr/blob/main/NEWS.md",
+  "readme": "https://github.com/StrategicProjects/transferegovr/blob/main/README.md",
+  "contIntegration": ["https://github.com/StrategicProjects/transferegovr/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/StrategicProjects/transferegovr"],
+  "developmentStatus": ["https://www.repostatus.org/#active", "https://lifecycle.r-lib.org/articles/stages.html#experimental"]
+}

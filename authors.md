@@ -19,7 +19,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/StrategicProjects/transferegovr/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/StrategicProjects/transferegovr/blob/v0.2.0/inst/CITATION)
 
 Leite A, Wasiliew M, Vasconcelos H, Amorim C, Bezerra D, Nascimento
 Barreto J (2026). *transferegovr: Access the TransfereGov Open Data

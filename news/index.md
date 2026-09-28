@@ -2,6 +2,8 @@
 
 ## transferegovr 0.2.0
 
+CRAN release: 2026-09-28
+
 The package now targets the public API host,
 `api-publica.transferegov.gestao.gov.br`. That host serves a different
 kind of service from the ‘PostgREST’ one the package was built against,

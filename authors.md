@@ -24,13 +24,13 @@ Source:
 
 Leite A, Wasiliew M, Vasconcelos H, Amorim C, Bezerra D, Nascimento
 Barreto J (2026). *transferegovr: Access the TransfereGov Open Data
-APIs*. R package version 0.2.0.9000,
+APIs*. R package version 0.3.0,
 <https://github.com/StrategicProjects/transferegovr>.
 
     @Manual{,
       title = {transferegovr: Access the TransfereGov Open Data APIs},
       author = {André Leite and Marcos Wasiliew and Hugo Vasconcelos and Carlos Amorim and Diogo Bezerra and Júlia {Nascimento Barreto}},
       year = {2026},
-      note = {R package version 0.2.0.9000},
+      note = {R package version 0.3.0},
       url = {https://github.com/StrategicProjects/transferegovr},
     }

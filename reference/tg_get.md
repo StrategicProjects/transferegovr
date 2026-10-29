@@ -1,7 +1,7 @@
 # Retrieve rows from a TransfereGov table
 
-Queries one of the seventy-four tables published by the TransfereGov
-open data APIs and returns them as a tibble, with columns typed from the
+Queries one of the eighty-six tables published by the TransfereGov open
+data APIs and returns them as a tibble, with columns typed from the
 API's own schema.
 
 ## Usage
@@ -38,8 +38,8 @@ tg_obter(
 
   A module name from
   [`tg_modules()`](https://strategicprojects.github.io/transferegovr/reference/tg_modules.md):
-  `"especiais"`, `"fundoafundo"`, `"parcerias"` or `"ted"`. Aliases such
-  as `"fundo_a_fundo"` are accepted.
+  `"discricionarias"`, `"especiais"`, `"fundoafundo"`, `"parcerias"` or
+  `"ted"`. Aliases such as `"fundo_a_fundo"` are accepted.
 
 - table:
 
@@ -122,10 +122,11 @@ plausible, wrong data.
 ## Pagination
 
 Each request returns one page of at most the module's page limit — 200
-rows for `especiais` and `parcerias`, 1000 for `fundoafundo` and `ted` —
-so a larger `.limit` is met by fetching successive pages. `.limit`
-counts rows, not pages; use `Inf` for every matching row. Several tables
-hold hundreds of thousands of rows, so check the size with
+rows for `discricionarias`, `especiais` and `parcerias`, 1000 for
+`fundoafundo` and `ted` — so a larger `.limit` is met by fetching
+successive pages. `.limit` counts rows, not pages; use `Inf` for every
+matching row. Several tables hold hundreds of thousands of rows, so
+check the size with
 [`tg_count()`](https://strategicprojects.github.io/transferegovr/reference/tg_count.md)
 first.
 

@@ -24,7 +24,9 @@
 library(httr2)
 
 base_url <- "https://api-publica.transferegov.gestao.gov.br"
-modules <- c("especiais", "fundoafundo", "parcerias", "ted")
+modules <- c(
+  "discricionarias", "especiais", "fundoafundo", "parcerias", "ted"
+)
 
 # Parameters the client owns. They are stripped from the frozen parameter list
 # so that a caller cannot set them as if they were filters and desynchronise
@@ -214,16 +216,24 @@ build_params <- function(parameters) {
 
 # Some parameters take a comma-separated list and match any of its values -- an
 # "is one of" -- and the rest take a single value. The OpenAPI documents do not
-# say which: both are declared as a plain string. Nor does the name: 113
-# parameters take a list, two of them not named `id_*`, while several `id_*`
-# strings do not. So it is asked of the service, which is how every other
-# behaviour frozen here was established.
+# say which: both are declared as a plain string. Nor does the name: 141
+# parameters take a list, several of them not named `id_*`, while several
+# `id_*` strings do not. So it is asked of the service, which is how every
+# other behaviour frozen here was established.
 #
 # A list-taking parameter rejects a non-integer with a 400 whose message says
 # it wants "números inteiros separados por vírgula"; any other parameter treats
-# "x" as an ordinary value. And sent more values than it allows, it answers
-# with the limit -- 100 in `especiais`, 200 elsewhere, so that is read per
-# parameter too. About 700 requests, a few minutes.
+# "x" as an ordinary value, and a parameter typed integer or number is
+# validated by FastAPI itself (422), so it is never a candidate. Sent more
+# values than it allows, a list parameter answers with the limit -- 100 in
+# `especiais`, 200 elsewhere, so that is read per parameter too.
+#
+# `discricionarias` complicates both halves. Its `/propostas` and
+# `/propostas-canceladas` crash on a non-integer -- a bare 500 "Erro Interno
+# Inesperado" -- instead of answering the 400, and past the value limit they
+# answer the same 500 with no limit in it. So there a 500 is confirmed as
+# "takes a list" by sending one, and the limit is read from the status by
+# bisection. Over a thousand requests in all, a few minutes.
 list_marker <- "separados por v"
 limit_pattern <- "m\u00e1ximo de valores poss\u00edveis.* \u00e9 ([0-9]+)"
 
@@ -252,32 +262,91 @@ probe_lists <- function(module, path, params) {
   )
 
   for (i in candidates) {
-    response <- probe(
-      module, path, stats::setNames(list("x"), params$param[[i]])
-    )
-    body <- resp_body_string(response)
-    if (resp_status(response) != 400L || !grepl(list_marker, body)) {
+    name <- params$param[[i]]
+    response <- probe(module, path, stats::setNames(list("x"), name))
+    status <- resp_status(response)
+
+    takes_list <- status == 400L &&
+      grepl(list_marker, resp_body_string(response))
+
+    if (!takes_list && status == 500L) {
+      # A 500 alone does not say "list": it says the endpoint crashed instead
+      # of validating. Only a two-value list coming back 200 does. When even
+      # that fails, a single value tells the rest apart: accepted, this is an
+      # ordinary one-value parameter that crashes on a non-number instead of
+      # rejecting it; refused as well, the filter is broken upstream for every
+      # value, and it is frozen as single-valued so the client at least names
+      # the parameter when the 500 comes back.
+      confirmation <- probe(module, path, stats::setNames(list("1,2"), name))
+      if (resp_status(confirmation) == 200L) {
+        takes_list <- TRUE
+      } else {
+        single <- probe(module, path, stats::setNames(list("1"), name))
+        if (resp_status(single) != 200L) {
+          message("  ", module, "/", path, " ", name,
+                  ": a 500 for every value probed")
+        }
+      }
+    }
+
+    if (!takes_list) {
       next
     }
 
-    too_many <- paste(seq_len(1001), collapse = ",")
-    response <- probe(
-      module, path, stats::setNames(list(too_many), params$param[[i]])
-    )
+    params$multiple[[i]] <- TRUE
+    params$max_values[[i]] <- probe_limit(module, path, name)
+  }
+
+  params
+}
+
+# How many values one list parameter accepts. Most endpoints name the limit in
+# a 400; the ones that answer a bare 500 get it read from the status instead,
+# with the limit every other parameter has reported tried first so that the
+# bisection only runs when an endpoint deviates.
+probe_limit <- function(module, path, name) {
+  accepts <- function(n) {
+    values <- paste(seq_len(n), collapse = ",")
+    response <- probe(module, path, stats::setNames(list(values), name))
+    status <- resp_status(response)
+
+    if (status == 200L) {
+      return(TRUE)
+    }
     limit <- regmatches(
       resp_body_string(response),
       regexec(limit_pattern, resp_body_string(response))
     )[[1]]
-    if (length(limit) != 2L) {
-      stop(module, "/", path, " ", params$param[[i]],
-           " takes a list but did not report its limit", call. = FALSE)
+    if (length(limit) == 2L) {
+      return(as.integer(limit[[2]]))
     }
-
-    params$multiple[[i]] <- TRUE
-    params$max_values[[i]] <- as.integer(limit[[2]])
+    FALSE
   }
 
-  params
+  first <- accepts(1001L)
+  if (is.integer(first)) {
+    return(first)
+  }
+  if (isTRUE(first)) {
+    stop(module, "/", path, " ", name,
+         " accepted 1001 values; it has no limit to freeze", call. = FALSE)
+  }
+
+  if (isTRUE(accepts(200L)) && isFALSE(accepts(201L))) {
+    return(200L)
+  }
+
+  lower <- 1L # a single value always works
+  upper <- 1001L # just shown to fail
+  while (upper - lower > 1L) {
+    middle <- as.integer((lower + upper) %/% 2L)
+    outcome <- accepts(middle)
+    if (is.integer(outcome)) {
+      return(outcome)
+    }
+    if (isTRUE(outcome)) lower <- middle else upper <- middle
+  }
+  lower
 }
 
 # Modules ---------------------------------------------------------------------
@@ -316,7 +385,7 @@ build_module <- function(module) {
     # These documents describe the query parameters but leave every response
     # column undescribed. Nearly every column is also filterable under its own
     # name, so the parameter's description is the column's description from the
-    # same document, and carrying it across covers 767 of the 811 columns.
+    # same document, and carrying it across covers 1,241 of the 1,300 columns.
     # The rest are the nested list columns and a handful that cannot be
     # filtered; they stay NA rather than being guessed at.
     described <- match(fields$field, params$param)
@@ -389,6 +458,7 @@ names(.tg_schema) <- modules
 
 # Human-facing module labels and the aliases `.tg_match_module()` accepts.
 .tg_module_labels <- c(
+  discricionarias = "Discretionary and legal transfers",
   especiais = "Special transfers",
   fundoafundo = "Fund-to-fund transfers",
   parcerias = "Partnerships",
@@ -396,6 +466,13 @@ names(.tg_schema) <- modules
 )
 
 .tg_module_aliases <- c(
+  discricionarias_e_legais = "discricionarias",
+  transferencias_discricionarias = "discricionarias",
+  discretionary = "discricionarias",
+  discretionary_and_legal = "discricionarias",
+  # The system these transfers lived in before Transferegov absorbed it; its
+  # CSV dumps are published under this name to this day.
+  siconv = "discricionarias",
   transferenciasespeciais = "especiais",
   transferencias_especiais = "especiais",
   especial = "especiais",
@@ -445,8 +522,8 @@ message("parameters taking a list: ", sum(lists), " (",
         paste(names(lists), lists, sep = " ", collapse = ", "), ")")
 
 stopifnot(
-  length(.tg_schema) == 4L,
-  sum(counts) == 74L,
+  length(.tg_schema) == 5L,
+  sum(counts) == 86L,
   all(vapply(
     .tg_schema,
     function(m) {

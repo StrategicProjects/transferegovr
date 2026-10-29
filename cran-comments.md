@@ -13,21 +13,17 @@ There are none.
 
 ## About this version
 
-Version 0.1.0, published on 2026-08-08, covers the TransfereGov 'PostgREST'
-services at `api.transferegov.gestao.gov.br`. The government has announced
-the retirement of those services, and publishes their replacement at
-`api-publica.transferegov.gestao.gov.br`: a different contract, with
-page-number pagination, typed query parameters instead of operators, and a
-module ('parcerias') that the first host does not serve at all.
-
-Version 0.2.0 moves the package to the replacement services. It is a rewrite
-rather than an addition, and it breaks code written against 0.1.0; `NEWS.md`
-lists every change. It follows 0.1.0 more closely than usual because the
-services 0.1.0 depends on are being withdrawn.
+Version 0.3.0 covers a fifth module, 'discricionarias' (discretionary and
+legal transfers), which the government published on the API host in October
+2026 — twelve new tables, bringing the package from seventy-four to
+eighty-six. It is additive: nothing in the 0.2.0 interface changes, and the
+four modules already covered are frozen byte-for-byte identically. It follows
+0.2.0 within a month because the upstream published the new module; `NEWS.md`
+has the details.
 
 ## Test environments
 
-* macOS 15 (local), R 4.6.0
+* macOS 26 (local), R 4.6.0
 * GitHub Actions: ubuntu-latest (R-devel, R-release, R-oldrel-1, R 4.1),
   macOS-latest (R-release), windows-latest (R-release)
 

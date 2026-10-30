@@ -2,13 +2,13 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "transferegovr",
-  "description": "Provides a modern interface to the open data application programming interfaces of the Brazilian federal government's 'TransfereGov' platform (<https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos>). Covers the special transfers, fund-to-fund transfers, partnership management, and decentralized credit ('TED') modules, which together publish seventy-four tables on action plans, programs, proposals, partnerships, budget commitments, credit notes, financial execution, management reports, and payment orders. Filters are the services' own typed query parameters, validated against the published schema before a request is made, and results are returned as tidy tibbles with types taken from that schema. Automatic pagination, request throttling, retries with exponential backoff, and an optional response cache are included.",
+  "description": "Provides a modern interface to the open data application programming interfaces of the Brazilian federal government's 'TransfereGov' platform (<https://www.gov.br/transferegov/pt-br/ferramentas-gestao/dados-abertos>). Covers the discretionary and legal transfers, special transfers, fund-to-fund transfers, partnership management, and decentralized credit ('TED') modules, which together publish eighty-six tables on action plans, programs, proposals, partnerships, budget commitments, credit notes, financial execution, management reports, and payment orders. Filters are the services' own typed query parameters, validated against the published schema before a request is made, and results are returned as tidy tibbles with types taken from that schema. Automatic pagination, request throttling, retries with exponential backoff, and an optional response cache are included.",
   "name": "transferegovr: Access the 'TransfereGov' Open Data APIs",
   "relatedLink": "https://strategicprojects.github.io/transferegovr/",
   "codeRepository": "https://github.com/StrategicProjects/transferegovr",
   "issueTracker": "https://github.com/StrategicProjects/transferegovr/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.2.0.9000",
+  "version": "0.3.0.9000",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -33,7 +33,8 @@
       "@type": "Person",
       "givenName": "Marcos",
       "familyName": "Wasiliew",
-      "email": "marcos.wasiliew@gmail.com"
+      "email": "marcos.wasiliew@gmail.com",
+      "@id": "https://orcid.org/0009-0004-4694-3159"
     },
     {
       "@type": "Person",
@@ -60,7 +61,8 @@
       "@type": "Person",
       "givenName": "Júlia",
       "familyName": "Nascimento Barreto",
-      "email": "juliabarreto@gd.seplag.pe.gov.br"
+      "email": "juliabarreto@gd.seplag.pe.gov.br",
+      "@id": "https://orcid.org/0009-0004-2851-7770"
     }
   ],
   "maintainer": [
@@ -254,7 +256,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "255.813KB",
+  "fileSize": "275.805KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -293,7 +295,7 @@
       ],
       "name": "transferegovr: Access the TransfereGov Open Data APIs",
       "url": "https://github.com/StrategicProjects/transferegovr",
-      "description": "R package version 0.2.0.9000"
+      "description": "R package version 0.3.0.9000"
     }
   ],
   "releaseNotes": "https://github.com/StrategicProjects/transferegovr/blob/main/NEWS.md",
